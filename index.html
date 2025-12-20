@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PrepMaster v3.0 - Final Release</title>
+    <title>PrepMaster v3.1 - Day Manager</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -16,12 +16,11 @@
                         primary: '#4F46E5', // Indigo 600
                         secondary: '#10B981', // Emerald 500
                         accent: '#F59E0B', // Amber 500
-                        partial: '#3B82F6', // Blue 500 (For In-Progress)
+                        partial: '#3B82F6', // Blue 500
                         dark: '#111827',
                         light: '#F9FAFB'
                     },
                     animation: {
-                        'slide-up': 'slideUp 0.3s ease-out forwards',
                         'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite'
                     }
                 }
@@ -51,7 +50,7 @@
         <div class="flex items-center gap-3 md:gap-4">
             <div class="flex items-center gap-2">
                 <i class="fas fa-layer-group text-primary text-2xl"></i>
-                <h1 class="text-lg md:text-xl font-bold tracking-tight">Prep<span class="text-primary">Master</span> <span class="text-[10px] bg-indigo-100 dark:bg-indigo-900 text-primary px-1.5 py-0.5 rounded align-top">v3.0</span></h1>
+                <h1 class="text-lg md:text-xl font-bold tracking-tight">Prep<span class="text-primary">Master</span> <span class="text-[10px] bg-indigo-100 dark:bg-indigo-900 text-primary px-1.5 py-0.5 rounded align-top">v3.1</span></h1>
             </div>
             <div class="hidden md:flex flex-col border-l pl-4 border-gray-300 dark:border-gray-600">
                 <span class="text-[10px] uppercase tracking-wider text-gray-500 dark:text-gray-400">Target</span>
@@ -67,8 +66,9 @@
                 <div class="text-xs font-bold text-secondary" id="streakDisplay">🔥 0 Day Streak</div>
                 <div class="text-[10px] text-gray-400" id="currentDateDisplay"></div>
             </div>
-            <button onclick="app.openSettings()" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-gray-500 dark:text-gray-400">
+            <button onclick="app.openSettings()" class="relative p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-gray-500 dark:text-gray-400">
                 <i class="fas fa-cog"></i>
+                <span id="backupWarningDot" class="hidden absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white dark:border-gray-800"></span>
             </button>
             <button onclick="app.toggleTheme()" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-gray-500 dark:text-yellow-400">
                 <i class="fas fa-moon dark:hidden"></i>
@@ -109,9 +109,10 @@
             </div>
         </aside>
 
-        <main id="mainContent" class="flex-1 overflow-y-auto p-4 md:p-8 bg-gray-50 dark:bg-gray-900 pb-32"> <div id="view-dashboard" class="view-section space-y-6 max-w-6xl mx-auto">
+        <main id="mainContent" class="flex-1 overflow-y-auto p-4 md:p-8 bg-gray-50 dark:bg-gray-900 pb-32">
+            
+            <div id="view-dashboard" class="view-section space-y-6 max-w-6xl mx-auto">
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    
                     <div class="lg:col-span-2 space-y-4">
                         <div class="flex justify-between items-center">
                             <div>
@@ -122,18 +123,14 @@
                                 <i class="fas fa-plus"></i> <span class="hidden sm:inline">Add Task</span>
                             </button>
                         </div>
-                        
-                        <div id="todayTaskList" class="space-y-3 min-h-[200px]">
-                            </div>
+                        <div id="todayTaskList" class="space-y-3 min-h-[200px]"></div>
                     </div>
-
                     <div class="space-y-6">
                         <div class="bg-white dark:bg-gray-800 p-5 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
                             <h3 class="text-lg font-bold mb-3 flex items-center gap-2">
                                 <i class="fas fa-inbox text-gray-400"></i> Backlog
                             </h3>
-                            <div id="dashboardBacklogList" class="space-y-2 max-h-[70vh] overflow-y-auto pr-1">
-                                </div>
+                            <div id="dashboardBacklogList" class="space-y-2 max-h-[70vh] overflow-y-auto pr-1"></div>
                         </div>
                     </div>
                 </div>
@@ -148,15 +145,12 @@
                         <button onclick="app.changeMonth(1)" class="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded text-gray-500"><i class="fas fa-chevron-right"></i></button>
                     </div>
                 </div>
-
                 <div class="flex flex-wrap gap-4 text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">
                     <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-white border border-gray-300"></span> Study (1-6)</div>
                     <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-yellow-100 border border-yellow-400"></span> Buffer/Rev (7,14,21,28)</div>
                     <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-purple-100 border border-purple-400"></span> Mock/End (29-31)</div>
                 </div>
-
-                <div id="calendarGrid" class="calendar-grid select-none">
-                    </div>
+                <div id="calendarGrid" class="calendar-grid select-none"></div>
             </div>
 
             <div id="view-subjects" class="view-section hidden max-w-5xl mx-auto">
@@ -169,13 +163,11 @@
                         <i class="fas fa-plus"></i> New Subject
                     </button>
                 </div>
-                <div id="subjectsList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                    </div>
+                <div id="subjectsList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"></div>
             </div>
 
             <div id="view-analytics" class="view-section hidden space-y-6 max-w-5xl mx-auto">
                 <h2 class="text-2xl font-bold mb-4">Performance Analytics</h2>
-                
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 text-center">
                         <h3 class="text-gray-400 text-xs uppercase font-bold tracking-wider">Total Study Time</h3>
@@ -190,11 +182,9 @@
                         <div class="text-4xl font-bold text-secondary mt-2" id="analyticsCompletion">0%</div>
                     </div>
                 </div>
-
                 <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
                     <h3 class="text-lg font-bold mb-6">Subject Distribution (Hours)</h3>
-                    <div id="analyticsSubjectBars" class="space-y-5">
-                        </div>
+                    <div id="analyticsSubjectBars" class="space-y-5"></div>
                 </div>
             </div>
 
@@ -239,65 +229,70 @@
                         <input type="file" id="importFile" class="hidden" accept=".json" onchange="app.importData(this)">
                     </div>
                 </div>
-                <div class="text-xs text-center text-gray-400">
-                    PrepMaster v3.0 • LocalStorage Only
+                <div class="text-xs text-center text-gray-400" id="lastBackupDisplay">
+                    PrepMaster v3.1 • LocalStorage Only
                 </div>
             </div>
         </div>
     </div>
 
     <div id="taskModal" class="modal fixed inset-0 z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-md overflow-hidden transform transition-all scale-100 max-h-[90vh] overflow-y-auto">
-            <div class="bg-gray-50 dark:bg-gray-700 px-6 py-4 border-b border-gray-200 dark:border-gray-600 flex justify-between items-center">
-                <h3 class="text-lg font-bold" id="taskModalTitle">Plan Session</h3>
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-lg overflow-hidden transform transition-all scale-100 max-h-[90vh] flex flex-col">
+            <div class="bg-gray-50 dark:bg-gray-700 px-6 py-4 border-b border-gray-200 dark:border-gray-600 flex justify-between items-center shrink-0">
+                <h3 class="text-lg font-bold" id="taskModalTitle">Day Manager</h3>
                 <button onclick="app.closeModal('taskModal')" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times"></i></button>
             </div>
-            
-            <div id="smartRevisionSection" class="hidden bg-yellow-50 dark:bg-yellow-900/20 p-4 border-b border-yellow-100 dark:border-yellow-900/30">
-                <div class="flex items-start gap-3">
-                    <i class="fas fa-lightbulb text-yellow-500 mt-1"></i>
-                    <div>
-                        <h4 class="text-sm font-bold text-yellow-800 dark:text-yellow-400">Smart Revision Day</h4>
-                        <p class="text-xs text-yellow-700 dark:text-yellow-500 mb-2">Load topics from the last 6 days?</p>
-                        <button onclick="app.loadRevisionTopics()" class="bg-yellow-500 text-white text-xs font-bold px-3 py-1.5 rounded hover:bg-yellow-600 transition-colors shadow-sm">
-                            <i class="fas fa-sync-alt mr-1"></i> Load Previous Topics
-                        </button>
+
+            <div class="bg-gray-50/50 dark:bg-gray-800/50 border-b border-gray-200 dark:border-gray-700 flex-1 overflow-y-auto min-h-[150px] p-4">
+                <h4 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Schedule for this day</h4>
+                <div id="dayManagerList" class="space-y-2">
                     </div>
+            </div>
+            
+            <div id="smartRevisionSection" class="hidden bg-yellow-50 dark:bg-yellow-900/20 p-3 border-b border-yellow-100 dark:border-yellow-900/30 shrink-0">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <i class="fas fa-lightbulb text-yellow-500"></i>
+                        <span class="text-sm font-bold text-yellow-800 dark:text-yellow-400">Spaced Repetition Review</span>
+                    </div>
+                    <button onclick="app.loadRevisionTopics()" class="text-xs bg-yellow-500 text-white px-3 py-1.5 rounded hover:bg-yellow-600 font-bold shadow-sm">
+                        Load Topics (1, 7, 30 days ago)
+                    </button>
                 </div>
             </div>
 
-            <form onsubmit="app.saveTask(event)" class="p-6">
+            <form onsubmit="app.saveTask(event)" class="p-5 bg-white dark:bg-gray-800 shrink-0 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] z-10">
+                <div class="flex justify-between items-center mb-3">
+                     <h4 class="text-xs font-bold text-gray-500 uppercase tracking-wider" id="formModeTitle">Plan New Task</h4>
+                     <button type="button" onclick="app.resetForm()" class="text-xs text-primary hover:underline hidden" id="cancelEditBtn">Cancel Edit</button>
+                </div>
+
                 <input type="hidden" id="taskEditId" value="">
 
-                <div class="mb-4">
-                    <label class="block text-xs font-bold uppercase text-gray-500 mb-1">Subject</label>
-                    <select id="taskSubject" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg p-2.5 focus:ring-2 focus:ring-primary outline-none" required onchange="app.updateSubSubjects()">
+                <div class="grid grid-cols-2 gap-3 mb-3">
+                    <div>
+                        <select id="taskSubject" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-2 text-sm focus:ring-2 focus:ring-primary outline-none" required onchange="app.updateSubSubjects()">
+                            <option value="">Subject</option>
                         </select>
-                </div>
-                <div class="mb-4">
-                    <label class="block text-xs font-bold uppercase text-gray-500 mb-1">Sub-Subject / Topic</label>
-                    <input list="subSubjectList" id="taskSubSubject" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg p-2.5 focus:ring-2 focus:ring-primary outline-none" placeholder="e.g. Mughal Empire" required autocomplete="off">
-                    <datalist id="subSubjectList"></datalist>
-                    <p class="text-[10px] text-gray-400 mt-1">Type freely or select from your Master List.</p>
-                </div>
-                <div class="grid grid-cols-2 gap-4 mb-4">
-                    <div>
-                        <label class="block text-xs font-bold uppercase text-gray-500 mb-1">Duration (Min)</label>
-                        <input type="number" id="taskDuration" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg p-2.5 focus:ring-2 focus:ring-primary outline-none" placeholder="60" required>
                     </div>
                     <div>
-                        <label class="block text-xs font-bold uppercase text-gray-500 mb-1">Date</label>
-                        <input type="date" id="taskDate" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg p-2.5 focus:ring-2 focus:ring-primary outline-none" required>
+                        <input list="subSubjectList" id="taskSubSubject" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-2 text-sm focus:ring-2 focus:ring-primary outline-none" placeholder="Topic" required autocomplete="off">
+                        <datalist id="subSubjectList"></datalist>
                     </div>
                 </div>
-                <div class="mb-6">
-                    <label class="block text-xs font-bold uppercase text-gray-500 mb-1">Description (Optional)</label>
-                    <input type="text" id="taskDesc" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg p-2.5 focus:ring-2 focus:ring-primary outline-none" placeholder="e.g. Chapter 4, Pages 20-40">
+                
+                <div class="grid grid-cols-3 gap-3 mb-3">
+                     <div class="col-span-1">
+                        <input type="number" id="taskDuration" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-2 text-sm focus:ring-2 focus:ring-primary outline-none" placeholder="Min" required>
+                    </div>
+                    <div class="col-span-2">
+                        <input type="text" id="taskDesc" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-2 text-sm focus:ring-2 focus:ring-primary outline-none" placeholder="Description (Optional)">
+                    </div>
                 </div>
-                <div class="flex justify-end gap-3">
-                    <button type="button" onclick="app.closeModal('taskModal')" class="px-4 py-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">Cancel</button>
-                    <button type="submit" class="px-6 py-2 bg-primary text-white rounded-lg hover:bg-indigo-700 font-medium">Save Task</button>
-                </div>
+
+                <input type="date" id="taskDate" class="hidden" required>
+
+                <button type="submit" id="saveTaskBtn" class="w-full py-2.5 bg-primary text-white rounded-lg hover:bg-indigo-700 font-bold text-sm transition-colors">Add to Schedule</button>
             </form>
         </div>
     </div>
@@ -313,7 +308,7 @@
             </div>
 
             <div class="mb-6">
-                <label class="block text-xs font-bold uppercase text-gray-500 mb-2">Focus Level (Optional)</label>
+                <label class="block text-xs font-bold uppercase text-gray-500 mb-2">Focus Level</label>
                 <input type="range" min="1" max="5" value="3" id="focusScore" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-primary">
                 <div class="flex justify-between px-1 mt-1 text-[10px] text-gray-400 uppercase">
                     <span>Distracted</span>
@@ -359,15 +354,15 @@
                 currentView: 'dashboard',
                 currentDate: new Date(),
                 calendarMonth: new Date(),
-                completingTaskId: null
+                completingTaskId: null,
+                lastBackup: null // v3.1 Feature
             },
 
             init() {
                 this.loadData();
                 this.render();
                 this.checkBacklog();
-                
-                // Resilience: Check for running timer in LS
+                this.checkBackupStatus(); // v3.1 Safety
                 this.restoreTimerState();
 
                 // Theme Logic
@@ -381,7 +376,8 @@
                 localStorage.setItem('prepMasterData_v3', JSON.stringify({
                     tasks: this.data.tasks,
                     subjects: this.data.subjects,
-                    targetDate: this.data.targetDate
+                    targetDate: this.data.targetDate,
+                    lastBackup: this.data.lastBackup // v3.1
                 }));
                 this.render();
             },
@@ -393,6 +389,7 @@
                     this.data.tasks = parsed.tasks || [];
                     this.data.subjects = parsed.subjects || [];
                     this.data.targetDate = parsed.targetDate || '2026-02-01';
+                    this.data.lastBackup = parsed.lastBackup || null;
                 } else {
                     // Seed Data
                     this.data.subjects = [
@@ -403,13 +400,30 @@
                 }
             },
 
+            checkBackupStatus() {
+                // v3.1 Safety Check
+                const dot = document.getElementById('backupWarningDot');
+                const last = this.data.lastBackup ? new Date(this.data.lastBackup) : new Date(0);
+                const now = new Date();
+                const diffDays = (now - last) / (1000 * 60 * 60 * 24);
+                
+                if (diffDays > 7) {
+                    dot.classList.remove('hidden');
+                } else {
+                    dot.classList.add('hidden');
+                }
+                
+                if(this.data.lastBackup) {
+                    document.getElementById('lastBackupDisplay').innerText = "Last Backup: " + new Date(this.data.lastBackup).toLocaleDateString();
+                }
+            },
+
             // --- NAVIGATION ---
             navigate(view) {
                 this.data.currentView = view;
                 document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
                 document.getElementById(`view-${view}`).classList.remove('hidden');
                 
-                // Sidebar Active State
                 document.querySelectorAll('.nav-item').forEach(el => {
                     el.classList.remove('active', 'bg-indigo-50', 'text-primary', 'dark:bg-gray-700', 'dark:text-indigo-400');
                     el.classList.add('text-gray-600', 'dark:text-gray-300');
@@ -420,7 +434,6 @@
                     activeBtn.classList.add('active', 'bg-indigo-50', 'text-primary', 'dark:bg-gray-700', 'dark:text-indigo-400');
                     activeBtn.classList.remove('text-gray-600', 'dark:text-gray-300');
                 }
-                
                 this.render();
             },
 
@@ -433,11 +446,15 @@
 
             // --- IMPORT/EXPORT ---
             exportData() {
-                const dataStr = JSON.stringify({ ...this.data, activeTimer: null, timerInterval: null }); // Don't export active timer state
+                this.data.lastBackup = new Date().toISOString();
+                this.saveData();
+                this.checkBackupStatus();
+
+                const dataStr = JSON.stringify({ ...this.data, activeTimer: null, timerInterval: null });
                 const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
                 const linkElement = document.createElement('a');
                 linkElement.setAttribute('href', dataUri);
-                linkElement.setAttribute('download', 'prepmaster_v3_backup.json');
+                linkElement.setAttribute('download', 'prepmaster_backup.json');
                 linkElement.click();
             },
 
@@ -453,6 +470,7 @@
                                 this.data.tasks = parsed.tasks;
                                 this.data.subjects = parsed.subjects;
                                 this.data.targetDate = parsed.targetDate || this.data.targetDate;
+                                this.data.lastBackup = new Date().toISOString();
                                 this.saveData();
                                 this.closeModal('settingsModal');
                                 alert("Import successful!");
@@ -464,7 +482,7 @@
                 input.value = '';
             },
 
-            // --- RENDERING CORE ---
+            // --- RENDERING ---
             render() {
                 this.renderHeader();
                 this.renderDashboard();
@@ -496,9 +514,7 @@
                 if(this.data.currentView !== 'dashboard') return;
 
                 const todayStr = this.formatDate(new Date());
-                // Sort: In-Progress (Partial) -> Pending -> Done
                 const sortOrder = { 'partial': 0, 'pending': 1, 'done': 2, 'backlog': 3 };
-                
                 const todaysTasks = this.data.tasks
                     .filter(t => t.date === todayStr && t.status !== 'backlog')
                     .sort((a,b) => sortOrder[a.status] - sortOrder[b.status]);
@@ -525,23 +541,19 @@
                             actionHtml = `<span class="text-primary font-bold text-xs animate-pulse mr-2">RUNNING</span>`;
                         } else {
                             actionHtml = `
-                                <button onclick="app.editTask(${task.id})" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors flex items-center justify-center mr-1" title="Edit"><i class="fas fa-pencil-alt text-xs"></i></button>
-                                <button onclick="app.startTimer(${task.id})" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-500 hover:bg-primary hover:text-white transition-colors flex items-center justify-center" title="Start Timer"><i class="fas fa-play text-xs pl-0.5"></i></button>
-                                <button onclick="app.manualComplete(${task.id})" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-500 hover:bg-green-500 hover:text-white transition-colors flex items-center justify-center ml-1" title="Mark Done"><i class="fas fa-check text-xs"></i></button>
+                                <button onclick="app.editTask(${task.id})" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors flex items-center justify-center mr-1"><i class="fas fa-pencil-alt text-xs"></i></button>
+                                <button onclick="app.startTimer(${task.id})" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-500 hover:bg-primary hover:text-white transition-colors flex items-center justify-center"><i class="fas fa-play text-xs pl-0.5"></i></button>
+                                <button onclick="app.manualComplete(${task.id})" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-500 hover:bg-green-500 hover:text-white transition-colors flex items-center justify-center ml-1"><i class="fas fa-check text-xs"></i></button>
                             `;
                         }
                     } else {
                          actionHtml = `<div class="flex flex-col items-end">
                                         <span class="text-green-500 text-xs font-bold flex items-center gap-1"><i class="fas fa-check-circle"></i> Done</span>
-                                        <span class="text-[10px] text-gray-400">${task.actualTime}m • Focus: ${task.focusScore || '-'}/5</span>
+                                        <span class="text-[10px] text-gray-400">${task.actualTime}m • ${task.focusScore || '-'}/5</span>
                                        </div>`;
                     }
 
-                    // Partial Badge Logic
-                    let statusBadge = '';
-                    if(isPartial) {
-                        statusBadge = `<span class="ml-2 text-[10px] bg-blue-100 text-blue-600 dark:bg-blue-900/50 dark:text-blue-300 px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">In Progress (${task.actualTime || 0}m)</span>`;
-                    }
+                    let statusBadge = isPartial ? `<span class="ml-2 text-[10px] bg-blue-100 text-blue-600 dark:bg-blue-900/50 dark:text-blue-300 px-1.5 py-0.5 rounded font-bold uppercase">In Progress</span>` : '';
 
                     const html = `
                         <div class="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border ${isPartial ? 'border-blue-300 dark:border-blue-800' : 'border-gray-100 dark:border-gray-700'} flex justify-between items-center group hover:shadow-md transition-shadow ${active ? 'ring-2 ring-primary ring-offset-2 dark:ring-offset-gray-900' : ''}">
@@ -552,7 +564,7 @@
                                     ${statusBadge}
                                 </div>
                                 <h4 class="font-semibold text-gray-800 dark:text-gray-200 truncate pr-2 ${isDone ? 'line-through text-gray-400' : ''}">${task.desc || 'Study Session'}</h4>
-                                <div class="text-xs text-gray-400 mt-1"><i class="far fa-clock"></i> Planned: ${task.duration}m</div>
+                                <div class="text-xs text-gray-400 mt-1"><i class="far fa-clock"></i> ${task.duration}m</div>
                             </div>
                             <div class="flex items-center gap-1 ml-2 shrink-0">
                                 ${actionHtml}
@@ -566,26 +578,19 @@
 
             renderBacklog() {
                 const backlogTasks = this.data.tasks.filter(t => t.status === 'backlog');
-                
                 const countEl = document.getElementById('backlogCount');
                 countEl.textContent = backlogTasks.length;
                 countEl.classList.toggle('hidden', backlogTasks.length === 0);
 
-                // Sidebar
                 const sidebarList = document.getElementById('sidebarBacklogList');
                 sidebarList.innerHTML = '';
                 if(backlogTasks.length === 0) sidebarList.innerHTML = `<p class="text-gray-400 italic text-[10px] text-center py-2">No backlog.</p>`;
 
-                // Dashboard
                 const dashList = document.getElementById('dashboardBacklogList');
                 if(dashList) dashList.innerHTML = '';
                 if(dashList && backlogTasks.length === 0) dashList.innerHTML = `<div class="text-center py-6 text-gray-400 text-sm"><i class="fas fa-check-double mb-2"></i><br>You're all caught up!</div>`;
 
                 backlogTasks.forEach(task => {
-                    // Logic to show if it was "Partial" in the backlog
-                    const wasPartial = task.actualTime > 0;
-                    const partialBadge = wasPartial ? `<span class="text-[9px] text-blue-500 font-bold ml-1">(Started)</span>` : '';
-
                     sidebarList.insertAdjacentHTML('beforeend', `
                         <div class="group flex justify-between items-center py-1.5 border-b border-gray-100 dark:border-gray-700">
                             <div class="truncate w-24 text-gray-600 dark:text-gray-400" title="${task.subSubject}">${task.subSubject}</div>
@@ -598,7 +603,7 @@
                             <div class="flex justify-between items-center p-3 bg-red-50 dark:bg-red-900/10 rounded-lg border border-red-100 dark:border-red-900/30">
                                 <div class="min-w-0 flex-1 pr-2">
                                     <div class="text-xs font-bold text-gray-600 dark:text-gray-300 truncate">${task.subject}</div>
-                                    <div class="text-sm font-medium text-gray-800 dark:text-gray-200 truncate">${task.subSubject} ${partialBadge}</div>
+                                    <div class="text-sm font-medium text-gray-800 dark:text-gray-200 truncate">${task.subSubject}</div>
                                     <div class="text-[10px] text-red-400">Missed: ${task.date}</div>
                                 </div>
                                 <button onclick="app.assignToToday(${task.id})" class="text-xs bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 px-3 py-1.5 rounded shadow-sm hover:border-primary hover:text-primary transition-all font-medium whitespace-nowrap">
@@ -612,7 +617,6 @@
 
             renderCalendar() {
                 if(this.data.currentView !== 'calendar') return;
-
                 const grid = document.getElementById('calendarGrid');
                 grid.innerHTML = '';
                 
@@ -620,7 +624,6 @@
                 const month = this.data.calendarMonth.getMonth();
                 
                 document.getElementById('calendarMonthLabel').innerText = this.data.calendarMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-
                 const daysInMonth = new Date(year, month + 1, 0).getDate();
                 
                 for (let day = 1; day <= daysInMonth; day++) {
@@ -644,17 +647,14 @@
                     let dots = "";
                     if (tasksForDay.length > 0) {
                         const completed = tasksForDay.filter(t => t.status === 'done').length;
-                        const partial = tasksForDay.filter(t => t.status === 'partial').length;
-                        
                         let color = "bg-red-400";
                         if (completed === tasksForDay.length) color = "bg-green-500";
-                        else if (completed > 0 || partial > 0) color = "bg-blue-400"; // Blue for partial/mixed
-                        
+                        else if (completed > 0) color = "bg-blue-400";
                         dots = `<div class="w-1.5 h-1.5 rounded-full ${color}"></div>`;
                     }
 
                     const html = `
-                        <div onclick="app.openDayView('${dateStr}')" class="${bgClass} border border-gray-100 dark:border-gray-700 rounded-lg h-24 p-2 relative cursor-pointer hover:ring-2 hover:ring-primary transition-all flex flex-col justify-between">
+                        <div onclick="app.openTaskModal('${dateStr}')" class="${bgClass} border border-gray-100 dark:border-gray-700 rounded-lg h-24 p-2 relative cursor-pointer hover:ring-2 hover:ring-primary transition-all flex flex-col justify-between">
                             <div class="flex justify-between items-start">
                                 <span class="font-bold text-sm ${textClass}">${day}</span>
                                 ${dots}
@@ -700,7 +700,6 @@
 
             renderAnalytics() {
                 if(this.data.currentView !== 'analytics') return;
-                
                 const completedOrPartial = this.data.tasks.filter(t => t.actualTime > 0);
                 const totalMins = completedOrPartial.reduce((acc, t) => acc + (t.actualTime || 0), 0);
                 document.getElementById('analyticsTotalHours').innerText = `${(totalMins/60).toFixed(1)}h`;
@@ -710,8 +709,7 @@
                 document.getElementById('analyticsAvgFocus').innerText = avgFocus;
 
                 const completed = this.data.tasks.filter(t => t.status === 'done');
-                const backlogCount = this.data.tasks.filter(t => t.status === 'backlog').length;
-                const denominator = completed.length + backlogCount + this.data.tasks.filter(t => t.status === 'partial').length;
+                const denominator = this.data.tasks.length;
                 const rate = denominator ? Math.round((completed.length / denominator) * 100) : 0;
                 document.getElementById('analyticsCompletion').innerText = `${rate}%`;
 
@@ -726,9 +724,9 @@
                 const maxMins = sortedSubjects.length > 0 ? sortedSubjects[0].mins : 1;
 
                 sortedSubjects.forEach(sub => {
-                    const width = (sub.mins / maxMins) * 100;
-                    const hours = (sub.mins/60).toFixed(1);
                     if(sub.mins > 0) {
+                        const width = (sub.mins / maxMins) * 100;
+                        const hours = (sub.mins/60).toFixed(1);
                         container.insertAdjacentHTML('beforeend', `
                             <div>
                                 <div class="flex justify-between text-xs font-bold mb-1.5 text-gray-600 dark:text-gray-300">
@@ -756,97 +754,134 @@
                 }
             },
 
-            // --- USER ACTIONS ---
+            // --- USER ACTIONS (v3.1 MODAL LOGIC) ---
             
             openTaskModal(date = null, editId = null) {
                 document.getElementById('taskModal').classList.remove('hidden');
-                document.getElementById('taskEditId').value = editId || ""; // Set Edit ID
                 
-                const title = document.getElementById('taskModalTitle');
+                const selectedDate = date || this.formatDate(new Date());
+                document.getElementById('taskDate').value = selectedDate;
                 
-                // Populate Subjects
+                // Format Title Date
+                const dateObj = new Date(selectedDate);
+                const prettyDate = dateObj.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+                document.getElementById('taskModalTitle').innerText = "Schedule for " + prettyDate;
+
+                // 1. Populate Subjects
                 const subSelect = document.getElementById('taskSubject');
-                subSelect.innerHTML = '<option value="">Select Subject</option>';
+                subSelect.innerHTML = '<option value="">Subject</option>';
                 this.data.subjects.forEach(s => {
                     subSelect.innerHTML += `<option value="${s.id}">${s.name}</option>`;
                 });
 
-                if (editId) {
-                    // EDIT MODE
-                    const task = this.data.tasks.find(t => t.id === editId);
-                    title.innerText = "Edit Task";
-                    document.getElementById('taskDate').value = task.date;
-                    
-                    // Select Subject
-                    const subObj = this.data.subjects.find(s => s.name === task.subject);
-                    if(subObj) subSelect.value = subObj.id;
-                    
-                    this.updateSubSubjects(); // Fill datalist
-                    document.getElementById('taskSubSubject').value = task.subSubject;
-                    document.getElementById('taskDuration').value = task.duration;
-                    document.getElementById('taskDesc').value = task.desc || "";
-                    document.getElementById('smartRevisionSection').classList.add('hidden'); // No revision prompt on edit
+                // 2. Render Existing List for Day (The Top View)
+                this.renderDayManagerList(selectedDate);
 
+                // 3. Smart Revision Logic (v3.1 Spaced Repetition)
+                const dayNum = dateObj.getDate();
+                const revisionSection = document.getElementById('smartRevisionSection');
+                if ([7, 14, 21, 28].includes(dayNum)) {
+                    revisionSection.classList.remove('hidden');
                 } else {
-                    // CREATE MODE
-                    title.innerText = "Plan Session";
-                    const selectedDate = date || this.formatDate(new Date());
-                    document.getElementById('taskDate').value = selectedDate;
-                    document.getElementById('taskSubSubject').value = "";
-                    document.getElementById('taskDuration').value = "";
-                    document.getElementById('taskDesc').value = "";
-                    
-                    // Smart Revision Logic
-                    const dayNum = new Date(selectedDate).getDate();
-                    const revisionSection = document.getElementById('smartRevisionSection');
-                    if ([7, 14, 21, 28].includes(dayNum)) {
-                        revisionSection.classList.remove('hidden');
-                    } else {
-                        revisionSection.classList.add('hidden');
-                    }
+                    revisionSection.classList.add('hidden');
+                }
+
+                // 4. Handle Edit vs New
+                if(editId) {
+                    this.populateEditForm(editId);
+                } else {
+                    this.resetForm();
                 }
             },
 
-            editTask(id) {
-                this.openTaskModal(null, id);
-            },
-            
-            // Hybrid Syllabus Logic
-            updateSubSubjects() {
-                const subId = document.getElementById('taskSubject').value;
-                const subject = this.data.subjects.find(s => s.id == subId);
-                const datalist = document.getElementById('subSubjectList');
-                datalist.innerHTML = '';
-                if(subject) {
-                    subject.sub.forEach(sub => {
-                        datalist.innerHTML += `<option value="${sub}">`;
-                    });
+            renderDayManagerList(dateStr) {
+                const list = document.getElementById('dayManagerList');
+                list.innerHTML = '';
+                const tasks = this.data.tasks.filter(t => t.date === dateStr);
+                
+                if(tasks.length === 0) {
+                    list.innerHTML = `<p class="text-xs text-gray-400 italic text-center py-4">No tasks planned yet.</p>`;
+                    return;
                 }
+
+                tasks.forEach(task => {
+                    let statusColor = "bg-gray-200 text-gray-500";
+                    if(task.status === 'done') statusColor = "bg-green-100 text-green-600";
+                    if(task.status === 'partial') statusColor = "bg-blue-100 text-blue-600";
+
+                    list.insertAdjacentHTML('beforeend', `
+                        <div class="flex justify-between items-center bg-white dark:bg-gray-800 p-3 rounded border border-gray-100 dark:border-gray-700">
+                            <div class="flex-1 min-w-0 mr-3">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-[10px] font-bold uppercase ${statusColor} px-1.5 py-0.5 rounded">${task.status}</span>
+                                    <span class="text-xs font-bold text-gray-700 dark:text-gray-300 truncate">${task.subject}</span>
+                                </div>
+                                <div class="text-xs text-gray-500 truncate mt-0.5">${task.subSubject}</div>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs text-gray-400 font-mono">${task.duration}m</span>
+                                <button onclick="app.populateEditForm(${task.id})" class="text-gray-400 hover:text-primary"><i class="fas fa-pencil-alt"></i></button>
+                                <button onclick="app.deleteTask(${task.id})" class="text-gray-400 hover:text-red-500"><i class="fas fa-trash-alt"></i></button>
+                            </div>
+                        </div>
+                    `);
+                });
+            },
+
+            populateEditForm(id) {
+                const task = this.data.tasks.find(t => t.id === id);
+                if(!task) return;
+
+                document.getElementById('taskEditId').value = task.id;
+                document.getElementById('formModeTitle').innerText = "Edit Task";
+                document.getElementById('cancelEditBtn').classList.remove('hidden');
+                document.getElementById('saveTaskBtn').innerText = "Update Task";
+                
+                // Select Subject
+                const subObj = this.data.subjects.find(s => s.name === task.subject);
+                const subSelect = document.getElementById('taskSubject');
+                if(subObj) subSelect.value = subObj.id;
+                
+                this.updateSubSubjects();
+                document.getElementById('taskSubSubject').value = task.subSubject;
+                document.getElementById('taskDuration').value = task.duration;
+                document.getElementById('taskDesc').value = task.desc || "";
+            },
+
+            resetForm() {
+                document.getElementById('taskEditId').value = "";
+                document.getElementById('formModeTitle').innerText = "Plan New Task";
+                document.getElementById('cancelEditBtn').classList.add('hidden');
+                document.getElementById('saveTaskBtn').innerText = "Add to Schedule";
+                document.getElementById('taskSubject').value = "";
+                document.getElementById('taskSubSubject').value = "";
+                document.getElementById('taskDuration').value = "";
+                document.getElementById('taskDesc').value = "";
             },
 
             saveTask(e) {
                 e.preventDefault();
                 const subId = document.getElementById('taskSubject').value;
+                if(!subId) return; // Guard
+
                 const subjectName = this.data.subjects.find(s => s.id == subId).name;
                 const editId = document.getElementById('taskEditId').value;
+                const dateStr = document.getElementById('taskDate').value;
 
                 if (editId) {
-                    // Update Existing
                     const task = this.data.tasks.find(t => t.id == editId);
                     task.subject = subjectName;
                     task.subSubject = document.getElementById('taskSubSubject').value;
                     task.duration = parseInt(document.getElementById('taskDuration').value);
                     task.desc = document.getElementById('taskDesc').value;
-                    task.date = document.getElementById('taskDate').value;
                 } else {
-                    // Create New
                     const task = {
                         id: Date.now(),
                         subject: subjectName,
                         subSubject: document.getElementById('taskSubSubject').value,
                         duration: parseInt(document.getElementById('taskDuration').value),
                         desc: document.getElementById('taskDesc').value,
-                        date: document.getElementById('taskDate').value,
+                        date: dateStr,
                         status: 'pending',
                         actualTime: 0
                     };
@@ -854,8 +889,8 @@
                 }
                 
                 this.saveData();
-                this.closeModal('taskModal');
-                e.target.reset();
+                this.resetForm();
+                this.renderDayManagerList(dateStr); // Refresh Top View
             },
 
             deleteTask(id) {
@@ -866,32 +901,71 @@
                     }
                     this.data.tasks = this.data.tasks.filter(t => t.id !== id);
                     this.saveData();
+                    
+                    // Refresh if modal is open
+                    const modalDate = document.getElementById('taskDate').value;
+                    if(!document.getElementById('taskModal').classList.contains('hidden')) {
+                         this.renderDayManagerList(modalDate);
+                         this.resetForm();
+                    }
                 }
             },
-
-            // --- TIMER LOGIC (WITH PERSISTENCE) ---
             
+            // v3.1 Spaced Repetition Logic
+            loadRevisionTopics() {
+                const targetDate = new Date(document.getElementById('taskDate').value);
+                const intervals = [1, 7, 30];
+                const topics = new Set();
+                
+                intervals.forEach(daysAgo => {
+                    const d = new Date(targetDate);
+                    d.setDate(targetDate.getDate() - daysAgo);
+                    const dStr = this.formatDate(d);
+                    const tasks = this.data.tasks.filter(t => t.date === dStr && t.status === 'done');
+                    tasks.forEach(t => topics.add(`${t.subject}: ${t.subSubject} (${daysAgo}d ago)`));
+                });
+                
+                if(topics.size === 0) {
+                    alert("No completed topics found from 1, 7, or 30 days ago.");
+                    return;
+                }
+
+                topics.forEach(topicStr => {
+                    // Parse string to get clean data (simple hack for this modal)
+                    // Format: "History: Mughal (7d ago)"
+                    const parts = topicStr.match(/(.+): (.+) \((.+) ago\)/);
+                    if(parts) {
+                        this.data.tasks.push({
+                            id: Date.now() + Math.random(),
+                            subject: parts[1],
+                            subSubject: `Review: ${parts[2]}`,
+                            duration: 20,
+                            desc: `Spaced Repetition (${parts[3]})`,
+                            date: document.getElementById('taskDate').value,
+                            status: 'pending',
+                            actualTime: 0
+                        });
+                    }
+                });
+                
+                this.saveData();
+                this.renderDayManagerList(document.getElementById('taskDate').value);
+                alert(`Added ${topics.size} review tasks!`);
+            },
+            
+            // --- TIMER LOGIC (Resilient) ---
             restoreTimerState() {
-                const savedTimer = localStorage.getItem('prepMasterTimer');
-                if(savedTimer) {
-                    const parsed = JSON.parse(savedTimer);
-                    // Check if task still exists
+                const saved = localStorage.getItem('prepMasterTimer');
+                if(saved) {
+                    const parsed = JSON.parse(saved);
                     if(this.data.tasks.find(t => t.id === parsed.id)) {
                         this.data.activeTimer = parsed;
-                        
-                        // Calculate elapsed time while closed
                         if (parsed.isRunning) {
-                             const now = Date.now();
-                             const elapsedWhileClosed = Math.floor((now - parsed.lastTimestamp) / 1000);
+                             const elapsedWhileClosed = Math.floor((Date.now() - parsed.lastTimestamp) / 1000);
                              this.data.activeTimer.accumulated += elapsedWhileClosed;
-                             this.data.activeTimer.startTime = now; // Reset start time to now
-                        }
-                        
-                        this.updateGlobalTimerUI();
-                        if(parsed.isRunning) {
-                            this.startTicker();
+                             this.data.activeTimer.startTime = Date.now();
+                             this.startTicker();
                         } else {
-                            // Update display once if paused
                             this.updateTickerDisplay(); 
                         }
                     } else {
@@ -901,29 +975,14 @@
             },
 
             saveTimerState(isRunning) {
-                if(!this.data.activeTimer) {
-                    localStorage.removeItem('prepMasterTimer');
-                    return;
-                }
-                // Add metadata for resilience
-                const state = {
-                    ...this.data.activeTimer,
-                    isRunning: isRunning,
-                    lastTimestamp: Date.now()
-                };
+                if(!this.data.activeTimer) { localStorage.removeItem('prepMasterTimer'); return; }
+                const state = { ...this.data.activeTimer, isRunning, lastTimestamp: Date.now() };
                 localStorage.setItem('prepMasterTimer', JSON.stringify(state));
             },
 
             startTimer(id) {
-                if (this.data.activeTimer && this.data.activeTimer.id !== id) {
-                    alert("Stop the current timer first!");
-                    return;
-                }
-                
-                if(!this.data.activeTimer) {
-                    this.data.activeTimer = { id: id, startTime: Date.now(), accumulated: 0 };
-                }
-                
+                if (this.data.activeTimer && this.data.activeTimer.id !== id) { alert("Stop current timer first!"); return; }
+                if(!this.data.activeTimer) this.data.activeTimer = { id: id, startTime: Date.now(), accumulated: 0 };
                 this.render(); 
                 this.startTicker();
                 this.saveTimerState(true);
@@ -933,7 +992,6 @@
                 if(this.data.timerInterval) clearInterval(this.data.timerInterval);
                 this.data.timerInterval = setInterval(() => {
                     this.updateTickerDisplay();
-                    // Periodically save state in case of crash
                     if(Date.now() % 5000 < 1000) this.saveTimerState(true);
                 }, 1000);
                 document.getElementById('globalTimerPauseBtn').innerText = "Pause";
@@ -941,9 +999,8 @@
 
             updateTickerDisplay() {
                 if(!this.data.activeTimer) return;
-                const now = this.data.timerInterval ? Date.now() : this.data.activeTimer.startTime; // If paused, don't advance
+                const now = this.data.timerInterval ? Date.now() : this.data.activeTimer.startTime;
                 const currentSecs = Math.floor((now - this.data.activeTimer.startTime) / 1000) + this.data.activeTimer.accumulated;
-                
                 const h = Math.floor(currentSecs / 3600).toString().padStart(2,'0');
                 const m = Math.floor((currentSecs % 3600) / 60).toString().padStart(2,'0');
                 const s = (currentSecs % 60).toString().padStart(2,'0');
@@ -952,16 +1009,13 @@
 
             toggleTimer() {
                 if(!this.data.timerInterval) {
-                    // Resume
                     this.data.activeTimer.startTime = Date.now();
                     this.startTicker();
                     this.saveTimerState(true);
                 } else {
-                    // Pause
                     clearInterval(this.data.timerInterval);
                     this.data.timerInterval = null;
-                    const elapsedSecs = Math.floor((Date.now() - this.data.activeTimer.startTime) / 1000);
-                    this.data.activeTimer.accumulated += elapsedSecs;
+                    this.data.activeTimer.accumulated += Math.floor((Date.now() - this.data.activeTimer.startTime) / 1000);
                     document.getElementById('globalTimerPauseBtn').innerText = "Resume";
                     this.saveTimerState(false);
                 }
@@ -970,30 +1024,22 @@
             stopTimer() {
                 clearInterval(this.data.timerInterval);
                 this.data.timerInterval = null;
-                
-                // Calculate total time
-                let elapsedSecs = this.data.activeTimer.accumulated;
+                let elapsed = this.data.activeTimer.accumulated;
                 if(this.data.activeTimer.startTime && document.getElementById('globalTimerPauseBtn').innerText === "Pause") {
-                     elapsedSecs += Math.floor((Date.now() - this.data.activeTimer.startTime) / 1000);
+                     elapsed += Math.floor((Date.now() - this.data.activeTimer.startTime) / 1000);
                 }
-
-                const elapsedMins = Math.ceil(elapsedSecs / 60);
-                const taskId = this.data.activeTimer.id;
-                
-                // Clear Persistence
+                const mins = Math.ceil(elapsed / 60);
+                const id = this.data.activeTimer.id;
                 this.data.activeTimer = null;
                 localStorage.removeItem('prepMasterTimer');
-                
                 this.updateGlobalTimerUI();
-                this.manualComplete(taskId, elapsedMins);
+                this.manualComplete(id, mins);
             },
 
-            // --- COMPLETION LOGIC (Updated for Partial) ---
-
+            // --- COMPLETION ---
             manualComplete(id, defaultTime = null) {
                 this.data.completingTaskId = id;
                 const task = this.data.tasks.find(t => t.id === id);
-                // Pre-fill with accumulated time if exists, else duration
                 document.getElementById('actualTimeInput').value = defaultTime || task.actualTime || task.duration;
                 document.getElementById('completeModal').classList.remove('hidden');
             },
@@ -1001,34 +1047,42 @@
             confirmCompletion(type) {
                 const id = this.data.completingTaskId;
                 const task = this.data.tasks.find(t => t.id === id);
-                const sessionTime = parseInt(document.getElementById('actualTimeInput').value) || 0;
-                
-                // If partial, add to existing. If done, set final or add (usually final).
-                // Logic: actualTime tracks TOTAL time spent. 
-                // If logging partial, we assume the input is the TOTAL time spent SO FAR? 
-                // Or just this session? The Modal asks "How much time did you actually spend?".
-                // For simplicity in this UX: Input is the TOTAL Accumulated time.
-                
-                task.actualTime = sessionTime; 
+                task.actualTime = parseInt(document.getElementById('actualTimeInput').value) || 0; 
                 task.focusScore = document.getElementById('focusScore').value;
-
-                if (type === 'done') {
-                    task.status = 'done';
-                } else if (type === 'partial') {
-                    task.status = 'partial'; // Distinct status for blue color
-                }
-                
+                task.status = type; // 'done' or 'partial'
                 this.saveData();
                 this.closeModal('completeModal');
                 this.data.completingTaskId = null;
             },
 
-            // --- BACKLOG LOGIC ---
+            // --- MISC HELPERS ---
+            editTask(id) {
+                // Find task to get date, then open modal
+                const task = this.data.tasks.find(t => t.id === id);
+                if(task) this.openTaskModal(task.date, id);
+            },
+            
+            updateSubSubjects() {
+                const subId = document.getElementById('taskSubject').value;
+                const subject = this.data.subjects.find(s => s.id == subId);
+                const datalist = document.getElementById('subSubjectList');
+                datalist.innerHTML = '';
+                if(subject) {
+                    subject.sub.forEach(sub => { datalist.innerHTML += `<option value="${sub}">`; });
+                }
+            },
+            
+            assignToToday(id) {
+                const task = this.data.tasks.find(t => t.id === id);
+                task.date = this.formatDate(new Date());
+                task.status = (task.actualTime > 0) ? 'partial' : 'pending';
+                this.saveData();
+            },
+            
             checkBacklog() {
                 const today = this.formatDate(new Date());
                 let changed = false;
                 this.data.tasks.forEach(t => {
-                    // Only move to backlog if date passed AND it's not done
                     if (t.date < today && t.status !== 'done' && t.status !== 'backlog') {
                         t.status = 'backlog';
                         changed = true;
@@ -1037,17 +1091,6 @@
                 if(changed) this.saveData();
             },
 
-            assignToToday(id) {
-                const task = this.data.tasks.find(t => t.id === id);
-                task.date = this.formatDate(new Date());
-                // If it was backlog, reset to partial if it had time, else pending
-                task.status = (task.actualTime > 0) ? 'partial' : 'pending';
-                this.saveData();
-            },
-
-            // --- MISC ---
-            openSubjectModal() { document.getElementById('subjectModal').classList.remove('hidden'); },
-            
             saveSubject(e) {
                 e.preventDefault();
                 const name = document.getElementById('newSubjectName').value;
@@ -1056,12 +1099,11 @@
                 this.closeModal('subjectModal');
                 e.target.reset();
             },
-
+            
             addSubSubjectPrompt(id) {
                 const sub = prompt("Enter new Topic/Sub-subject name:");
                 if(sub) {
-                    const subject = this.data.subjects.find(s => s.id === id);
-                    subject.sub.push(sub);
+                    this.data.subjects.find(s => s.id === id).sub.push(sub);
                     this.saveData();
                 }
             },
@@ -1074,47 +1116,12 @@
                 }
             },
 
-            loadRevisionTopics() {
-                const targetDate = new Date(document.getElementById('taskDate').value);
-                const topics = new Set();
-                for(let i=1; i<=6; i++) {
-                    const d = new Date(targetDate);
-                    d.setDate(targetDate.getDate() - i);
-                    const dStr = this.formatDate(d);
-                    const dayTasks = this.data.tasks.filter(t => t.date === dStr && t.status === 'done');
-                    dayTasks.forEach(t => topics.add(`${t.subject} - ${t.subSubject}`));
-                }
-                
-                if(topics.size === 0) {
-                    alert("No completed topics found in the last 6 days.");
-                    return;
-                }
-
-                topics.forEach(topic => {
-                    const [sub, subSub] = topic.split(' - ');
-                    this.data.tasks.push({
-                        id: Date.now() + Math.random(),
-                        subject: sub,
-                        subSubject: subSub,
-                        duration: 30,
-                        desc: "Smart Revision",
-                        date: document.getElementById('taskDate').value,
-                        status: 'pending',
-                        actualTime: 0
-                    });
-                });
-                this.saveData();
-                this.closeModal('taskModal');
-                alert(`Added ${topics.size} revision tasks!`);
-            },
-
             editTargetDate() {
                 const newDate = prompt("Set Exam Target Date (YYYY-MM-DD):", this.data.targetDate);
                 if(newDate) { this.data.targetDate = newDate; this.saveData(); }
             },
             
             changeMonth(delta) { this.data.calendarMonth.setMonth(this.data.calendarMonth.getMonth() + delta); this.render(); },
-            openDayView(dateStr) { this.openTaskModal(dateStr); },
             closeModal(id) { document.getElementById(id).classList.add('hidden'); },
             formatDate(d) { return d.toISOString().split('T')[0]; }
         };
