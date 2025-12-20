@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PrepMaster v4.2.0</title>
+    <title>PrepMaster v4.2.1</title>
     <meta name="description" content="PrepMaster - Study Planner & Task Manager for Competitive Exams">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -14,80 +14,104 @@
     
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                        mono: ['JetBrains Mono', 'monospace'],
+<script>
+    tailwind.config = {
+        darkMode: 'class',
+        theme: {
+            extend: {
+                fontFamily: {
+                    sans: ['Inter', 'sans-serif'],
+                    mono: ['JetBrains Mono', 'monospace'],
+                },
+                colors: {
+                    primary: {
+                        DEFAULT: '#4F46E5', // Indigo 600
+                        50: '#EEF2FF',
+                        100: '#E0E7FF',
+                        600: '#4F46E5',
+                        700: '#4338CA',
                     },
-                    colors: {
-                        primary: {
-                            DEFAULT: '#4F46E5', // Indigo 600
-                            50: '#EEF2FF',
-                            100: '#E0E7FF',
-                            600: '#4F46E5',
-                            700: '#4338CA',
-                        },
-                        secondary: {
-                            DEFAULT: '#10B981', // Emerald 500
-                            50: '#ECFDF5',
-                            600: '#059669',
-                        },
-                        accent: '#F59E0B', // Amber 500
-                        danger: '#EF4444', // Red 500
-                        dark: {
-                            DEFAULT: '#111827',
-                            bg: '#0B0F19',
-                            surface: '#1F2937',
-                            border: '#374151'
-                        },
-                        light: '#F3F4F6'
+                    secondary: {
+                        DEFAULT: '#10B981', // Emerald 500
+                        50: '#ECFDF5',
+                        600: '#059669',
                     },
-                    boxShadow: {
-                        'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
-                        'glow': '0 0 15px rgba(79, 70, 229, 0.3)'
+                    // FINAL "HIGH DEFINITION" SLATE PALETTE
+                    gray: {
+                        50: '#F8FAFC',  // Bg: Soft Slate
+                        100: '#F1F5F9', // Hover: Crisp Slate
+                        200: '#CBD5E1', // BORDER: Hard Slate (Defined edges)
+                        300: '#94A3B8', 
+                        400: '#64748B', // TEXT: Visible Labels
+                        500: '#475569', // TEXT: Visible Body
+                        600: '#334155', 
+                        700: '#374151', // Dark Mode Surface
+                        800: '#1F2937', // Dark Mode Cards
+                        900: '#111827', // Dark Mode Base
                     },
-                    animation: {
-                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite'
-                    }
+                    accent: '#F59E0B',
+                    danger: '#EF4444',
+                    dark: {
+                        DEFAULT: '#111827',
+                        bg: '#0B0F19',
+                        surface: '#1F2937',
+                        border: '#374151'
+                    },
+                    light: '#F3F4F6'
+                },
+                boxShadow: {
+                    'soft': '0 2px 8px -2px rgba(0, 0, 0, 0.08), 0 4px 16px -4px rgba(0, 0, 0, 0.04)',
+                    'glow': '0 0 15px rgba(79, 70, 229, 0.3)'
+                },
+                animation: {
+                    'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite'
                 }
             }
         }
-    </script>
-    <style>
-        /* Modern Scrollbar */
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 99px; }
-        ::-webkit-scrollbar-thumb:hover { background: #94A3B8; }
-        .dark ::-webkit-scrollbar-thumb { background: #374151; }
-        .dark ::-webkit-scrollbar-thumb:hover { background: #4B5563; }
-        
-        /* Glassmorphism & Utilities */
-        .glass { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
-        .dark .glass { background: rgba(17, 24, 39, 0.95); }
-        .modal { background-color: rgba(0, 0, 0, 0.6); backdrop-filter: blur(4px); }
-        
-        /* Smooth inputs */
-        input:focus, select:focus, textarea:focus { 
-            outline: none; 
-            box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2); 
-            border-color: #4F46E5; 
-        }
+    }
+</script>
+<style>
+    /* Modern Scrollbar - Slate Theme */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    
+    /* Light Mode: Slate Thumb */
+    ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 99px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94A3B8; }
+    
+    /* Dark Mode: Preserved Standard Gray */
+    .dark ::-webkit-scrollbar-thumb { background: #374151; }
+    .dark ::-webkit-scrollbar-thumb:hover { background: #4B5563; }
+    
+    /* Glassmorphism & Utilities */
+    .glass { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
+    .dark .glass { background: rgba(17, 24, 39, 0.95); }
+    .modal { background-color: rgba(0, 0, 0, 0.6); backdrop-filter: blur(4px); }
+    
+    /* Smooth inputs */
+    input:focus, select:focus, textarea:focus { 
+        outline: none; 
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1); 
+        border-color: #4F46E5; 
+    }
 
-        /* Calendar Grid */
-        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.75rem; }
-        @media (max-width: 640px) {
-            .calendar-grid { gap: 0.25rem; }
-        }
+    /* Calendar Grid */
+    .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.75rem; }
+    @media (max-width: 640px) {
+        .calendar-grid { gap: 0.25rem; }
+    }
 
-        /* Utilities */
-        .text-xxs { font-size: 0.65rem; line-height: 1rem; }
-        .bg-pattern { background-image: radial-gradient(#4F46E5 0.5px, transparent 0.5px); background-size: 10px 10px; opacity: 0.05; }
-    </style>
+    /* --- SPECIFIC FIX: CALENDAR BORDERS --- */
+    /* Forces calendar tiles to use the darker Gray-200 color in light mode 
+       so they don't disappear against the background */
+    html:not(.dark) #calendarGrid > div {
+        border-color: #CBD5E1 !important;
+    }
+
+    /* Utilities */
+    .text-xxs { font-size: 0.65rem; line-height: 1rem; }
+    .bg-pattern { background-image: radial-gradient(#4F46E5 0.5px, transparent 0.5px); background-size: 10px 10px; opacity: 0.05; }
+</style>
 </head>
 <body class="bg-gray-50 text-gray-800 dark:bg-dark-bg dark:text-gray-100 transition-colors duration-200 h-screen flex flex-col overflow-hidden font-sans antialiased selection:bg-primary-100 dark:selection:bg-primary-700/30">
 
@@ -100,7 +124,7 @@
                 </div>
                 <div>
                     <h1 class="text-lg md:text-xl font-bold tracking-tight leading-none">Prep<span class="text-primary">Master</span></h1>
-                    <span class="text-[10px] font-mono font-medium text-gray-400 dark:text-gray-500 uppercase tracking-widest">v4.1.0</span>
+                    <span class="text-[10px] font-mono font-medium text-gray-400 dark:text-gray-500 uppercase tracking-widest">v4.2.1</span>
                 </div>
             </div>
             
