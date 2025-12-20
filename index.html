@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="en" class="light">
 <head>
@@ -86,6 +87,7 @@
 
         /* Utilities */
         .text-xxs { font-size: 0.65rem; line-height: 1rem; }
+        .bg-pattern { background-image: radial-gradient(#4F46E5 0.5px, transparent 0.5px); background-size: 10px 10px; opacity: 0.05; }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-800 dark:bg-dark-bg dark:text-gray-100 transition-colors duration-200 h-screen flex flex-col overflow-hidden font-sans antialiased selection:bg-primary-100 dark:selection:bg-primary-700/30">
@@ -318,83 +320,100 @@
         </div>
     </div>
 
-    <div id="taskModal" class="modal fixed inset-0 z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]">
+    <div id="taskModal" class="modal fixed inset-0 z-50 hidden flex items-center justify-center p-0 md:p-4">
+        <div class="bg-white dark:bg-gray-800 rounded-t-2xl md:rounded-2xl shadow-2xl w-full max-w-lg md:max-w-5xl overflow-hidden flex flex-col h-[92vh] md:h-auto md:max-h-[85vh] absolute bottom-0 md:relative transform transition-all scale-100">
             <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center bg-gray-50/50 dark:bg-gray-700/30 shrink-0">
                 <h3 class="text-lg font-bold text-gray-800 dark:text-white" id="taskModalTitle">Day Manager</h3>
                 <button onclick="app.closeModal('taskModal')" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-200 dark:hover:bg-gray-600"><i class="fas fa-times"></i></button>
             </div>
 
-            <div class="px-6 pt-4 pb-2 shrink-0">
-                <div class="flex justify-between items-end mb-1.5">
-                    <span class="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Planned Capacity</span>
-                    <span class="text-[10px] font-bold text-gray-600 dark:text-gray-300 font-mono" id="dailyLoadText">0h</span>
-                </div>
-                <div class="w-full bg-gray-100 dark:bg-gray-700 rounded-full h-2 overflow-hidden">
-                    <div id="dailyLoadBar" class="bg-secondary h-2 rounded-full transition-all duration-500 shadow-[0_0_10px_rgba(16,185,129,0.4)]" style="width: 0%"></div>
-                </div>
-                <div id="dailyLoadWarning" class="hidden text-[10px] text-red-500 font-bold mt-1 text-right animate-pulse">⚠️ Overload Warning</div>
-            </div>
-
-            <div class="bg-white dark:bg-gray-800 flex-1 overflow-y-auto min-h-[150px] p-6 pt-2">
-                <div id="dayManagerList" class="space-y-2.5">
-                    </div>
-            </div>
-            
-            <div id="smartRevisionSection" class="hidden bg-amber-50 dark:bg-amber-900/20 p-4 border-y border-amber-100 dark:border-amber-900/30 shrink-0">
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center gap-3">
-                        <div class="w-8 h-8 rounded-full bg-amber-100 dark:bg-amber-900/50 flex items-center justify-center text-amber-500">
-                            <i class="fas fa-lightbulb"></i>
-                        </div>
-                        <div>
-                            <span class="text-xs font-bold text-amber-800 dark:text-amber-400 block uppercase tracking-wider">Smart Review</span>
-                            <span class="text-[10px] text-amber-700 dark:text-amber-500 block mt-0.5">Spaced repetition — auto-suggests review topics on revision days.</span>
-                        </div>
-                    </div>
-                    <button onclick="app.loadRevisionTopics()" class="text-xs bg-amber-500 text-white px-3 py-2 rounded-lg hover:bg-amber-600 font-bold shadow-sm transition-colors">
-                        Auto-Load
-                    </button>
-                </div>
-            </div>
-
-            <form onsubmit="app.saveTask(event)" class="p-6 bg-gray-50 dark:bg-gray-900/50 shrink-0 shadow-inner z-10 border-t border-gray-100 dark:border-gray-700">
-                <div class="flex justify-between items-center mb-4">
-                     <h4 class="text-xs font-bold text-gray-400 uppercase tracking-widest" id="formModeTitle">Plan New Task</h4>
-                     <button type="button" onclick="app.resetForm()" class="text-xs text-primary font-bold hover:underline hidden" id="cancelEditBtn">Cancel Edit</button>
-                </div>
-
-                <input type="hidden" id="taskEditId" value="">
-
-                <div class="grid grid-cols-2 gap-4 mb-4">
-                    <div class="group relative">
-                        <select id="taskSubject" class="w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-xl p-3 text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none appearance-none font-medium" required onchange="app.updateSubSubjects()">
-                            <option value="">Select Subject</option>
-                        </select>
-                        <i class="fas fa-chevron-down absolute right-3 top-3.5 text-gray-400 pointer-events-none text-xs"></i>
-                    </div>
-                    <div>
-                        <input list="subSubjectList" id="taskSubSubject" class="w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-xl p-3 text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none font-medium" placeholder="Topic / Chapter" required autocomplete="off">
-                        <datalist id="subSubjectList"></datalist>
-                    </div>
-                </div>
+            <div class="flex flex-col md:flex-row flex-1 min-h-0 overflow-hidden relative">
                 
-                <div class="grid grid-cols-3 gap-4 mb-5">
-                     <div class="col-span-1">
-                        <div class="relative">
-                            <input type="number" id="taskDuration" class="w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-xl p-3 text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none font-medium" placeholder="Min" required>
-                            <span class="absolute right-3 top-3.5 text-xs text-gray-400 font-medium">min</span>
+                <div class="flex-1 flex flex-col min-h-0 bg-gray-50/50 dark:bg-gray-900/50 order-1 md:order-1 relative overflow-y-auto custom-scrollbar">
+                    
+                    <div class="px-6 py-3 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm sticky top-0 z-10 border-b border-gray-100 dark:border-gray-700 shrink-0">
+                        <div class="flex justify-between items-end mb-1.5">
+                            <span class="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Planned Capacity</span>
+                            <span class="text-[10px] font-bold text-gray-600 dark:text-gray-300 font-mono" id="dailyLoadText">0h</span>
                         </div>
+                        <div class="w-full bg-gray-100 dark:bg-gray-700 rounded-full h-1.5 overflow-hidden">
+                            <div id="dailyLoadBar" class="bg-secondary h-1.5 rounded-full transition-all duration-500 shadow-[0_0_10px_rgba(16,185,129,0.4)]" style="width: 0%"></div>
+                        </div>
+                        <div id="dailyLoadWarning" class="hidden text-[10px] text-red-500 font-bold mt-1 text-right animate-pulse">⚠️ Overload Warning</div>
                     </div>
-                    <div class="col-span-2">
-                        <input type="text" id="taskDesc" class="w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-xl p-3 text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none font-medium" placeholder="Notes (Optional)">
+
+                    <div class="p-4 space-y-2.5 pb-24 md:pb-6">
+                        <div id="dayManagerList" class="space-y-2.5">
+                            </div>
+                        
+                        <div id="smartRevisionSection" class="hidden bg-amber-50/50 dark:bg-amber-900/10 p-3 rounded-xl border border-amber-100 dark:border-amber-900/20 mt-4 opacity-75 hover:opacity-100 transition-opacity">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-full bg-amber-100 dark:bg-amber-900/50 flex items-center justify-center text-amber-500 text-xs">
+                                        <i class="fas fa-lightbulb"></i>
+                                    </div>
+                                    <div>
+                                        <span class="text-[10px] font-bold text-amber-800 dark:text-amber-400 block uppercase tracking-wider">Smart Review</span>
+                                        <span class="text-[10px] text-amber-700 dark:text-amber-500 block">Auto-suggests topics.</span>
+                                    </div>
+                                </div>
+                                <button onclick="app.loadRevisionTopics()" class="text-[10px] bg-amber-500 text-white px-2.5 py-1.5 rounded-lg hover:bg-amber-600 font-bold shadow-sm transition-colors">
+                                    Load
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <input type="date" id="taskDate" class="hidden" required>
+                <div class="w-full md:w-80 lg:w-96 bg-white dark:bg-gray-800 border-t md:border-t-0 md:border-l border-gray-200 dark:border-gray-700 shrink-0 z-30 shadow-[0_-4px_20px_-5px_rgba(0,0,0,0.1)] md:shadow-[-4px_0_20px_-5px_rgba(0,0,0,0.05)] order-2 md:order-2 flex flex-col">
+                    <form onsubmit="app.saveTask(event)" class="p-5 md:p-6 flex-1 overflow-y-auto">
+                        <div class="flex justify-between items-center mb-5">
+                             <h4 class="text-xs font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2" id="formModeTitle">
+                                <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span> Plan New Task
+                             </h4>
+                             <button type="button" onclick="app.resetForm(); app.renderDayManagerList(document.getElementById('taskDate').value);" class="text-[10px] bg-red-50 text-red-500 px-2 py-1 rounded border border-red-100 hover:bg-red-100 font-bold hidden transition-colors" id="cancelEditBtn">CANCEL EDIT</button>
+                        </div>
 
-                <button type="submit" id="saveTaskBtn" class="w-full py-3 bg-primary text-white rounded-xl hover:bg-primary-700 font-bold text-sm transition-all shadow-lg shadow-primary/20 hover:shadow-primary/40">Add to Schedule</button>
-            </form>
+                        <input type="hidden" id="taskEditId" value="">
+
+                        <div class="space-y-4">
+                            <div class="group relative">
+                                <label class="block text-[10px] font-bold uppercase text-gray-400 mb-1">Subject</label>
+                                <div class="relative">
+                                    <select id="taskSubject" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-600 rounded-xl p-3 text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none appearance-none font-medium transition-shadow pr-8" required onchange="app.updateSubSubjects()">
+                                        <option value="">Select Subject</option>
+                                    </select>
+                                    <i class="fas fa-chevron-down absolute right-3 top-3.5 text-gray-400 pointer-events-none text-xs"></i>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-[10px] font-bold uppercase text-gray-400 mb-1">Topic / Chapter</label>
+                                <input list="subSubjectList" id="taskSubSubject" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-600 rounded-xl p-3 text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none font-medium transition-shadow" placeholder="e.g. Mughal Empire" required autocomplete="off">
+                                <datalist id="subSubjectList"></datalist>
+                            </div>
+
+                            <div class="grid grid-cols-3 gap-3">
+                                 <div class="col-span-1">
+                                    <label class="block text-[10px] font-bold uppercase text-gray-400 mb-1">Duration</label>
+                                    <div class="relative">
+                                        <input type="number" id="taskDuration" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-600 rounded-xl p-3 text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none font-medium transition-shadow" placeholder="Min" required>
+                                        <span class="absolute right-2 top-3.5 text-[10px] text-gray-400 font-bold pointer-events-none">m</span>
+                                    </div>
+                                </div>
+                                <div class="col-span-2">
+                                    <label class="block text-[10px] font-bold uppercase text-gray-400 mb-1">Notes</label>
+                                    <input type="text" id="taskDesc" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-600 rounded-xl p-3 text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none font-medium transition-shadow" placeholder="Optional details">
+                                </div>
+                            </div>
+                        </div>
+
+                        <input type="date" id="taskDate" class="hidden" required>
+
+                        <button type="submit" id="saveTaskBtn" class="w-full mt-6 py-3.5 bg-primary text-white rounded-xl hover:bg-primary-700 font-bold text-sm transition-all shadow-lg shadow-primary/20 hover:shadow-primary/40 transform active:scale-[0.98]">Add to Schedule</button>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -1330,6 +1349,8 @@
                 const list = document.getElementById('dayManagerList');
                 list.innerHTML = '';
                 const tasks = this.data.tasks.filter(t => t.date === dateStr);
+                const editId = document.getElementById('taskEditId').value;
+                const isEditMode = !!editId;
                 
                 // v3.2 Daily Capacity Logic
                 const totalMinutes = tasks.reduce((acc, t) => acc + (t.duration || 0), 0);
@@ -1344,7 +1365,7 @@
                 let percentage = Math.min((totalMinutes / 600) * 100, 100); 
                 bar.style.width = `${percentage}%`;
                 
-                bar.className = "h-2 rounded-full transition-all duration-500 "; 
+                bar.className = "h-1.5 rounded-full transition-all duration-500 "; 
                 warningText.classList.add('hidden');
                 
                 if (totalMinutes > 480) { 
@@ -1362,12 +1383,17 @@
                 }
 
                 tasks.forEach(task => {
+                    const isEditing = task.id === editId;
                     let statusColor = "bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400";
                     if(task.status === 'done') statusColor = "bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400";
                     if(task.status === 'partial') statusColor = "bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400";
 
+                    // Visual states for Edit Mode
+                    const opacityClass = (isEditMode && !isEditing) ? 'opacity-40 grayscale-[0.5]' : 'opacity-100';
+                    const activeClass = isEditing ? 'ring-2 ring-primary ring-offset-2 ring-offset-gray-50 dark:ring-offset-gray-900 bg-white dark:bg-gray-800 z-10 scale-[1.01] shadow-lg' : 'bg-gray-50 dark:bg-gray-700/30 border border-gray-100 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600';
+
                     list.insertAdjacentHTML('beforeend', `
-                        <div class="flex justify-between items-center bg-gray-50 dark:bg-gray-700/30 p-3 rounded-xl border border-gray-100 dark:border-gray-700 group hover:border-gray-300 dark:hover:border-gray-600 transition-colors">
+                        <div class="flex justify-between items-center p-3 rounded-xl transition-all duration-200 ${activeClass} ${opacityClass}">
                             <div class="flex-1 min-w-0 mr-3">
                                 <div class="flex items-center gap-2 mb-1">
                                     <span class="text-[9px] font-bold uppercase ${statusColor} px-1.5 py-0.5 rounded tracking-wide">${task.status}</span>
@@ -1376,9 +1402,9 @@
                                 <div class="text-xs text-gray-500 font-medium truncate">${task.subSubject}</div>
                             </div>
                             <div class="flex items-center gap-3">
-                                <span class="text-xs text-gray-400 font-mono bg-white dark:bg-gray-800 px-2 py-1 rounded border border-gray-200 dark:border-gray-600">${task.duration}m</span>
+                                <span class="text-xs text-gray-400 font-mono bg-white/50 dark:bg-gray-800/50 px-2 py-1 rounded border border-gray-200 dark:border-gray-600">${task.duration}m</span>
                                 <div class="flex gap-1">
-                                    <button onclick="app.populateEditForm('${task.id}')" class="w-7 h-7 flex items-center justify-center rounded text-gray-400 hover:text-primary hover:bg-white dark:hover:bg-gray-600 transition-all"><i class="fas fa-pencil-alt text-xs"></i></button>
+                                    <button onclick="app.populateEditForm('${task.id}'); app.renderDayManagerList('${dateStr}');" class="w-7 h-7 flex items-center justify-center rounded text-gray-400 hover:text-primary hover:bg-white dark:hover:bg-gray-600 transition-all"><i class="fas fa-pencil-alt text-xs"></i></button>
                                     <button onclick="app.deleteTask('${task.id}')" class="w-7 h-7 flex items-center justify-center rounded text-gray-400 hover:text-red-500 hover:bg-white dark:hover:bg-gray-600 transition-all"><i class="fas fa-trash-alt text-xs"></i></button>
                                 </div>
                             </div>
@@ -1392,7 +1418,7 @@
                 if(!task) return;
 
                 document.getElementById('taskEditId').value = task.id;
-                document.getElementById('formModeTitle').innerText = "Edit Task";
+                document.getElementById('formModeTitle').innerHTML = '<span class="w-2 h-2 rounded-full bg-accent animate-pulse"></span> Edit Mode';
                 document.getElementById('cancelEditBtn').classList.remove('hidden');
                 document.getElementById('saveTaskBtn').innerText = "Update Task";
                 document.getElementById('saveTaskBtn').classList.add('bg-gray-800', 'hover:bg-black');
@@ -1409,7 +1435,7 @@
 
             resetForm() {
                 document.getElementById('taskEditId').value = "";
-                document.getElementById('formModeTitle').innerText = "Plan New Task";
+                document.getElementById('formModeTitle').innerHTML = '<span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span> Plan New Task';
                 document.getElementById('cancelEditBtn').classList.add('hidden');
                 document.getElementById('saveTaskBtn').innerText = "Add to Schedule";
                 document.getElementById('saveTaskBtn').classList.remove('bg-gray-800', 'hover:bg-black');
@@ -1593,3 +1619,4 @@
     </script>
 </body>
 </html>
+
