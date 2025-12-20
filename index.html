@@ -1,10 +1,9 @@
-```html
 <!DOCTYPE html>
 <html lang="en" class="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PrepMaster v4.1.0</title>
+    <title>PrepMaster v4.2.0</title>
     <meta name="description" content="PrepMaster - Study Planner & Task Manager for Competitive Exams">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -92,1531 +91,1719 @@
 </head>
 <body class="bg-gray-50 text-gray-800 dark:bg-dark-bg dark:text-gray-100 transition-colors duration-200 h-screen flex flex-col overflow-hidden font-sans antialiased selection:bg-primary-100 dark:selection:bg-primary-700/30">
 
-    <header class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 shrink-0 z-20">
-        <div class="px-4 md:px-6 h-16 flex justify-between items-center">
-            <div class="flex items-center gap-4">
-                <div class="flex items-center gap-2.5 group cursor-default">
-                    <div class="w-8 h-8 rounded-lg bg-primary/10 dark:bg-primary/20 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
-                        <i class="fas fa-layer-group text-lg"></i>
-                    </div>
-                    <div>
-                        <h1 class="text-lg md:text-xl font-bold tracking-tight leading-none">Prep<span class="text-primary">Master</span></h1>
-                        <span class="text-[10px] font-mono font-medium text-gray-400 dark:text-gray-500 uppercase tracking-widest">v4.1.0</span>
-                    </div>
+   <header class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 shrink-0 z-20">
+    <div class="px-4 md:px-6 h-16 flex justify-between items-center">
+        <div class="flex items-center gap-4">
+            <div class="flex items-center gap-2.5 group cursor-default">
+                <div class="w-8 h-8 rounded-lg bg-primary/10 dark:bg-primary/20 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
+                    <i class="fas fa-layer-group text-lg"></i>
                 </div>
-                
-                <div class="hidden md:block h-8 w-px bg-gray-200 dark:bg-gray-700 mx-2"></div>
-
-                <div class="hidden md:flex items-center gap-6">
-                    <div class="flex flex-col cursor-pointer group" onclick="app.editTargetDate()" title="Edit Target Date">
-                        <span class="text-[10px] uppercase font-bold tracking-wider text-gray-400 group-hover:text-primary transition-colors">Target</span>
-                        <span id="targetDateDisplay" class="text-xs font-semibold text-gray-700 dark:text-gray-200">Loading...</span>
-                    </div>
-                    <div class="flex flex-col">
-                        <span class="text-[10px] uppercase font-bold tracking-wider text-gray-400">Time Left</span>
-                        <span class="text-xs font-mono font-bold text-danger" id="countdownTimer">--</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="flex items-center gap-3 md:gap-5">
-                <div class="text-right hidden sm:block">
-                    <div class="text-xs font-bold text-secondary flex items-center justify-end gap-1.5" id="streakDisplay">
-                        <i class="fas fa-fire"></i> 0 Days
-                    </div>
-                    <div class="text-[10px] font-medium text-gray-400 mt-0.5" id="currentDateDisplay"></div>
-                </div>
-                
-                <div class="flex items-center gap-2">
-                    <button onclick="app.openSettings()" class="relative p-2.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors text-gray-500 dark:text-gray-400 group" aria-label="Settings">
-                        <i class="fas fa-cog group-hover:rotate-90 transition-transform duration-500"></i>
-                        <span id="backupWarningDot" class="hidden absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full ring-2 ring-white dark:ring-gray-800"></span>
-                    </button>
-                    <button onclick="app.toggleTheme()" class="p-2.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors text-gray-500 dark:text-yellow-400" aria-label="Toggle Theme">
-                        <i class="fas fa-moon dark:hidden"></i>
-                        <i class="fas fa-sun hidden dark:inline"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </header>
-
-    <div class="flex flex-1 overflow-hidden relative">
-        
-        <aside class="w-[72px] md:w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col justify-between transition-all duration-300 z-10">
-            <nav class="flex flex-col py-6 gap-2 px-3">
-                <button onclick="app.navigate('dashboard')" id="nav-dashboard" class="nav-item group flex items-center px-3 py-3 rounded-xl text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all duration-200">
-                    <div class="w-8 flex justify-center"><i class="fas fa-home text-lg transition-transform group-hover:scale-110"></i></div>
-                    <span class="hidden md:block ml-3 font-medium text-sm tracking-wide">Dashboard</span>
-                </button>
-                <button onclick="app.navigate('calendar')" id="nav-calendar" class="nav-item group flex items-center px-3 py-3 rounded-xl text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all duration-200">
-                    <div class="w-8 flex justify-center"><i class="fas fa-calendar-alt text-lg transition-transform group-hover:scale-110"></i></div>
-                    <span class="hidden md:block ml-3 font-medium text-sm tracking-wide">Calendar</span>
-                </button>
-                <button onclick="app.navigate('subjects')" id="nav-subjects" class="nav-item group flex items-center px-3 py-3 rounded-xl text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all duration-200">
-                    <div class="w-8 flex justify-center"><i class="fas fa-book text-lg transition-transform group-hover:scale-110"></i></div>
-                    <span class="hidden md:block ml-3 font-medium text-sm tracking-wide">Subjects</span>
-                </button>
-                <button onclick="app.navigate('analytics')" id="nav-analytics" class="nav-item group flex items-center px-3 py-3 rounded-xl text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all duration-200">
-                    <div class="w-8 flex justify-center"><i class="fas fa-chart-pie text-lg transition-transform group-hover:scale-110"></i></div>
-                    <span class="hidden md:block ml-3 font-medium text-sm tracking-wide">Analytics</span>
-                </button>
-            </nav>
-            
-            <div class="p-4 border-t border-gray-200 dark:border-gray-700 pb-20 md:pb-6">
-                <div class="flex items-center justify-between mb-3 cursor-pointer group" onclick="app.navigate('dashboard')">
-                    <h3 class="text-xs font-bold text-gray-400 uppercase hidden md:block tracking-widest group-hover:text-primary transition-colors">Backlog</h3>
-                    <span id="backlogCount" class="hidden bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded font-bold shadow-sm min-w-[20px] text-center">0</span>
-                </div>
-                <div id="sidebarBacklogList" class="hidden md:block overflow-y-auto max-h-32 space-y-1.5 pr-1">
-                    </div>
-            </div>
-        </aside>
-
-        <main id="mainContent" class="flex-1 overflow-y-auto bg-gray-50 dark:bg-dark-bg p-4 md:p-8 lg:p-10 pb-32 scroll-smooth">
-            
-            <div id="view-dashboard" class="view-section max-w-7xl mx-auto animate-fade-in">
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    <div class="lg:col-span-2 flex flex-col gap-6">
-                        <div class="flex justify-between items-end">
-                            <div>
-                                <h2 class="text-2xl md:text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">Today's Focus</h2>
-                                <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mt-1">Execute your plan consistently.</p>
-                            </div>
-                            <button onclick="app.openTaskModal()" class="bg-primary hover:bg-primary-700 text-white pl-6 pr-7 py-3 rounded-xl shadow-lg shadow-primary/30 hover:shadow-primary/50 transition-all active:scale-95 flex items-center gap-2 font-extrabold text-sm">
-                                <i class="fas fa-plus"></i> <span class="hidden sm:inline">New Task</span>
-                            </button>
-                        </div>
-
-                        <div id="todayTaskList" class="flex flex-col gap-3 min-h-[200px]">
-                            </div>
-                    </div>
-
-                    <div class="space-y-6">
-                        <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-soft border border-gray-100 dark:border-gray-700 h-full max-h-[80vh] flex flex-col">
-                            <h3 class="text-sm font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-4 flex items-center gap-2">
-                                <i class="fas fa-inbox text-gray-400"></i> Backlog Bucket
-                            </h3>
-                            <div id="dashboardBacklogList" class="flex-1 overflow-y-auto pr-2 space-y-3 custom-scrollbar">
-                                </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div id="view-calendar" class="view-section hidden max-w-6xl mx-auto">
-                <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
-                    <h2 class="text-2xl md:text-3xl font-extrabold text-gray-900 dark:text-white">Sprint Calendar</h2>
-                    <div class="flex items-center gap-4 bg-white dark:bg-gray-800 rounded-xl shadow-sm p-1.5 border border-gray-200 dark:border-gray-700">
-                        <button onclick="app.changeMonth(-1)" class="w-8 h-8 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg text-gray-500 transition-colors"><i class="fas fa-chevron-left"></i></button>
-                        <span id="calendarMonthLabel" class="font-bold text-sm w-36 text-center select-none text-gray-800 dark:text-gray-200">December</span>
-                        <button onclick="app.changeMonth(1)" class="w-8 h-8 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg text-gray-500 transition-colors"><i class="fas fa-chevron-right"></i></button>
-                    </div>
-                </div>
-                
-                <div class="flex flex-wrap gap-4 text-xs font-semibold text-gray-500 dark:text-gray-400 mb-4 px-1">
-                    <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-white border border-gray-300 dark:border-gray-600 dark:bg-gray-800"></span> Regular</div>
-                    <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-yellow-100 border border-yellow-300 dark:bg-yellow-900/30 dark:border-yellow-700"></span> Revision</div>
-                    <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-purple-100 border border-purple-300 dark:bg-purple-900/30 dark:border-purple-700"></span> Mock Test</div>
-                </div>
-                
-                <div id="calendarGrid" class="calendar-grid select-none">
-                    </div>
-            </div>
-
-            <div id="view-subjects" class="view-section hidden max-w-6xl mx-auto">
-                <div class="flex justify-between items-end mb-8">
-                    <div>
-                        <h2 class="text-2xl md:text-3xl font-extrabold text-gray-900 dark:text-white">Subjects & Syllabus</h2>
-                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mt-1">Manage your curriculum depth.</p>
-                    </div>
-                    <button onclick="app.openSubjectModal()" class="bg-secondary hover:bg-secondary-600 text-white px-4 py-2.5 rounded-xl shadow-lg shadow-secondary/20 hover:shadow-secondary/40 transition-all flex items-center gap-2 text-sm font-semibold">
-                        <i class="fas fa-plus"></i> New Subject
-                    </button>
-                </div>
-                <div id="subjectsList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    </div>
-            </div>
-
-            <div id="view-analytics" class="view-section hidden max-w-5xl mx-auto space-y-8">
-                <h2 class="text-2xl md:text-3xl font-extrabold text-gray-900 dark:text-white">Performance Analytics</h2>
-                
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-soft border border-gray-200 dark:border-gray-700 flex flex-col items-center justify-center relative overflow-hidden">
-                        <div class="absolute top-0 right-0 p-4 text-primary opacity-10"><i class="fas fa-clock text-6xl"></i></div>
-                        <h3 class="text-gray-400 text-xxs uppercase font-bold tracking-widest z-10">Total Study Time</h3>
-                        <div class="text-5xl font-extrabold text-primary mt-2 z-10" id="analyticsTotalHours">0h</div>
-                    </div>
-                    
-                    <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-soft border border-gray-200 dark:border-gray-700 flex flex-col items-center justify-center relative overflow-hidden">
-                        <div class="absolute top-0 right-0 p-4 text-accent opacity-10"><i class="fas fa-brain text-6xl"></i></div>
-                        <h3 class="text-gray-400 text-xxs uppercase font-bold tracking-widest z-10">Avg Focus Score</h3>
-                        <div class="text-5xl font-extrabold text-accent mt-2 z-10" id="analyticsAvgFocus">0.0</div>
-                    </div>
-                    
-                    <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-soft border border-gray-200 dark:border-gray-700 flex flex-col items-center justify-center relative overflow-hidden">
-                        <div class="absolute top-0 right-0 p-4 text-secondary opacity-10"><i class="fas fa-check-circle text-6xl"></i></div>
-                        <h3 class="text-gray-400 text-xxs uppercase font-bold tracking-widest z-10">Completion Rate</h3>
-                        <div class="text-5xl font-extrabold text-secondary mt-2 z-10" id="analyticsCompletion">0%</div>
-                    </div>
-                </div>
-
-                <div class="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-soft border border-gray-200 dark:border-gray-700">
-                    <h3 class="text-lg font-bold mb-6 text-gray-800 dark:text-gray-100">Subject Distribution</h3>
-                    <div id="analyticsSubjectBars" class="space-y-6">
-                        </div>
-                </div>
-            </div>
-
-        </main>
-    </div>
-
-    <div id="globalTimerBar" class="fixed bottom-0 left-0 w-full bg-white/90 dark:bg-gray-800/90 backdrop-blur-md border-t border-gray-200 dark:border-gray-700 shadow-[0_-4px_20px_rgba(0,0,0,0.1)] z-40 transform translate-y-full transition-transform duration-300 px-4 md:px-8 py-3 flex items-center justify-between">
-        <div class="flex items-center gap-4 flex-1 min-w-0">
-            <div class="relative">
-                <div class="w-3 h-3 rounded-full bg-secondary animate-pulse"></div>
-                <div class="absolute inset-0 w-3 h-3 rounded-full bg-secondary animate-ping opacity-75"></div>
-            </div>
-            <div class="flex flex-col min-w-0">
-                <div class="text-[10px] text-gray-500 dark:text-gray-400 uppercase tracking-wider font-bold">In Progress</div>
-                <div id="globalTimerTaskName" class="text-sm font-bold text-gray-900 dark:text-gray-100 truncate pr-4">History</div>
-            </div>
-        </div>
-        
-        <div class="flex items-center gap-4 md:gap-8 shrink-0">
-            <div id="globalTimerDisplay" class="font-mono text-2xl md:text-3xl font-bold text-primary tracking-widest tabular-nums leading-none">00:00:00</div>
-            <div class="flex gap-2">
-                <button onclick="app.toggleTimer()" id="globalTimerPauseBtn" class="bg-amber-100 text-amber-700 hover:bg-amber-200 dark:bg-amber-900/30 dark:text-amber-400 dark:hover:bg-amber-900/50 px-4 py-2 rounded-lg font-bold text-xs md:text-sm transition-colors uppercase tracking-wide">Pause</button>
-                <button onclick="app.stopTimer()" class="bg-red-500 text-white hover:bg-red-600 px-4 py-2 rounded-lg font-bold text-xs md:text-sm shadow-md shadow-red-500/30 transition-colors uppercase tracking-wide">Stop</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="settingsModal" class="modal fixed inset-0 z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden border border-gray-200 dark:border-gray-700 transform transition-all scale-100">
-            <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center bg-gray-50/50 dark:bg-gray-700/30">
-                <h3 class="text-base font-bold text-gray-800 dark:text-white">Settings & Data</h3>
-                <button onclick="app.closeModal('settingsModal')" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-200 dark:hover:bg-gray-600"><i class="fas fa-times"></i></button>
-            </div>
-            <div class="p-6 space-y-6">
                 <div>
-                    <h4 class="text-xs font-bold uppercase text-gray-400 mb-4 tracking-wider">Data Management</h4>
-                    <div class="grid grid-cols-2 gap-4">
-                        <button onclick="app.exportData()" class="flex flex-col items-center justify-center p-5 border border-gray-200 dark:border-gray-600 rounded-xl hover:bg-indigo-50 dark:hover:bg-gray-700 hover:border-primary/50 dark:hover:border-primary/50 transition-all group text-gray-600 dark:text-gray-300">
-                            <i class="fas fa-download text-2xl mb-2 text-gray-400 group-hover:text-primary transition-colors"></i>
-                            <span class="text-xs font-bold">Export JSON</span>
-                        </button>
-                        <button onclick="document.getElementById('importFile').click()" class="flex flex-col items-center justify-center p-5 border border-gray-200 dark:border-gray-600 rounded-xl hover:bg-emerald-50 dark:hover:bg-gray-700 hover:border-secondary/50 dark:hover:border-secondary/50 transition-all group text-gray-600 dark:text-gray-300">
-                            <i class="fas fa-file-upload text-2xl mb-2 text-gray-400 group-hover:text-secondary transition-colors"></i>
-                            <span class="text-xs font-bold">Import JSON</span>
-                        </button>
-                        <input type="file" id="importFile" class="hidden" accept=".json" onchange="app.importData(this)">
-                    </div>
-                </div>
-                <div class="text-[10px] text-center text-gray-400 font-mono bg-gray-50 dark:bg-gray-900 py-2 rounded-lg" id="lastBackupDisplay">
-                    Local Storage • No Cloud Sync
+                    <h1 class="text-lg md:text-xl font-bold tracking-tight leading-none">Prep<span class="text-primary">Master</span></h1>
+                    <span class="text-[10px] font-mono font-medium text-gray-400 dark:text-gray-500 uppercase tracking-widest">v4.1.0</span>
                 </div>
             </div>
-        </div>
-    </div>
-
-    <div id="taskModal" class="modal fixed inset-0 z-50 hidden flex items-center justify-center p-0 md:p-4">
-        <div class="bg-white dark:bg-gray-800 rounded-t-2xl md:rounded-2xl shadow-2xl w-full max-w-lg md:max-w-5xl overflow-hidden flex flex-col h-[92vh] md:h-auto md:max-h-[85vh] absolute bottom-0 md:relative transform transition-all scale-100">
-            <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center bg-gray-50/50 dark:bg-gray-700/30 shrink-0">
-                <h3 class="text-lg font-bold text-gray-800 dark:text-white" id="taskModalTitle">Day Manager</h3>
-                <button onclick="app.closeModal('taskModal')" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-200 dark:hover:bg-gray-600"><i class="fas fa-times"></i></button>
-            </div>
-
-            <div class="flex flex-col md:flex-row flex-1 min-h-0 overflow-hidden relative">
-                
-                <div class="flex-1 flex flex-col min-h-0 bg-gray-50/50 dark:bg-gray-900/50 order-1 md:order-1 relative overflow-y-auto custom-scrollbar">
-                    
-                    <div class="px-6 py-3 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm sticky top-0 z-10 border-b border-gray-100 dark:border-gray-700 shrink-0">
-                        <div class="flex justify-between items-end mb-1.5">
-                            <span class="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Planned Capacity</span>
-                            <span class="text-[10px] font-bold text-gray-600 dark:text-gray-300 font-mono" id="dailyLoadText">0h</span>
-                        </div>
-                        <div class="w-full bg-gray-100 dark:bg-gray-700 rounded-full h-1.5 overflow-hidden">
-                            <div id="dailyLoadBar" class="bg-secondary h-1.5 rounded-full transition-all duration-500 shadow-[0_0_10px_rgba(16,185,129,0.4)]" style="width: 0%"></div>
-                        </div>
-                        <div id="dailyLoadWarning" class="hidden text-[10px] text-red-500 font-bold mt-1 text-right animate-pulse">⚠️ Overload Warning</div>
-                    </div>
-
-                    <div class="p-4 space-y-2.5 pb-24 md:pb-6">
-                        <div id="dayManagerList" class="space-y-2.5">
-                            </div>
-                        
-                        <div id="smartRevisionSection" class="hidden bg-amber-50/50 dark:bg-amber-900/10 p-3 rounded-xl border border-amber-100 dark:border-amber-900/20 mt-4 opacity-75 hover:opacity-100 transition-opacity">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-8 h-8 rounded-full bg-amber-100 dark:bg-amber-900/50 flex items-center justify-center text-amber-500 text-xs">
-                                        <i class="fas fa-lightbulb"></i>
-                                    </div>
-                                    <div>
-                                        <span class="text-[10px] font-bold text-amber-800 dark:text-amber-400 block uppercase tracking-wider">Smart Review</span>
-                                        <span class="text-[10px] text-amber-700 dark:text-amber-500 block">Auto-suggests topics.</span>
-                                    </div>
-                                </div>
-                                <button onclick="app.loadRevisionTopics()" class="text-[10px] bg-amber-500 text-white px-2.5 py-1.5 rounded-lg hover:bg-amber-600 font-bold shadow-sm transition-colors">
-                                    Load
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="w-full md:w-80 lg:w-96 bg-white dark:bg-gray-800 border-t md:border-t-0 md:border-l border-gray-200 dark:border-gray-700 shrink-0 z-30 shadow-[0_-4px_20px_-5px_rgba(0,0,0,0.1)] md:shadow-[-4px_0_20px_-5px_rgba(0,0,0,0.05)] order-2 md:order-2 flex flex-col">
-                    <form onsubmit="app.saveTask(event)" class="p-5 md:p-6 flex-1 overflow-y-auto">
-                        <div class="flex justify-between items-center mb-5">
-                             <h4 class="text-xs font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2" id="formModeTitle">
-                                <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span> Plan New Task
-                             </h4>
-                             <button type="button" onclick="app.resetForm(); app.renderDayManagerList(document.getElementById('taskDate').value);" class="text-[10px] bg-red-50 text-red-500 px-2 py-1 rounded border border-red-100 hover:bg-red-100 font-bold hidden transition-colors" id="cancelEditBtn">CANCEL EDIT</button>
-                        </div>
-
-                        <input type="hidden" id="taskEditId" value="">
-
-                        <div class="space-y-4">
-                            <div class="group relative">
-                                <label class="block text-[10px] font-bold uppercase text-gray-400 mb-1">Subject</label>
-                                <div class="relative">
-                                    <select id="taskSubject" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-600 rounded-xl p-3 text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none appearance-none font-medium transition-shadow pr-8" required onchange="app.updateSubSubjects()">
-                                        <option value="">Select Subject</option>
-                                    </select>
-                                    <i class="fas fa-chevron-down absolute right-3 top-3.5 text-gray-400 pointer-events-none text-xs"></i>
-                                </div>
-                            </div>
-                            
-                            <div>
-                                <label class="block text-[10px] font-bold uppercase text-gray-400 mb-1">Topic / Chapter</label>
-                                <input list="subSubjectList" id="taskSubSubject" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-600 rounded-xl p-3 text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none font-medium transition-shadow" placeholder="e.g. Mughal Empire" required autocomplete="off">
-                                <datalist id="subSubjectList"></datalist>
-                            </div>
-
-                            <div class="grid grid-cols-3 gap-3">
-                                 <div class="col-span-1">
-                                    <label class="block text-[10px] font-bold uppercase text-gray-400 mb-1">Duration</label>
-                                    <div class="relative">
-                                        <input type="number" id="taskDuration" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-600 rounded-xl p-3 text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none font-medium transition-shadow" placeholder="Min" required>
-                                        <span class="absolute right-2 top-3.5 text-[10px] text-gray-400 font-bold pointer-events-none">m</span>
-                                    </div>
-                                </div>
-                                <div class="col-span-2">
-                                    <label class="block text-[10px] font-bold uppercase text-gray-400 mb-1">Notes</label>
-                                    <input type="text" id="taskDesc" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-600 rounded-xl p-3 text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none font-medium transition-shadow" placeholder="Optional details">
-                                </div>
-                            </div>
-                        </div>
-
-                        <input type="date" id="taskDate" class="hidden" required>
-
-                        <button type="submit" id="saveTaskBtn" class="w-full mt-6 py-3.5 bg-primary text-white rounded-xl hover:bg-primary-700 font-bold text-sm transition-all shadow-lg shadow-primary/20 hover:shadow-primary/40 transform active:scale-[0.98]">Add to Schedule</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="completeModal" class="modal fixed inset-0 z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-sm p-8 text-center border border-gray-100 dark:border-gray-700">
-            <div class="w-16 h-16 bg-secondary/10 text-secondary rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
-                <i class="fas fa-stopwatch"></i>
-            </div>
-            <h3 class="text-xl font-extrabold mb-2 text-gray-900 dark:text-white">Session Stopped</h3>
-            <p class="text-sm text-gray-500 mb-8">Log your actual performance.</p>
             
-            <div class="mb-6 text-left">
-                 <label class="block text-xs font-bold uppercase text-gray-400 mb-2 tracking-wider">Time Spent (Minutes)</label>
-                 <input type="number" id="actualTimeInput" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-600 rounded-xl p-4 font-mono text-center text-2xl font-bold focus:ring-2 focus:ring-secondary outline-none">
-            </div>
+            <div class="hidden md:block h-8 w-px bg-gray-200 dark:bg-gray-700 mx-2"></div>
 
-            <div class="mb-8 text-left">
-                <label class="block text-xs font-bold uppercase text-gray-400 mb-3 tracking-wider">Focus Level</label>
-                <input type="range" min="1" max="5" value="3" id="focusScore" class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-primary">
-                <div class="flex justify-between px-1 mt-2 text-[10px] font-bold text-gray-400 uppercase">
-                    <span>Distracted</span>
-                    <span>Flow State</span>
+            <div class="hidden md:flex items-center gap-6">
+                <div class="flex flex-col cursor-pointer group" onclick="app.editTargetDate()" title="Edit Target Date">
+                    <span class="text-[10px] uppercase font-bold tracking-wider text-gray-400 group-hover:text-primary transition-colors">Target</span>
+                    <span id="targetDateDisplay" class="text-xs font-semibold text-gray-700 dark:text-gray-200">Loading...</span>
+                </div>
+                <div class="flex flex-col">
+                    <span class="text-[10px] uppercase font-bold tracking-wider text-gray-400">Time Left</span>
+                    <span class="text-xs font-mono font-bold text-danger" id="countdownTimer">--</span>
                 </div>
             </div>
+        </div>
 
-            <div class="grid grid-cols-1 gap-3">
-                <button onclick="app.confirmCompletion('done')" class="w-full px-4 py-3 bg-secondary hover:bg-secondary-600 text-white rounded-xl font-bold shadow-lg shadow-secondary/20 transition-all flex items-center justify-center gap-2">
-                    <i class="fas fa-check"></i> Mark Fully Complete
+        <div class="flex items-center gap-3 md:gap-5">
+            <div class="text-right hidden sm:block">
+                <div class="text-xs font-bold text-secondary flex items-center justify-end gap-1.5" id="streakDisplay">
+                    <i class="fas fa-fire"></i> 0 Days
+                </div>
+                <div class="text-[10px] font-medium text-gray-400 mt-0.5" id="currentDateDisplay"></div>
+            </div>
+            
+            <div class="flex items-center gap-2">
+                <button onclick="app.openSettings()" class="relative p-2.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors text-gray-500 dark:text-gray-400 group" aria-label="Settings">
+                    <i class="fas fa-cog group-hover:rotate-90 transition-transform duration-500"></i>
+                    <span id="backupWarningDot" class="hidden absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full ring-2 ring-white dark:ring-gray-800"></span>
                 </button>
-                <button onclick="app.confirmCompletion('partial')" class="w-full px-4 py-3 bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-300 rounded-xl hover:bg-blue-100 dark:hover:bg-blue-900/40 font-bold transition-all flex items-center justify-center gap-2">
-                    <i class="fas fa-hourglass-half"></i> Log & Continue Later
+                <button onclick="app.toggleTheme()" class="p-2.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors text-gray-500 dark:text-yellow-400" aria-label="Toggle Theme">
+                    <i class="fas fa-moon dark:hidden"></i>
+                    <i class="fas fa-sun hidden dark:inline"></i>
                 </button>
             </div>
         </div>
     </div>
+</header>
 
-    <div id="subjectModal" class="modal fixed inset-0 z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-sm p-6 border border-gray-100 dark:border-gray-700">
-            <h3 class="text-xl font-bold mb-6 text-gray-900 dark:text-white">Add New Subject</h3>
-            <form onsubmit="app.saveSubject(event)">
-                <div class="mb-6">
-                    <label class="block text-xs font-bold uppercase text-gray-400 mb-2 tracking-wider">Subject Name</label>
-                    <input type="text" id="newSubjectName" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-600 rounded-xl p-3 focus:ring-2 focus:ring-primary focus:border-primary outline-none font-medium" placeholder="e.g. Economics" required>
+<div class="flex flex-1 overflow-hidden relative">
+    
+    <aside class="w-[72px] md:w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col justify-between transition-all duration-300 z-10">
+        <nav class="flex flex-col py-6 gap-2 px-3">
+            <button onclick="app.navigate('dashboard')" id="nav-dashboard" class="nav-item group flex items-center px-3 py-3 rounded-xl text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all duration-200">
+                <div class="w-8 flex justify-center"><i class="fas fa-home text-lg transition-transform group-hover:scale-110"></i></div>
+                <span class="hidden md:block ml-3 font-medium text-sm tracking-wide">Dashboard</span>
+            </button>
+            <button onclick="app.navigate('calendar')" id="nav-calendar" class="nav-item group flex items-center px-3 py-3 rounded-xl text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all duration-200">
+                <div class="w-8 flex justify-center"><i class="fas fa-calendar-alt text-lg transition-transform group-hover:scale-110"></i></div>
+                <span class="hidden md:block ml-3 font-medium text-sm tracking-wide">Calendar</span>
+            </button>
+            <button onclick="app.navigate('subjects')" id="nav-subjects" class="nav-item group flex items-center px-3 py-3 rounded-xl text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all duration-200">
+                <div class="w-8 flex justify-center"><i class="fas fa-book text-lg transition-transform group-hover:scale-110"></i></div>
+                <span class="hidden md:block ml-3 font-medium text-sm tracking-wide">Subjects</span>
+            </button>
+            <button onclick="app.navigate('analytics')" id="nav-analytics" class="nav-item group flex items-center px-3 py-3 rounded-xl text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all duration-200">
+                <div class="w-8 flex justify-center"><i class="fas fa-chart-pie text-lg transition-transform group-hover:scale-110"></i></div>
+                <span class="hidden md:block ml-3 font-medium text-sm tracking-wide">Analytics</span>
+            </button>
+        </nav>
+        
+        <div class="p-4 border-t border-gray-200 dark:border-gray-700 pb-20 md:pb-6">
+            <div class="flex items-center justify-between mb-3 cursor-pointer group" onclick="app.navigate('dashboard')">
+                <h3 class="text-xs font-bold text-gray-400 uppercase hidden md:block tracking-widest group-hover:text-primary transition-colors">Backlog</h3>
+                <span id="backlogCount" class="hidden bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded font-bold shadow-sm min-w-[20px] text-center">0</span>
+            </div>
+            <div id="sidebarBacklogList" class="hidden md:block overflow-y-auto max-h-32 space-y-1.5 pr-1">
                 </div>
-                <div class="flex justify-end gap-3">
-                    <button type="button" onclick="app.closeModal('subjectModal')" class="px-5 py-2.5 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl font-medium text-sm transition-colors">Cancel</button>
-                    <button type="submit" class="px-5 py-2.5 bg-primary text-white rounded-xl hover:bg-primary-700 font-bold text-sm shadow-lg shadow-primary/20 transition-all">Create Subject</button>
+        </div>
+    </aside>
+
+    <main id="mainContent" class="flex-1 overflow-y-auto bg-gray-50 dark:bg-dark-bg p-4 md:p-8 lg:p-10 pb-32 scroll-smooth">
+        
+        <div id="view-dashboard" class="view-section max-w-7xl mx-auto animate-fade-in">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div class="lg:col-span-2 flex flex-col gap-6">
+                    <div class="flex justify-between items-end">
+                        <div>
+                            <h2 class="text-2xl md:text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">Today's Focus</h2>
+                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mt-1">Execute your plan consistently.</p>
+                        </div>
+                        <button onclick="app.openTaskModal()" class="bg-primary hover:bg-primary-700 text-white pl-6 pr-7 py-3 rounded-xl shadow-lg shadow-primary/30 hover:shadow-primary/50 transition-all active:scale-95 flex items-center gap-2 font-extrabold text-sm">
+                            <i class="fas fa-plus"></i> <span class="hidden sm:inline">New Task</span>
+                        </button>
+                    </div>
+
+                    <div id="todayTaskList" class="flex flex-col gap-3 min-h-[200px]">
+                        </div>
                 </div>
-            </form>
+
+                <div class="space-y-6">
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-soft border border-gray-100 dark:border-gray-700 h-full max-h-[80vh] flex flex-col">
+                        <h3 class="text-sm font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-4 flex items-center gap-2">
+                            <i class="fas fa-inbox text-gray-400"></i> Backlog Bucket
+                        </h3>
+                        <div id="dashboardBacklogList" class="flex-1 overflow-y-auto pr-2 space-y-3 custom-scrollbar">
+                            </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="view-calendar" class="view-section hidden max-w-6xl mx-auto">
+            <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+                <h2 class="text-2xl md:text-3xl font-extrabold text-gray-900 dark:text-white">Sprint Calendar</h2>
+                <div class="flex items-center gap-4 bg-white dark:bg-gray-800 rounded-xl shadow-sm p-1.5 border border-gray-200 dark:border-gray-700">
+                    <button onclick="app.changeMonth(-1)" class="w-8 h-8 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg text-gray-500 transition-colors"><i class="fas fa-chevron-left"></i></button>
+                    <span id="calendarMonthLabel" class="font-bold text-sm w-36 text-center select-none text-gray-800 dark:text-gray-200">December</span>
+                    <button onclick="app.changeMonth(1)" class="w-8 h-8 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg text-gray-500 transition-colors"><i class="fas fa-chevron-right"></i></button>
+                </div>
+            </div>
+            
+            <div class="flex flex-wrap gap-4 text-xs font-semibold text-gray-500 dark:text-gray-400 mb-4 px-1">
+                <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-white border border-gray-300 dark:border-gray-600 dark:bg-gray-800"></span> Regular</div>
+                <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-yellow-100 border border-yellow-300 dark:bg-yellow-900/30 dark:border-yellow-700"></span> Revision</div>
+                <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-purple-100 border border-purple-300 dark:bg-purple-900/30 dark:border-purple-700"></span> Mock Test</div>
+            </div>
+            
+            <div id="calendarGrid" class="calendar-grid select-none">
+                </div>
+        </div>
+<div id="view-subjects" class="view-section hidden max-w-6xl mx-auto pb-20"> <div class="flex justify-between items-end mb-8"> <div> <h2 class="text-2xl md:text-3xl font-extrabold text-gray-900 dark:text-white">Curriculum</h2> <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mt-1">Manage syllabus & steering.</p> </div> <button onclick="app.openSubjectModal()" class="bg-secondary hover:bg-secondary-600 text-white px-4 py-2.5 rounded-xl shadow-lg shadow-secondary/20 hover:shadow-secondary/40 transition-all flex items-center gap-2 text-sm font-semibold active:scale-95"> <i class="fas fa-plus"></i> New Subject </button> </div> <div id="subjectsList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"> </div> </div>
+
+        <div id="view-analytics" class="view-section hidden max-w-5xl mx-auto space-y-8">
+            <h2 class="text-2xl md:text-3xl font-extrabold text-gray-900 dark:text-white">Performance Analytics</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-soft border border-gray-200 dark:border-gray-700 flex flex-col items-center justify-center relative overflow-hidden">
+                    <div class="absolute top-0 right-0 p-4 text-primary opacity-10"><i class="fas fa-clock text-6xl"></i></div>
+                    <h3 class="text-gray-400 text-xxs uppercase font-bold tracking-widest z-10">Total Study Time</h3>
+                    <div class="text-5xl font-extrabold text-primary mt-2 z-10" id="analyticsTotalHours">0h</div>
+                </div>
+                
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-soft border border-gray-200 dark:border-gray-700 flex flex-col items-center justify-center relative overflow-hidden">
+                    <div class="absolute top-0 right-0 p-4 text-accent opacity-10"><i class="fas fa-brain text-6xl"></i></div>
+                    <h3 class="text-gray-400 text-xxs uppercase font-bold tracking-widest z-10">Avg Focus Score</h3>
+                    <div class="text-5xl font-extrabold text-accent mt-2 z-10" id="analyticsAvgFocus">0.0</div>
+                </div>
+                
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-soft border border-gray-200 dark:border-gray-700 flex flex-col items-center justify-center relative overflow-hidden">
+                    <div class="absolute top-0 right-0 p-4 text-secondary opacity-10"><i class="fas fa-check-circle text-6xl"></i></div>
+                    <h3 class="text-gray-400 text-xxs uppercase font-bold tracking-widest z-10">Completion Rate</h3>
+                    <div class="text-5xl font-extrabold text-secondary mt-2 z-10" id="analyticsCompletion">0%</div>
+                </div>
+            </div>
+
+            <div class="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-soft border border-gray-200 dark:border-gray-700">
+                <h3 class="text-lg font-bold mb-6 text-gray-800 dark:text-gray-100">Subject Distribution</h3>
+                <div id="analyticsSubjectBars" class="space-y-6">
+                    </div>
+            </div>
+        </div>
+
+    </main>
+</div>
+
+<div id="globalTimerBar" class="fixed bottom-0 left-0 w-full bg-white/90 dark:bg-gray-800/90 backdrop-blur-md border-t border-gray-200 dark:border-gray-700 shadow-[0_-4px_20px_rgba(0,0,0,0.1)] z-40 transform translate-y-full transition-transform duration-300 px-4 md:px-8 py-3 flex items-center justify-between">
+    <div class="flex items-center gap-4 flex-1 min-w-0">
+        <div class="relative">
+            <div class="w-3 h-3 rounded-full bg-secondary animate-pulse"></div>
+            <div class="absolute inset-0 w-3 h-3 rounded-full bg-secondary animate-ping opacity-75"></div>
+        </div>
+        <div class="flex flex-col min-w-0">
+            <div class="text-[10px] text-gray-500 dark:text-gray-400 uppercase tracking-wider font-bold">In Progress</div>
+            <div id="globalTimerTaskName" class="text-sm font-bold text-gray-900 dark:text-gray-100 truncate pr-4">History</div>
         </div>
     </div>
     
-    <div id="uiDialogContainer" class="modal fixed inset-0 z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden border border-gray-200 dark:border-gray-700 transform transition-all scale-100 p-6 flex flex-col gap-4">
-             <h3 id="uiDialogTitle" class="text-lg font-bold text-gray-900 dark:text-white"></h3>
-             <p id="uiDialogMessage" class="text-sm text-gray-600 dark:text-gray-300 whitespace-pre-wrap"></p>
-             <input type="text" id="uiDialogInput" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-600 rounded-xl p-3 text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none font-medium hidden">
-             <div id="uiDialogButtons" class="flex justify-end gap-3 mt-2"></div>
+    <div class="flex items-center gap-4 md:gap-8 shrink-0">
+        <div id="globalTimerDisplay" class="font-mono text-2xl md:text-3xl font-bold text-primary tracking-widest tabular-nums leading-none">00:00:00</div>
+        <div class="flex gap-2">
+            <button onclick="app.toggleTimer()" id="globalTimerPauseBtn" class="bg-amber-100 text-amber-700 hover:bg-amber-200 dark:bg-amber-900/30 dark:text-amber-400 dark:hover:bg-amber-900/50 px-4 py-2 rounded-lg font-bold text-xs md:text-sm transition-colors uppercase tracking-wide">Pause</button>
+            <button onclick="app.stopTimer()" class="bg-red-500 text-white hover:bg-red-600 px-4 py-2 rounded-lg font-bold text-xs md:text-sm shadow-md shadow-red-500/30 transition-colors uppercase tracking-wide">Stop</button>
         </div>
     </div>
+</div>
 
-    <script>
-        const app = {
-            data: {
-                tasks: [],
-                subjects: [],
-                targetDate: '2026-02-01',
-                // TIMER STATE
-                activeTimer: null, // { id, startTime, accumulated, lastSaved }
-                timerInterval: null,
-                // UI STATE
-                currentView: 'dashboard',
-                currentDate: new Date(),
-                calendarMonth: new Date(),
-                completingTaskId: null,
-                lastBackup: null,
-                // UI DIALOG STATE
-                dialogQueue: [],
-                isDialogOpen: false
-            },
+<div id="settingsModal" class="modal fixed inset-0 z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden border border-gray-200 dark:border-gray-700 transform transition-all scale-100">
+        <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center bg-gray-50/50 dark:bg-gray-700/30">
+            <h3 class="text-base font-bold text-gray-800 dark:text-white">Settings & Data</h3>
+            <button onclick="app.closeModal('settingsModal')" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-200 dark:hover:bg-gray-600"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="p-6 space-y-6">
+            <div>
+                <h4 class="text-xs font-bold uppercase text-gray-400 mb-4 tracking-wider">Data Management</h4>
+                <div class="grid grid-cols-2 gap-4">
+                    <button onclick="app.exportData()" class="flex flex-col items-center justify-center p-5 border border-gray-200 dark:border-gray-600 rounded-xl hover:bg-indigo-50 dark:hover:bg-gray-700 hover:border-primary/50 dark:hover:border-primary/50 transition-all group text-gray-600 dark:text-gray-300">
+                        <i class="fas fa-download text-2xl mb-2 text-gray-400 group-hover:text-primary transition-colors"></i>
+                        <span class="text-xs font-bold">Export JSON</span>
+                    </button>
+                    <button onclick="document.getElementById('importFile').click()" class="flex flex-col items-center justify-center p-5 border border-gray-200 dark:border-gray-600 rounded-xl hover:bg-emerald-50 dark:hover:bg-gray-700 hover:border-secondary/50 dark:hover:border-secondary/50 transition-all group text-gray-600 dark:text-gray-300">
+                        <i class="fas fa-file-upload text-2xl mb-2 text-gray-400 group-hover:text-secondary transition-colors"></i>
+                        <span class="text-xs font-bold">Import JSON</span>
+                    </button>
+                    <input type="file" id="importFile" class="hidden" accept=".json" onchange="app.importData(this)">
+                </div>
+            </div>
+            <div class="text-[10px] text-center text-gray-400 font-mono bg-gray-50 dark:bg-gray-900 py-2 rounded-lg" id="lastBackupDisplay">
+                Local Storage • No Cloud Sync
+            </div>
+        </div>
+    </div>
+</div>
 
-            init() {
-                this.loadData();
-                this.render();
-                this.checkBacklog();
-                this.checkBackupStatus(); 
-                this.restoreTimerState(); // Now uses robust restoration logic
-                this.setupKeyboardShortcuts();
+<div id="taskModal" class="modal fixed inset-0 z-50 hidden flex items-center justify-center p-0 md:p-4">
+    <div class="bg-white dark:bg-gray-800 rounded-t-2xl md:rounded-2xl shadow-2xl w-full max-w-lg md:max-w-5xl overflow-hidden flex flex-col h-[92vh] md:h-auto md:max-h-[85vh] absolute bottom-0 md:relative transform transition-all scale-100">
+        <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center bg-gray-50/50 dark:bg-gray-700/30 shrink-0">
+            <h3 class="text-lg font-bold text-gray-800 dark:text-white" id="taskModalTitle">Day Manager</h3>
+            <button onclick="app.closeModal('taskModal')" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-200 dark:hover:bg-gray-600"><i class="fas fa-times"></i></button>
+        </div>
 
-                // Theme Logic
-                if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-                    document.documentElement.classList.add('dark');
-                }
-            },
+        <div class="flex flex-col md:flex-row flex-1 min-h-0 overflow-hidden relative">
             
-            // --- CUSTOM UI DIALOGS ---
-            processDialogQueue() {
-                if (this.isDialogOpen || this.data.dialogQueue.length === 0) return;
+            <div class="flex-1 flex flex-col min-h-0 bg-gray-50/50 dark:bg-gray-900/50 order-1 md:order-1 relative overflow-y-auto custom-scrollbar">
                 
-                const { type, msg, defaultVal, resolve } = this.data.dialogQueue.shift();
-                this.isDialogOpen = true;
-                
-                const container = document.getElementById('uiDialogContainer');
-                const titleEl = document.getElementById('uiDialogTitle');
-                const msgEl = document.getElementById('uiDialogMessage');
-                const inputEl = document.getElementById('uiDialogInput');
-                const btnsEl = document.getElementById('uiDialogButtons');
-                
-                msgEl.innerText = msg;
-                inputEl.classList.add('hidden');
-                inputEl.value = '';
-                btnsEl.innerHTML = '';
-                
-                const closeDialog = (result) => {
-                    container.classList.add('hidden');
-                    this.isDialogOpen = false;
-                    resolve(result);
-                    setTimeout(() => this.processDialogQueue(), 50); // slight delay to allow stack clear
-                };
-                
-                // Setup based on type
-                if (type === 'alert') {
-                    titleEl.innerText = 'Alert';
-                    btnsEl.innerHTML = `<button id="uiBtnOK" class="px-5 py-2.5 bg-primary text-white rounded-xl hover:bg-primary-700 font-bold text-sm shadow-lg shadow-primary/20 transition-all">OK</button>`;
-                    document.getElementById('uiBtnOK').onclick = () => closeDialog(undefined);
-                    container.classList.remove('hidden');
-                    document.getElementById('uiBtnOK').focus();
-                } else if (type === 'confirm') {
-                    titleEl.innerText = 'Confirm';
-                    btnsEl.innerHTML = `
-                        <button id="uiBtnCancel" class="px-5 py-2.5 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl font-medium text-sm transition-colors">Cancel</button>
-                        <button id="uiBtnConfirm" class="px-5 py-2.5 bg-primary text-white rounded-xl hover:bg-primary-700 font-bold text-sm shadow-lg shadow-primary/20 transition-all">Confirm</button>
-                    `;
-                    document.getElementById('uiBtnCancel').onclick = () => closeDialog(false);
-                    document.getElementById('uiBtnConfirm').onclick = () => closeDialog(true);
-                    container.classList.remove('hidden');
-                    document.getElementById('uiBtnConfirm').focus();
-                } else if (type === 'prompt') {
-                    titleEl.innerText = 'Input';
-                    inputEl.value = defaultVal || '';
-                    inputEl.classList.remove('hidden');
-                    btnsEl.innerHTML = `
-                        <button id="uiBtnCancel" class="px-5 py-2.5 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl font-medium text-sm transition-colors">Cancel</button>
-                        <button id="uiBtnConfirm" class="px-5 py-2.5 bg-primary text-white rounded-xl hover:bg-primary-700 font-bold text-sm shadow-lg shadow-primary/20 transition-all">Confirm</button>
-                    `;
-                    document.getElementById('uiBtnCancel').onclick = () => closeDialog(null);
-                    const confirmAction = () => closeDialog(inputEl.value);
-                    document.getElementById('uiBtnConfirm').onclick = confirmAction;
+                <div class="px-6 py-3 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm sticky top-0 z-10 border-b border-gray-100 dark:border-gray-700 shrink-0">
+                    <div class="flex justify-between items-end mb-1.5">
+                        <span class="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Planned Capacity</span>
+                        <span class="text-[10px] font-bold text-gray-600 dark:text-gray-300 font-mono" id="dailyLoadText">0h</span>
+                    </div>
+                    <div class="w-full bg-gray-100 dark:bg-gray-700 rounded-full h-1.5 overflow-hidden">
+                        <div id="dailyLoadBar" class="bg-secondary h-1.5 rounded-full transition-all duration-500 shadow-[0_0_10px_rgba(16,185,129,0.4)]" style="width: 0%"></div>
+                    </div>
+                    <div id="dailyLoadWarning" class="hidden text-[10px] text-red-500 font-bold mt-1 text-right animate-pulse">⚠️ Overload Warning</div>
+                </div>
+
+                <div class="p-4 space-y-2.5 pb-24 md:pb-6">
+                    <div id="dayManagerList" class="space-y-2.5">
+                        </div>
                     
-                    // Allow Enter to confirm in prompt
-                    inputEl.onkeydown = (e) => {
-                         if(e.key === 'Enter') confirmAction();
-                    };
-                    
-                    container.classList.remove('hidden');
-                    inputEl.focus();
-                    inputEl.select();
-                }
-                
-                // Global Escape handler for this specific dialog instance
-                const escapeHandler = (e) => {
-                     if (e.key === 'Escape' && !container.classList.contains('hidden')) {
-                         if (type === 'alert') closeDialog(undefined);
-                         else if (type === 'confirm') closeDialog(false);
-                         else if (type === 'prompt') closeDialog(null);
-                         document.removeEventListener('keydown', escapeHandler);
-                     }
-                };
-                document.addEventListener('keydown', escapeHandler);
-            },
-            
-            uiAlert(msg) {
-                return new Promise(resolve => {
-                    this.data.dialogQueue.push({ type: 'alert', msg, resolve });
-                    this.processDialogQueue();
-                });
-            },
-            
-            uiConfirm(msg) {
-                return new Promise(resolve => {
-                    this.data.dialogQueue.push({ type: 'confirm', msg, resolve });
-                    this.processDialogQueue();
-                });
-            },
-            
-            uiPrompt(msg, defaultVal = '') {
-                return new Promise(resolve => {
-                    this.data.dialogQueue.push({ type: 'prompt', msg, defaultVal, resolve });
-                    this.processDialogQueue();
-                });
-            },
+                    <div id="smartRevisionSection" class="hidden bg-amber-50/50 dark:bg-amber-900/10 p-3 rounded-xl border border-amber-100 dark:border-amber-900/20 mt-4 opacity-75 hover:opacity-100 transition-opacity">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-full bg-amber-100 dark:bg-amber-900/50 flex items-center justify-center text-amber-500 text-xs">
+                                    <i class="fas fa-lightbulb"></i>
+                                </div>
+                                <div>
+                                    <span class="text-[10px] font-bold text-amber-800 dark:text-amber-400 block uppercase tracking-wider">Smart Review</span>
+                                    <span class="text-[10px] text-amber-700 dark:text-amber-500 block">Auto-suggests topics.</span>
+                                </div>
+                            </div>
+                            <button onclick="app.loadRevisionTopics()" class="text-[10px] bg-amber-500 text-white px-2.5 py-1.5 rounded-lg hover:bg-amber-600 font-bold shadow-sm transition-colors">
+                                Load
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-            // --- HELPERS ---
-            generateUUID() {
-                if (typeof crypto !== 'undefined' && crypto.randomUUID) {
-                    return crypto.randomUUID();
-                }
-                return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-                    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-                    return v.toString(16);
-                });
-            },
+            <div class="w-full md:w-80 lg:w-96 bg-white dark:bg-gray-800 border-t md:border-t-0 md:border-l border-gray-200 dark:border-gray-700 shrink-0 z-30 shadow-[0_-4px_20px_-5px_rgba(0,0,0,0.1)] md:shadow-[-4px_0_20px_-5px_rgba(0,0,0,0.05)] order-2 md:order-2 flex flex-col">
+                <form onsubmit="app.saveTask(event)" class="p-5 md:p-6 flex-1 overflow-y-auto">
+                    <div class="flex justify-between items-center mb-5">
+                         <h4 class="text-xs font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2" id="formModeTitle">
+                            <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span> Plan New Task
+                         </h4>
+                         <button type="button" onclick="app.resetForm(); app.renderDayManagerList(document.getElementById('taskDate').value);" class="text-[10px] bg-red-50 text-red-500 px-2 py-1 rounded border border-red-100 hover:bg-red-100 font-bold hidden transition-colors" id="cancelEditBtn">CANCEL EDIT</button>
+                    </div>
 
-            setupKeyboardShortcuts() {
-                document.addEventListener('keydown', async (e) => {
-                    // Ignore global shortcuts if a custom dialog is open (it handles its own keys)
-                    if (this.isDialogOpen) return;
+                    <input type="hidden" id="taskEditId" value="">
 
-                    if (e.key === 'Escape') {
-                        const modals = Array.from(document.querySelectorAll('.modal')).filter(m => !m.classList.contains('hidden') && m.id !== 'uiDialogContainer');
-                        if (modals.length === 0) return;
-                        const top = modals[modals.length - 1];
+                    <div class="space-y-4">
+                        <div class="group relative">
+                            <label class="block text-[10px] font-bold uppercase text-gray-400 mb-1">Subject</label>
+                            <div class="relative">
+                                <select id="taskSubject" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-600 rounded-xl p-3 text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none appearance-none font-medium transition-shadow pr-8" required onchange="app.updateSubSubjects()">
+                                    <option value="">Select Subject</option>
+                                </select>
+                                <i class="fas fa-chevron-down absolute right-3 top-3.5 text-gray-400 pointer-events-none text-xs"></i>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-[10px] font-bold uppercase text-gray-400 mb-1">Topic / Chapter</label>
+                            <input list="subSubjectList" id="taskSubSubject" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-600 rounded-xl p-3 text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none font-medium transition-shadow" placeholder="e.g. Mughal Empire" required autocomplete="off">
+                            <datalist id="subSubjectList"></datalist>
+                        </div>
 
-                        // Heuristic for unsaved edits in Task Modal
-                        if (top.id === 'taskModal') {
-                            const editId = document.getElementById('taskEditId')?.value;
-                            const subjectVal = document.getElementById('taskSubject')?.value || '';
-                            const subSubjectVal = document.getElementById('taskSubSubject')?.value || '';
-                            const durationVal = document.getElementById('taskDuration')?.value || '';
-                            
-                            // Prompt heuristic: editId exists AND fields have values
-                            const isDirty = !!(editId && (subjectVal || subSubjectVal || durationVal));
+                        <div class="grid grid-cols-3 gap-3">
+                             <div class="col-span-1">
+                                <label class="block text-[10px] font-bold uppercase text-gray-400 mb-1">Duration</label>
+                                <div class="relative">
+                                    <input type="number" id="taskDuration" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-600 rounded-xl p-3 text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none font-medium transition-shadow" placeholder="Min" required>
+                                    <span class="absolute right-2 top-3.5 text-[10px] text-gray-400 font-bold pointer-events-none">m</span>
+                                </div>
+                            </div>
+                            <div class="col-span-2">
+                                <label class="block text-[10px] font-bold uppercase text-gray-400 mb-1">Notes</label>
+                                <input type="text" id="taskDesc" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-600 rounded-xl p-3 text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none font-medium transition-shadow" placeholder="Optional details">
+                            </div>
+                        </div>
+                    </div>
+
+                    <input type="date" id="taskDate" class="hidden" required>
+
+                    <button type="submit" id="saveTaskBtn" class="w-full mt-6 py-3.5 bg-primary text-white rounded-xl hover:bg-primary-700 font-bold text-sm transition-all shadow-lg shadow-primary/20 hover:shadow-primary/40 transform active:scale-[0.98]">Add to Schedule</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="completeModal" class="modal fixed inset-0 z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-sm p-8 text-center border border-gray-100 dark:border-gray-700">
+        <div class="w-16 h-16 bg-secondary/10 text-secondary rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
+            <i class="fas fa-stopwatch"></i>
+        </div>
+        <h3 class="text-xl font-extrabold mb-2 text-gray-900 dark:text-white">Session Stopped</h3>
+        <p class="text-sm text-gray-500 mb-8">Log your actual performance.</p>
         
-                            if (isDirty) {
-                                const proceed = await this.uiConfirm("You have unsaved changes. Close anyway?");
-                                if (!proceed) return;
-                            }
-                        }
+        <div class="mb-6 text-left">
+             <label class="block text-xs font-bold uppercase text-gray-400 mb-2 tracking-wider">Time Spent (Minutes)</label>
+             <input type="number" id="actualTimeInput" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-600 rounded-xl p-4 font-mono text-center text-2xl font-bold focus:ring-2 focus:ring-secondary outline-none">
+        </div>
 
-                        top.classList.add('hidden');
-                    }
-                });
-            },
+        <div class="mb-8 text-left">
+            <label class="block text-xs font-bold uppercase text-gray-400 mb-3 tracking-wider">Focus Level</label>
+            <input type="range" min="1" max="5" value="3" id="focusScore" class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-primary">
+            <div class="flex justify-between px-1 mt-2 text-[10px] font-bold text-gray-400 uppercase">
+                <span>Distracted</span>
+                <span>Flow State</span>
+            </div>
+        </div>
 
-            // --- DATA LAYER ---
-            saveData() {
-                // We do NOT save activeTimer here anymore to avoid race conditions.
-                // activeTimer is managed by its own persistence cycle.
-                localStorage.setItem('prepMasterData_v3', JSON.stringify({
-                    schema: 3.2,
-                    tasks: this.data.tasks,
-                    subjects: this.data.subjects,
-                    targetDate: this.data.targetDate,
-                    lastBackup: this.data.lastBackup 
-                }));
-                this.render();
-            },
+        <div class="grid grid-cols-1 gap-3">
+            <button onclick="app.confirmCompletion('done')" class="w-full px-4 py-3 bg-secondary hover:bg-secondary-600 text-white rounded-xl font-bold shadow-lg shadow-secondary/20 transition-all flex items-center justify-center gap-2">
+                <i class="fas fa-check"></i> Mark Fully Complete
+            </button>
+            <button onclick="app.confirmCompletion('partial')" class="w-full px-4 py-3 bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-300 rounded-xl hover:bg-blue-100 dark:hover:bg-blue-900/40 font-bold transition-all flex items-center justify-center gap-2">
+                <i class="fas fa-hourglass-half"></i> Log & Continue Later
+            </button>
+        </div>
+    </div>
+</div>
 
-            loadData() {
-                const stored = localStorage.getItem('prepMasterData_v3');
-                if (stored) {
-                    const parsed = JSON.parse(stored);
-                    this.data.tasks = parsed.tasks || [];
-                    this.data.subjects = parsed.subjects || [];
-                    this.data.targetDate = parsed.targetDate || '2026-02-01';
-                    this.data.lastBackup = parsed.lastBackup || null;
-                } else {
-                    // Seed Data
-                    this.data.subjects = [
-                        { id: this.generateUUID(), name: 'History', sub: ['Ancient', 'Medieval', 'Modern'] },
-                        { id: this.generateUUID(), name: 'Polity', sub: ['Constitution', 'Governance'] },
-                        { id: this.generateUUID(), name: 'Geography', sub: ['Physical', 'Indian'] }
-                    ];
-                }
-            },
+<div id="subjectModal" class="modal fixed inset-0 z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-sm p-6 border border-gray-100 dark:border-gray-700">
+        <h3 class="text-xl font-bold mb-6 text-gray-900 dark:text-white">Add New Subject</h3>
+        <form onsubmit="app.saveSubject(event)">
+            <div class="mb-6">
+                <label class="block text-xs font-bold uppercase text-gray-400 mb-2 tracking-wider">Subject Name</label>
+                <input type="text" id="newSubjectName" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-600 rounded-xl p-3 focus:ring-2 focus:ring-primary focus:border-primary outline-none font-medium" placeholder="e.g. Economics" required>
+            </div>
+            <div class="flex justify-end gap-3">
+                <button type="button" onclick="app.closeModal('subjectModal')" class="px-5 py-2.5 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl font-medium text-sm transition-colors">Cancel</button>
+                <button type="submit" class="px-5 py-2.5 bg-primary text-white rounded-xl hover:bg-primary-700 font-bold text-sm shadow-lg shadow-primary/20 transition-all">Create Subject</button>
+            </div>
+        </form>
+    </div>
+</div>
 
-            checkBackupStatus() {
-                const dot = document.getElementById('backupWarningDot');
-                if (!dot) return;
-                const last = this.data.lastBackup ? new Date(this.data.lastBackup) : new Date(0);
-                const now = new Date();
-                const diffDays = (now - last) / (1000 * 60 * 60 * 24);
-                
-                if (diffDays > 7) {
-                    dot.classList.remove('hidden');
-                } else {
-                    dot.classList.add('hidden');
-                }
-                
-                if(this.data.lastBackup) {
-                    const display = document.getElementById('lastBackupDisplay');
-                    if(display) display.innerText = "Last Backup: " + new Date(this.data.lastBackup).toLocaleDateString();
-                }
-            },
+<div id="uiDialogContainer" class="modal fixed inset-0 z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden border border-gray-200 dark:border-gray-700 transform transition-all scale-100 p-6 flex flex-col gap-4">
+         <h3 id="uiDialogTitle" class="text-lg font-bold text-gray-900 dark:text-white"></h3>
+         <p id="uiDialogMessage" class="text-sm text-gray-600 dark:text-gray-300 whitespace-pre-wrap"></p>
+         <input type="text" id="uiDialogInput" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-600 rounded-xl p-3 text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none font-medium hidden">
+         <div id="uiDialogButtons" class="flex justify-end gap-3 mt-2"></div>
+    </div>
+</div>
 
-            // --- TIMER LOGIC (STABILIZED) ---
+<script>
+    const app = {
+        data: {
+            tasks: [],
+            subjects: [],
+            targetDate: '2026-02-01',
+            // TIMER STATE
+            activeTimer: null, // { id, startTime, accumulated, lastSaved }
+            timerInterval: null,
+            // UI STATE
+            currentView: 'dashboard',
+            currentDate: new Date(),
+            calendarMonth: new Date(),
+            completingTaskId: null,
+            lastBackup: null,
+            // UI DIALOG STATE
+            dialogQueue: [],
+            isDialogOpen: false
+        },
+
+        init() {
+            this.loadData();
+            this.render();
+            this.checkBacklog();
+            this.checkBackupStatus(); 
+            this.restoreTimerState(); // Now uses robust restoration logic
+            this.setupKeyboardShortcuts();
+
+            // Theme Logic
+            if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+            }
+        },
+        
+        // --- CUSTOM UI DIALOGS ---
+        processDialogQueue() {
+            if (this.isDialogOpen || this.data.dialogQueue.length === 0) return;
             
-            // 1. Single Source of Truth for Time
-            getElapsedMS() {
-                if (!this.data.activeTimer) return 0;
+            const { type, msg, defaultVal, resolve } = this.data.dialogQueue.shift();
+            this.isDialogOpen = true;
+            
+            const container = document.getElementById('uiDialogContainer');
+            const titleEl = document.getElementById('uiDialogTitle');
+            const msgEl = document.getElementById('uiDialogMessage');
+            const inputEl = document.getElementById('uiDialogInput');
+            const btnsEl = document.getElementById('uiDialogButtons');
+            
+            msgEl.innerText = msg;
+            inputEl.classList.add('hidden');
+            inputEl.value = '';
+            btnsEl.innerHTML = '';
+            
+            const closeDialog = (result) => {
+                container.classList.add('hidden');
+                this.isDialogOpen = false;
+                resolve(result);
+                setTimeout(() => this.processDialogQueue(), 50); // slight delay to allow stack clear
+            };
+            
+            // Setup based on type
+            if (type === 'alert') {
+                titleEl.innerText = 'Alert';
+                btnsEl.innerHTML = `<button id="uiBtnOK" class="px-5 py-2.5 bg-primary text-white rounded-xl hover:bg-primary-700 font-bold text-sm shadow-lg shadow-primary/20 transition-all">OK</button>`;
+                document.getElementById('uiBtnOK').onclick = () => closeDialog(undefined);
+                container.classList.remove('hidden');
+                document.getElementById('uiBtnOK').focus();
+            } else if (type === 'confirm') {
+                titleEl.innerText = 'Confirm';
+                btnsEl.innerHTML = `
+                    <button id="uiBtnCancel" class="px-5 py-2.5 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl font-medium text-sm transition-colors">Cancel</button>
+                    <button id="uiBtnConfirm" class="px-5 py-2.5 bg-primary text-white rounded-xl hover:bg-primary-700 font-bold text-sm shadow-lg shadow-primary/20 transition-all">Confirm</button>
+                `;
+                document.getElementById('uiBtnCancel').onclick = () => closeDialog(false);
+                document.getElementById('uiBtnConfirm').onclick = () => closeDialog(true);
+                container.classList.remove('hidden');
+                document.getElementById('uiBtnConfirm').focus();
+            } else if (type === 'prompt') {
+                titleEl.innerText = 'Input';
+                inputEl.value = defaultVal || '';
+                inputEl.classList.remove('hidden');
+                btnsEl.innerHTML = `
+                    <button id="uiBtnCancel" class="px-5 py-2.5 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl font-medium text-sm transition-colors">Cancel</button>
+                    <button id="uiBtnConfirm" class="px-5 py-2.5 bg-primary text-white rounded-xl hover:bg-primary-700 font-bold text-sm shadow-lg shadow-primary/20 transition-all">Confirm</button>
+                `;
+                document.getElementById('uiBtnCancel').onclick = () => closeDialog(null);
+                const confirmAction = () => closeDialog(inputEl.value);
+                document.getElementById('uiBtnConfirm').onclick = confirmAction;
                 
-                let currentSegment = 0;
-                // If startTime exists, the timer is RUNNING. Calculate delta from now.
-                if (this.data.activeTimer.startTime !== null) {
-                    currentSegment = Math.max(0, Date.now() - this.data.activeTimer.startTime);
-                }
+                // Allow Enter to confirm in prompt
+                inputEl.onkeydown = (e) => {
+                     if(e.key === 'Enter') confirmAction();
+                };
                 
-                return (this.data.activeTimer.accumulated || 0) + currentSegment;
-            },
+                container.classList.remove('hidden');
+                inputEl.focus();
+                inputEl.select();
+            }
+            
+            // Global Escape handler for this specific dialog instance
+            const escapeHandler = (e) => {
+                 if (e.key === 'Escape' && !container.classList.contains('hidden')) {
+                     if (type === 'alert') closeDialog(undefined);
+                     else if (type === 'confirm') closeDialog(false);
+                     else if (type === 'prompt') closeDialog(null);
+                     document.removeEventListener('keydown', escapeHandler);
+                 }
+            };
+            document.addEventListener('keydown', escapeHandler);
+        },
+        
+        uiAlert(msg) {
+            return new Promise(resolve => {
+                this.data.dialogQueue.push({ type: 'alert', msg, resolve });
+                this.processDialogQueue();
+            });
+        },
+        
+        uiConfirm(msg) {
+            return new Promise(resolve => {
+                this.data.dialogQueue.push({ type: 'confirm', msg, resolve });
+                this.processDialogQueue();
+            });
+        },
+        
+        uiPrompt(msg, defaultVal = '') {
+            return new Promise(resolve => {
+                this.data.dialogQueue.push({ type: 'prompt', msg, defaultVal, resolve });
+                this.processDialogQueue();
+            });
+        },
 
-            // 2. Robust Restoration
-            restoreTimerState() {
-                const saved = localStorage.getItem('prepMasterTimer');
-                if (saved) {
-                    try {
-                        const parsed = JSON.parse(saved);
-                        // Validate that the task still exists
-                        if (this.data.tasks.find(t => t.id === parsed.id)) {
-                            this.data.activeTimer = parsed;
-                            
-                            // If startTime is not null, it means it was left RUNNING.
-                            // We don't need to do any math here. 
-                            // getElapsedMS() will automatically calculate (Now - OldStartTime) + Accumulated.
-                            // This correctly accounts for time while the browser was closed.
-                            
-                            this.updateGlobalTimerUI(); // Update UI immediately
-                            if (this.data.activeTimer.startTime !== null) {
-                                this.startTicker(); // Resume visual updates
-                            }
-                        } else {
-                            // Task deleted while timer saved? Clean up.
-                            localStorage.removeItem('prepMasterTimer');
+        // --- HELPERS ---
+        generateUUID() {
+            if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+                return crypto.randomUUID();
+            }
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+        },
+
+        setupKeyboardShortcuts() {
+            document.addEventListener('keydown', async (e) => {
+                // Ignore global shortcuts if a custom dialog is open (it handles its own keys)
+                if (this.isDialogOpen) return;
+
+                if (e.key === 'Escape') {
+                    const modals = Array.from(document.querySelectorAll('.modal')).filter(m => !m.classList.contains('hidden') && m.id !== 'uiDialogContainer');
+                    if (modals.length === 0) return;
+                    const top = modals[modals.length - 1];
+
+                    // Heuristic for unsaved edits in Task Modal
+                    if (top.id === 'taskModal') {
+                        const editId = document.getElementById('taskEditId')?.value;
+                        const subjectVal = document.getElementById('taskSubject')?.value || '';
+                        const subSubjectVal = document.getElementById('taskSubSubject')?.value || '';
+                        const durationVal = document.getElementById('taskDuration')?.value || '';
+                        
+                        // Prompt heuristic: editId exists AND fields have values
+                        const isDirty = !!(editId && (subjectVal || subSubjectVal || durationVal));
+    
+                        if (isDirty) {
+                            const proceed = await this.uiConfirm("You have unsaved changes. Close anyway?");
+                            if (!proceed) return;
                         }
-                    } catch (e) {
-                        console.error("Timer state corrupted", e);
+                    }
+
+                    top.classList.add('hidden');
+                }
+            });
+        },
+
+        // --- DATA LAYER ---
+        saveData() {
+            // We do NOT save activeTimer here anymore to avoid race conditions.
+            // activeTimer is managed by its own persistence cycle.
+            localStorage.setItem('prepMasterData_v3', JSON.stringify({
+                schema: 3.2,
+                tasks: this.data.tasks,
+                subjects: this.data.subjects,
+                targetDate: this.data.targetDate,
+                lastBackup: this.data.lastBackup 
+            }));
+            this.render();
+        },
+
+        loadData() {
+            const stored = localStorage.getItem('prepMasterData_v3');
+            if (stored) {
+                const parsed = JSON.parse(stored);
+                this.data.tasks = parsed.tasks || [];
+                this.data.subjects = parsed.subjects || [];
+                this.data.targetDate = parsed.targetDate || '2026-02-01';
+                this.data.lastBackup = parsed.lastBackup || null;
+            } else {
+                // Seed Data
+                this.data.subjects = [
+                    { id: this.generateUUID(), name: 'History', sub: ['Ancient', 'Medieval', 'Modern'] },
+                    { id: this.generateUUID(), name: 'Polity', sub: ['Constitution', 'Governance'] },
+                    { id: this.generateUUID(), name: 'Geography', sub: ['Physical', 'Indian'] }
+                ];
+            }
+        },
+
+        checkBackupStatus() {
+            const dot = document.getElementById('backupWarningDot');
+            if (!dot) return;
+            const last = this.data.lastBackup ? new Date(this.data.lastBackup) : new Date(0);
+            const now = new Date();
+            const diffDays = (now - last) / (1000 * 60 * 60 * 24);
+            
+            if (diffDays > 7) {
+                dot.classList.remove('hidden');
+            } else {
+                dot.classList.add('hidden');
+            }
+            
+            if(this.data.lastBackup) {
+                const display = document.getElementById('lastBackupDisplay');
+                if(display) display.innerText = "Last Backup: " + new Date(this.data.lastBackup).toLocaleDateString();
+            }
+        },
+
+        // --- TIMER LOGIC (STABILIZED) ---
+        
+        // 1. Single Source of Truth for Time
+        getElapsedMS() {
+            if (!this.data.activeTimer) return 0;
+            
+            let currentSegment = 0;
+            // If startTime exists, the timer is RUNNING. Calculate delta from now.
+            if (this.data.activeTimer.startTime !== null) {
+                currentSegment = Math.max(0, Date.now() - this.data.activeTimer.startTime);
+            }
+            
+            return (this.data.activeTimer.accumulated || 0) + currentSegment;
+        },
+
+        // 2. Robust Restoration
+        restoreTimerState() {
+            const saved = localStorage.getItem('prepMasterTimer');
+            if (saved) {
+                try {
+                    const parsed = JSON.parse(saved);
+                    // Validate that the task still exists
+                    if (this.data.tasks.find(t => t.id === parsed.id)) {
+                        this.data.activeTimer = parsed;
+                        
+                        // If startTime is not null, it means it was left RUNNING.
+                        // We don't need to do any math here. 
+                        // getElapsedMS() will automatically calculate (Now - OldStartTime) + Accumulated.
+                        // This correctly accounts for time while the browser was closed.
+                        
+                        this.updateGlobalTimerUI(); // Update UI immediately
+                        if (this.data.activeTimer.startTime !== null) {
+                            this.startTicker(); // Resume visual updates
+                        }
+                    } else {
+                        // Task deleted while timer saved? Clean up.
                         localStorage.removeItem('prepMasterTimer');
                     }
-                }
-            },
-
-            // 3. Deterministic Persistence
-            persistTimerState() {
-                if (this.data.activeTimer) {
-                    localStorage.setItem('prepMasterTimer', JSON.stringify(this.data.activeTimer));
-                } else {
+                } catch (e) {
+                    console.error("Timer state corrupted", e);
                     localStorage.removeItem('prepMasterTimer');
                 }
-            },
+            }
+        },
 
-            async startTimer(id) {
-                // Prevent double-start or hijacking
-                if (this.data.activeTimer) {
-                    if (this.data.activeTimer.id !== id) {
-                        await this.uiAlert("Please stop the current timer first.");
-                        return;
-                    }
-                    // If already running, do nothing
-                    if (this.data.activeTimer.startTime !== null) return;
+        // 3. Deterministic Persistence
+        persistTimerState() {
+            if (this.data.activeTimer) {
+                localStorage.setItem('prepMasterTimer', JSON.stringify(this.data.activeTimer));
+            } else {
+                localStorage.removeItem('prepMasterTimer');
+            }
+        },
+
+        async startTimer(id) {
+            // Prevent double-start or hijacking
+            if (this.data.activeTimer) {
+                if (this.data.activeTimer.id !== id) {
+                    await this.uiAlert("Please stop the current timer first.");
+                    return;
                 }
+                // If already running, do nothing
+                if (this.data.activeTimer.startTime !== null) return;
+            }
 
-                // Initialize State
-                if (!this.data.activeTimer) {
-                    this.data.activeTimer = {
-                        id: id,
-                        startTime: Date.now(),
-                        accumulated: 0
-                    };
-                } else {
-                    // Resuming from pause
-                    this.data.activeTimer.startTime = Date.now();
-                }
+            // Initialize State
+            if (!this.data.activeTimer) {
+                this.data.activeTimer = {
+                    id: id,
+                    startTime: Date.now(),
+                    accumulated: 0
+                };
+            } else {
+                // Resuming from pause
+                this.data.activeTimer.startTime = Date.now();
+            }
 
-                this.persistTimerState();
-                this.render(); // Update play/pause buttons in list
-                this.startTicker();
-            },
+            this.persistTimerState();
+            this.render(); // Update play/pause buttons in list
+            this.startTicker();
+        },
 
-            toggleTimer() {
-                if (!this.data.activeTimer) return;
+        toggleTimer() {
+            if (!this.data.activeTimer) return;
 
-                if (this.data.activeTimer.startTime !== null) {
-                    // PAUSE LOGIC
-                    // 1. Calculate elapsed for this segment
-                    const now = Date.now();
-                    const delta = Math.max(0, now - this.data.activeTimer.startTime);
-                    
-                    // 2. Bank it into accumulated
-                    this.data.activeTimer.accumulated += delta;
-                    
-                    // 3. Nullify startTime to indicate paused state
-                    this.data.activeTimer.startTime = null;
-                    
-                    // 4. Stop visual ticker (optional, but saves resources)
-                    if (this.data.timerInterval) {
-                        clearInterval(this.data.timerInterval);
-                        this.data.timerInterval = null;
-                    }
-                    
-                    // 5. Update UI one last time to show precise pause time
-                    this.updateTickerDisplay();
-                    document.getElementById('globalTimerPauseBtn').innerText = "Resume";
-                } else {
-                    // RESUME LOGIC
-                    // 1. Set new start time
-                    this.data.activeTimer.startTime = Date.now();
-                    
-                    // 2. Restart ticker
-                    this.startTicker();
-                }
+            if (this.data.activeTimer.startTime !== null) {
+                // PAUSE LOGIC
+                // 1. Calculate elapsed for this segment
+                const now = Date.now();
+                const delta = Math.max(0, now - this.data.activeTimer.startTime);
                 
-                this.persistTimerState();
-            },
-
-            stopTimer() {
-                if (!this.data.activeTimer) return;
-
-                // 1. Calculate final total time
-                const finalElapsedMS = this.getElapsedMS();
-                const finalMinutes = Math.ceil(finalElapsedMS / 1000 / 60);
-                const taskId = this.data.activeTimer.id;
-
-                // 2. Clean up
+                // 2. Bank it into accumulated
+                this.data.activeTimer.accumulated += delta;
+                
+                // 3. Nullify startTime to indicate paused state
+                this.data.activeTimer.startTime = null;
+                
+                // 4. Stop visual ticker (optional, but saves resources)
                 if (this.data.timerInterval) {
                     clearInterval(this.data.timerInterval);
                     this.data.timerInterval = null;
                 }
-                this.data.activeTimer = null;
-                this.persistTimerState(); // Clears localStorage
-
-                // 3. UI Cleanup & Completion
-                this.updateGlobalTimerUI();
-                this.render(); // Resets list buttons
-                this.manualComplete(taskId, finalMinutes);
-            },
-
-            startTicker() {
-                if (this.data.timerInterval) clearInterval(this.data.timerInterval);
                 
-                this.updateGlobalTimerUI(); // Immediate update
+                // 5. Update UI one last time to show precise pause time
+                this.updateTickerDisplay();
+                document.getElementById('globalTimerPauseBtn').innerText = "Resume";
+            } else {
+                // RESUME LOGIC
+                // 1. Set new start time
+                this.data.activeTimer.startTime = Date.now();
                 
-                // Visual update loop (does not affect data integrity)
-                this.data.timerInterval = setInterval(() => {
-                    this.updateTickerDisplay();
-                }, 1000);
-            },
+                // 2. Restart ticker
+                this.startTicker();
+            }
+            
+            this.persistTimerState();
+        },
 
-            updateTickerDisplay() {
-                if (!this.data.activeTimer) return;
-                
-                const totalMS = this.getElapsedMS();
-                const totalSecs = Math.floor(totalMS / 1000);
-                
-                const h = Math.floor(totalSecs / 3600).toString().padStart(2, '0');
-                const m = Math.floor((totalSecs % 3600) / 60).toString().padStart(2, '0');
-                const s = (totalSecs % 60).toString().padStart(2, '0');
-                
-                const display = document.getElementById('globalTimerDisplay');
-                if (display) display.innerText = `${h}:${m}:${s}`;
-            },
+        stopTimer() {
+            if (!this.data.activeTimer) return;
 
-            updateGlobalTimerUI() {
-                const bar = document.getElementById('globalTimerBar');
-                if (!bar) return;
+            // 1. Calculate final total time
+            const finalElapsedMS = this.getElapsedMS();
+            const finalMinutes = Math.ceil(finalElapsedMS / 1000 / 60);
+            const taskId = this.data.activeTimer.id;
 
-                if (this.data.activeTimer) {
-                    bar.classList.remove('translate-y-full');
-                    const task = this.data.tasks.find(t => t.id === this.data.activeTimer.id);
-                    if (task) {
-                        document.getElementById('globalTimerTaskName').innerText = `${task.subject}: ${task.subSubject}`;
-                    }
-                    // Update button state based on data, not DOM
-                    const isRunning = this.data.activeTimer.startTime !== null;
-                    document.getElementById('globalTimerPauseBtn').innerText = isRunning ? "Pause" : "Resume";
-                    
-                    // Ensure display is correct immediately
-                    this.updateTickerDisplay();
-                } else {
-                    bar.classList.add('translate-y-full');
-                }
-            },
+            // 2. Clean up
+            if (this.data.timerInterval) {
+                clearInterval(this.data.timerInterval);
+                this.data.timerInterval = null;
+            }
+            this.data.activeTimer = null;
+            this.persistTimerState(); // Clears localStorage
 
-            // --- COMPLETION LOGIC ---
-            manualComplete(id, defaultTime = null) {
-                this.data.completingTaskId = id;
-                const task = this.data.tasks.find(t => t.id === id);
-                if (!task) return;
-                
-                document.getElementById('actualTimeInput').value = defaultTime || task.actualTime || task.duration;
-                document.getElementById('completeModal').classList.remove('hidden');
-            },
+            // 3. UI Cleanup & Completion
+            this.updateGlobalTimerUI();
+            this.render(); // Resets list buttons
+            this.manualComplete(taskId, finalMinutes);
+        },
 
-            confirmCompletion(type) {
-                const id = this.data.completingTaskId;
-                const task = this.data.tasks.find(t => t.id === id);
+        startTicker() {
+            if (this.data.timerInterval) clearInterval(this.data.timerInterval);
+            
+            this.updateGlobalTimerUI(); // Immediate update
+            
+            // Visual update loop (does not affect data integrity)
+            this.data.timerInterval = setInterval(() => {
+                this.updateTickerDisplay();
+            }, 1000);
+        },
+
+        updateTickerDisplay() {
+            if (!this.data.activeTimer) return;
+            
+            const totalMS = this.getElapsedMS();
+            const totalSecs = Math.floor(totalMS / 1000);
+            
+            const h = Math.floor(totalSecs / 3600).toString().padStart(2, '0');
+            const m = Math.floor((totalSecs % 3600) / 60).toString().padStart(2, '0');
+            const s = (totalSecs % 60).toString().padStart(2, '0');
+            
+            const display = document.getElementById('globalTimerDisplay');
+            if (display) display.innerText = `${h}:${m}:${s}`;
+        },
+
+        updateGlobalTimerUI() {
+            const bar = document.getElementById('globalTimerBar');
+            if (!bar) return;
+
+            if (this.data.activeTimer) {
+                bar.classList.remove('translate-y-full');
+                const task = this.data.tasks.find(t => t.id === this.data.activeTimer.id);
                 if (task) {
-                    task.actualTime = parseInt(document.getElementById('actualTimeInput').value) || 0;
-                    task.focusScore = document.getElementById('focusScore').value;
-                    task.status = type; // 'done' or 'partial'
-                    this.saveData();
+                    document.getElementById('globalTimerTaskName').innerText = `${task.subject}: ${task.subSubject}`;
+                } else {
+                    // Defensive: Timer exists but task doesn't?
+                    this.data.activeTimer = null;
+                    this.persistTimerState();
+                    bar.classList.add('translate-y-full');
+                    return;
                 }
-                this.closeModal('completeModal');
-                this.data.completingTaskId = null;
-            },
-
-            // --- NAVIGATION ---
-            navigate(view) {
-                this.data.currentView = view;
-                document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
-                document.getElementById(`view-${view}`).classList.remove('hidden');
+                // Update button state based on data, not DOM
+                const isRunning = this.data.activeTimer.startTime !== null;
+                document.getElementById('globalTimerPauseBtn').innerText = isRunning ? "Pause" : "Resume";
                 
-                document.querySelectorAll('.nav-item').forEach(el => {
-                    el.classList.remove('bg-indigo-50', 'text-primary', 'dark:bg-gray-700', 'dark:text-indigo-400', 'font-bold');
-                    el.classList.add('text-gray-500', 'dark:text-gray-400');
-                });
-                
-                const activeBtn = document.getElementById(`nav-${view}`);
-                if(activeBtn) {
-                    activeBtn.classList.add('bg-indigo-50', 'text-primary', 'dark:bg-gray-700', 'dark:text-indigo-400', 'font-bold');
-                    activeBtn.classList.remove('text-gray-500', 'dark:text-gray-400');
-                }
-                this.render();
-            },
+                // Ensure display is correct immediately
+                this.updateTickerDisplay();
+            } else {
+                bar.classList.add('translate-y-full');
+            }
+        },
 
-            toggleTheme() {
-                document.documentElement.classList.toggle('dark');
-                localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
-            },
+        // --- COMPLETION LOGIC ---
+        manualComplete(id, defaultTime = null) {
+            this.data.completingTaskId = id;
+            const task = this.data.tasks.find(t => t.id === id);
+            if (!task) return;
+            
+            document.getElementById('actualTimeInput').value = defaultTime || task.actualTime || task.duration;
+            document.getElementById('completeModal').classList.remove('hidden');
+        },
 
-            openSettings() { document.getElementById('settingsModal').classList.remove('hidden'); },
-
-            // --- IMPORT/EXPORT ---
-            exportData() {
-                this.data.lastBackup = new Date().toISOString();
+        confirmCompletion(type) {
+            const id = this.data.completingTaskId;
+            const task = this.data.tasks.find(t => t.id === id);
+            if (task) {
+                task.actualTime = parseInt(document.getElementById('actualTimeInput').value) || 0;
+                task.focusScore = document.getElementById('focusScore').value;
+                task.status = type; // 'done' or 'partial'
                 this.saveData();
-                this.checkBackupStatus();
+            }
+            this.closeModal('completeModal');
+            this.data.completingTaskId = null;
+        },
 
-                const dataStr = JSON.stringify({ ...this.data, activeTimer: null, timerInterval: null });
-                const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-                const linkElement = document.createElement('a');
-                linkElement.setAttribute('href', dataUri);
-                linkElement.setAttribute('download', 'prepmaster_backup.json');
-                linkElement.click();
-            },
+        // --- NAVIGATION ---
+        navigate(view) {
+            this.data.currentView = view;
+            document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`view-${view}`).classList.remove('hidden');
+            
+            document.querySelectorAll('.nav-item').forEach(el => {
+                el.classList.remove('bg-indigo-50', 'text-primary', 'dark:bg-gray-700', 'dark:text-indigo-400', 'font-bold');
+                el.classList.add('text-gray-500', 'dark:text-gray-400');
+            });
+            
+            const activeBtn = document.getElementById(`nav-${view}`);
+            if(activeBtn) {
+                activeBtn.classList.add('bg-indigo-50', 'text-primary', 'dark:bg-gray-700', 'dark:text-indigo-400', 'font-bold');
+                activeBtn.classList.remove('text-gray-500', 'dark:text-gray-400');
+            }
+            this.render();
+        },
 
-            importData(input) {
-                const file = input.files[0];
-                if (!file) return;
-                const reader = new FileReader();
-                reader.onload = async (e) => {
-                    try {
-                        const parsed = JSON.parse(e.target.result);
+        toggleTheme() {
+            document.documentElement.classList.toggle('dark');
+            localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+        },
+
+        openSettings() { document.getElementById('settingsModal').classList.remove('hidden'); },
+
+        // --- IMPORT/EXPORT ---
+        exportData() {
+            this.data.lastBackup = new Date().toISOString();
+            this.saveData();
+            this.checkBackupStatus();
+
+            const dataStr = JSON.stringify({ ...this.data, activeTimer: null, timerInterval: null });
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', 'prepmaster_backup.json');
+            linkElement.click();
+        },
+
+        importData(input) {
+            const file = input.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                try {
+                    const parsed = JSON.parse(e.target.result);
+                    
+                    // Validation
+                    if (!parsed.tasks || !Array.isArray(parsed.tasks) || !parsed.subjects || !Array.isArray(parsed.subjects)) {
+                        await this.uiAlert("Invalid backup file: missing tasks or subjects.");
+                        return;
+                    }
+
+                    // Deep check on first few items
+                    const invalid = parsed.tasks.slice(0,3).some(t => !t.id || !t.date || typeof t.duration !== 'number');
+                    if (invalid) {
+                        await this.uiAlert("Backup file incompatible with this app version.");
+                        return;
+                    }
+
+                    const currentBackup = this.data.lastBackup ? new Date(this.data.lastBackup) : new Date(0);
+                    const importBackup = parsed.lastBackup ? new Date(parsed.lastBackup) : new Date(0);
+
+                    let msg = `This will overwrite current data.\nTasks: ${parsed.tasks.length}\nSubjects: ${parsed.subjects.length}\nProceed?`;
+
+                    if (importBackup < currentBackup) {
+                        msg = "WARNING: You are importing OLDER data over NEWER data.\n\n" + msg;
+                    }
+                    
+                    // Confirmation
+                    if(await this.uiConfirm(msg)) {
+                        this.data.tasks = parsed.tasks;
+                        this.data.subjects = parsed.subjects;
+                        this.data.targetDate = parsed.targetDate || this.data.targetDate;
+                        this.data.lastBackup = new Date().toISOString();
+                        this.saveData();
+                        this.closeModal('settingsModal');
+                        await this.uiAlert("Import successful!");
+                    }
+                } catch(err) { 
+                    await this.uiAlert("Error reading backup file. Import aborted.");
+                }
+            };
+            reader.readAsText(file);
+            input.value = '';
+        },
+
+        // --- RENDERING ---
+        render() {
+            this.renderHeader();
+            this.renderDashboard();
+            this.renderCalendar();
+            this.renderSubjects();
+            this.renderAnalytics();
+            this.renderBacklog();
+            this.updateGlobalTimerUI();
+        },
+
+        renderHeader() {
+            const opts = { weekday: 'short', month: 'short', day: 'numeric' };
+            document.getElementById('currentDateDisplay').textContent = new Date().toLocaleDateString('en-US', opts);
+            
+            const target = new Date(this.data.targetDate);
+            const diff = target - new Date();
+            const daysLeft = Math.ceil(diff / (1000 * 60 * 60 * 24));
+            document.getElementById('countdownTimer').textContent = daysLeft > 0 ? `${daysLeft}d` : "NOW";
+            document.getElementById('targetDateDisplay').textContent = target.toLocaleDateString('en-US', {month: 'short', year: 'numeric'});
+
+            const todayStr = this.formatDate(new Date());
+            const activeToday = this.data.tasks.some(t => t.date === todayStr && t.status === 'done');
+            const streakEl = document.getElementById('streakDisplay');
+            if(activeToday) {
+                streakEl.innerHTML = `<i class="fas fa-fire text-orange-500 animate-pulse"></i> <span class="text-orange-600 dark:text-orange-400">Streak Active</span>`;
+            } else {
+                streakEl.innerHTML = `<i class="fas fa-snowflake text-blue-300"></i> <span class="text-gray-400">Get Started</span>`;
+            }
+        },
+
+        renderDashboard() {
+            if(this.data.currentView !== 'dashboard') return;
+
+            const todayStr = this.formatDate(new Date());
+            const sortOrder = { 'partial': 0, 'pending': 1, 'done': 2, 'backlog': 3 };
+            const todaysTasks = this.data.tasks
+                .filter(t => t.date === todayStr && t.status !== 'backlog')
+                .sort((a,b) => sortOrder[a.status] - sortOrder[b.status]);
+
+            const list = document.getElementById('todayTaskList');
+            list.innerHTML = '';
+
+            if (todaysTasks.length === 0) {
+                // UX: Made button more dominant
+                list.innerHTML = `<div class="flex flex-col items-center justify-center py-16 px-4 bg-white dark:bg-gray-800 rounded-2xl border-2 border-dashed border-gray-200 dark:border-gray-700">
+                    <div class="w-16 h-16 bg-gray-50 dark:bg-gray-700 rounded-full flex items-center justify-center mb-4">
+                        <i class="fas fa-clipboard-list text-2xl text-gray-300 dark:text-gray-500"></i>
+                    </div>
+                    <p class="text-gray-500 dark:text-gray-400 font-medium text-sm">Your schedule is clear today.</p>
+                    <button onclick="app.openTaskModal()" class="bg-primary text-white hover:bg-primary-700 font-extrabold text-sm mt-4 px-6 py-3 rounded-xl flex items-center gap-2 shadow-lg shadow-primary/30 transition-all">
+                        <i class="fas fa-plus-circle"></i> Plan your day
+                    </button>
+                </div>`;
+            }
+
+            todaysTasks.forEach(task => {
+                const isDone = task.status === 'done';
+                const isPartial = task.status === 'partial';
+                const active = this.data.activeTimer && this.data.activeTimer.id === task.id;
+                
+                let actionHtml = '';
+                if (!isDone) {
+                    if (active) {
+                        actionHtml = `
+                            <div class="flex items-center gap-3">
+                                <span class="inline-flex relative flex h-3 w-3">
+                                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary-600 opacity-75"></span>
+                                  <span class="relative inline-flex rounded-full h-3 w-3 bg-primary-600"></span>
+                                </span>
+                                <span class="text-primary font-bold text-xs tracking-wider">RUNNING</span>
+                            </div>`;
+                    } else {
+                        actionHtml = `
+                            <div class="flex items-center gap-2">
+                                <button onclick="app.editTask('${task.id}')" class="w-9 h-9 rounded-full text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 dark:hover:text-gray-200 transition-all flex items-center justify-center" aria-label="Edit" title="Edit"><i class="fas fa-pencil-alt text-sm"></i></button>
+                                
+                                <button onclick="app.startTimer('${task.id}')" class="w-9 h-9 rounded-full bg-primary/10 text-primary hover:bg-primary hover:text-white transition-all flex items-center justify-center shadow-sm" aria-label="Start Timer" title="Start Timer"><i class="fas fa-play text-xs pl-0.5"></i></button>
+                                
+                                <button onclick="app.manualComplete('${task.id}')" class="w-9 h-9 rounded-full text-gray-400 hover:text-secondary hover:bg-secondary/10 dark:hover:bg-gray-700 transition-all flex items-center justify-center" aria-label="Mark Done" title="Manual Complete"><i class="fas fa-check text-sm"></i></button>
+                            </div>
+                        `;
+                    }
+                } else {
+                     actionHtml = `<div class="flex flex-col items-end">
+                                    <div class="text-secondary text-xs font-bold flex items-center gap-1.5 bg-secondary/10 px-2 py-1 rounded-md">
+                                        <i class="fas fa-check-circle"></i> Complete
+                                    </div>
+                                    <span class="text-[10px] text-gray-400 mt-1 font-mono">${task.actualTime}m • Focus: ${task.focusScore || '-'}/5</span>
+                                   </div>`;
+                }
+
+                let statusBadge = isPartial ? `<span class="ml-2 text-[9px] bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300 px-1.5 py-0.5 rounded font-bold uppercase tracking-wide">In Progress</span>` : '';
+
+                const containerClass = active 
+                    ? 'ring-2 ring-primary ring-offset-2 ring-offset-gray-50 dark:ring-offset-dark-bg border-primary' 
+                    : (isDone ? 'opacity-75 bg-gray-50/50 dark:bg-gray-800/50 border-transparent' : 'bg-white dark:bg-gray-800 border-gray-100 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600');
+
+                const html = `
+                    <div class="${containerClass} p-4 sm:p-5 rounded-xl shadow-soft flex flex-col sm:flex-row justify-between sm:items-center gap-4 group transition-all duration-200 border">
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-2.5 mb-2">
+                                <span class="text-[9px] font-bold uppercase tracking-widest text-gray-500 border border-gray-200 dark:border-gray-600 px-1.5 py-0.5 rounded bg-gray-50 dark:bg-gray-700/50 truncate max-w-[120px]">${task.subject}</span>
+                                ${statusBadge}
+                            </div>
+                            <h4 class="font-bold text-gray-800 dark:text-gray-100 text-base leading-snug truncate pr-2 ${isDone ? 'line-through text-gray-400 dark:text-gray-500' : ''}">${task.desc || task.subSubject}</h4>
+                            <div class="flex items-center gap-3 mt-1.5">
+                                <div class="text-xs text-gray-400 font-medium flex items-center gap-1.5"><i class="far fa-dot-circle text-[10px]"></i> ${task.subSubject}</div>
+                                <div class="w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-600"></div>
+                                <div class="text-xs text-gray-400 font-medium flex items-center gap-1.5"><i class="far fa-clock text-[10px]"></i> ${task.duration}m</div>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between sm:justify-end gap-2 pt-2 sm:pt-0 border-t sm:border-t-0 border-gray-100 dark:border-gray-700">
+                            ${actionHtml}
+                            ${!isDone ? `<button onclick="app.deleteTask('${task.id}')" class="text-gray-300 hover:text-red-500 dark:text-gray-600 dark:hover:text-red-400 ml-2 w-8 h-8 flex items-center justify-center transition-colors" aria-label="Delete"><i class="fas fa-trash-alt text-xs"></i></button>` : ''}
+                        </div>
+                    </div>
+                `;
+                list.insertAdjacentHTML('beforeend', html);
+            });
+        },
+
+        renderBacklog() {
+            const backlogTasks = this.data.tasks.filter(t => t.status === 'backlog');
+            const countEl = document.getElementById('backlogCount');
+            countEl.textContent = backlogTasks.length;
+            countEl.classList.toggle('hidden', backlogTasks.length === 0);
+
+            const sidebarList = document.getElementById('sidebarBacklogList');
+            sidebarList.innerHTML = '';
+            if(backlogTasks.length === 0) sidebarList.innerHTML = `<p class="text-gray-400 italic text-[10px] text-center py-2">No backlog.</p>`;
+
+            const dashList = document.getElementById('dashboardBacklogList');
+            if(dashList) dashList.innerHTML = '';
+            if(dashList && backlogTasks.length === 0) dashList.innerHTML = `
+                <div class="flex flex-col items-center justify-center h-48 text-gray-400">
+                    <i class="fas fa-check-circle text-3xl mb-3 text-emerald-100 dark:text-emerald-900"></i>
+                    <span class="text-sm font-medium">All caught up!</span>
+                </div>`;
+
+            backlogTasks.forEach(task => {
+                sidebarList.insertAdjacentHTML('beforeend', `
+                    <div class="group flex justify-between items-center py-2 px-2 hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded-lg transition-colors cursor-default">
+                        <div class="truncate w-24 text-gray-600 dark:text-gray-400 text-xs" title="${task.subSubject}">${task.subSubject}</div>
+                         <button onclick="app.assignToToday('${task.id}')" class="text-primary hover:text-primary-700 text-[10px] font-bold opacity-0 group-hover:opacity-100 transition-opacity">MOVE</button>
+                    </div>
+                `);
+
+                if(dashList) {
+                    dashList.insertAdjacentHTML('beforeend', `
+                        <div class="flex justify-between items-center p-3.5 bg-red-50 dark:bg-red-900/10 rounded-xl border border-red-100 dark:border-red-900/20 group hover:border-red-200 dark:hover:border-red-800 transition-colors">
+                            <div class="min-w-0 flex-1 pr-3">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <div class="text-[9px] font-bold uppercase text-gray-400 tracking-wider">${task.subject}</div>
+                                    <div class="text-[9px] text-red-400 bg-red-100 dark:bg-red-900/40 px-1 rounded font-medium">Missed: ${task.date}</div>
+                                </div>
+                                <div class="text-sm font-bold text-gray-800 dark:text-gray-200 truncate">${task.subSubject}</div>
+                            </div>
+                            <button onclick="app.assignToToday('${task.id}')" class="text-xs bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 px-3 py-2 rounded-lg shadow-sm hover:border-primary hover:text-primary transition-all font-bold whitespace-nowrap">
+                                Do Today
+                            </button>
+                        </div>
+                    `);
+                }
+            });
+        },
+
+        renderCalendar() {
+            if(this.data.currentView !== 'calendar') return;
+            const grid = document.getElementById('calendarGrid');
+            grid.innerHTML = '';
+            
+            const year = this.data.calendarMonth.getFullYear();
+            const month = this.data.calendarMonth.getMonth();
+            
+            document.getElementById('calendarMonthLabel').innerText = this.data.calendarMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            
+            // Add padding for start day
+            const firstDay = new Date(year, month, 1).getDay();
+            for(let i=0; i<firstDay; i++) {
+                 grid.insertAdjacentHTML('beforeend', `<div class="h-24 md:h-28"></div>`);
+            }
+
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dateStr = `${year}-${String(month+1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const tasksForDay = this.data.tasks.filter(t => t.date === dateStr && t.status !== 'backlog');
+                
+                let bgClass = "bg-white dark:bg-gray-800";
+                let textClass = "text-gray-700 dark:text-gray-300";
+                let label = "";
+
+                if([7, 14, 21, 28].includes(day)) {
+                    bgClass = "bg-amber-50 dark:bg-amber-900/10";
+                    textClass = "text-amber-700 dark:text-amber-500";
+                    label = "REV";
+                } else if (day >= 29) {
+                    bgClass = "bg-purple-50 dark:bg-purple-900/10";
+                    textClass = "text-purple-700 dark:text-purple-400";
+                    label = "MOCK";
+                }
+
+                // Status Dots
+                let dots = "";
+                if (tasksForDay.length > 0) {
+                    const completed = tasksForDay.filter(t => t.status === 'done').length;
+                    const ratio = completed / tasksForDay.length;
+                    
+                    let colorClass = "bg-gray-300 dark:bg-gray-600"; // default
+                    if(ratio === 1) colorClass = "bg-secondary";
+                    else if (ratio > 0) colorClass = "bg-blue-400";
+                    else if (new Date(dateStr) < new Date() && ratio < 1) colorClass = "bg-red-400"; // missed
+                    
+                    dots = `<div class="flex gap-0.5 mt-2 flex-wrap">
+                                ${Array(Math.min(tasksForDay.length, 4)).fill(0).map(() => `<div class="w-1.5 h-1.5 rounded-full ${colorClass}"></div>`).join('')}
+                                ${tasksForDay.length > 4 ? '<span class="text-[8px] text-gray-400 leading-none">+</span>' : ''}
+                            </div>`;
+                }
+
+                const todayClass = (dateStr === this.formatDate(new Date())) ? 'ring-2 ring-primary z-10' : '';
+
+                const html = `
+                    <div onclick="app.openTaskModal('${dateStr}')" class="${bgClass} ${todayClass} border border-gray-100 dark:border-gray-700 rounded-xl h-24 md:h-28 p-2 md:p-3 relative cursor-pointer hover:shadow-md transition-all flex flex-col justify-between group overflow-hidden">
+                        <div class="flex justify-between items-start">
+                            <span class="font-bold text-sm ${textClass}">${day}</span>
+                            <span class="text-[9px] font-bold text-gray-300 dark:text-gray-600 block uppercase tracking-wider group-hover:text-primary transition-colors">${label}</span>
+                        </div>
+                        <div class="mt-auto">
+                            ${dots}
+                            <span class="text-[9px] text-gray-400 mt-1 block">${tasksForDay.length > 0 ? tasksForDay.length + ' tasks' : ''}</span>
+                        </div>
+                    </div>
+                `;
+                grid.insertAdjacentHTML('beforeend', html);
+            }
+        },
+renderSubjects() { if(this.data.currentView !== 'subjects') return; const list = document.getElementById('subjectsList'); list.innerHTML = '';
+
+            // --- 1. CRUD HELPER (Injected Safely) ---
+            // We attach this to window to allow HTML onclicks to access logic 
+            // without refactoring the main 'app' object structure.
+         // --- 1. CRUD HELPER (With Data Cascading) ---
+            if (!window.subjActions) {
+                window.subjActions = {
+                    renameSubject: async (id) => {
+                        const sub = app.data.subjects.find(s => s.id === id);
+                        if (!sub) return;
+
+                        const oldName = sub.name; // Capture old name before change
+                        const newName = await app.uiPrompt("Rename Subject:", oldName);
                         
-                        // Validation
-                        if (!parsed.tasks || !Array.isArray(parsed.tasks) || !parsed.subjects || !Array.isArray(parsed.subjects)) {
-                            await this.uiAlert("Invalid backup file: missing tasks or subjects.");
-                            return;
+                        if (newName && newName.trim() !== "" && newName !== oldName) {
+                            // 1. Update the Subject Definition
+                            sub.name = newName.trim();
+
+                            // 2. CASCADE UPDATE: Fix all existing tasks
+                            let count = 0;
+                            app.data.tasks.forEach(t => {
+                                if (t.subject === oldName) {
+                                    t.subject = newName.trim();
+                                    count++;
+                                }
+                            });
+
+                            app.saveData();
+                            app.render();
+                            await app.uiAlert(`Renamed subject and updated ${count} history records.`);
+                        }
+                    },
+
+deleteSubject: async (id) => {
+                        const sub = app.data.subjects.find(s => s.id === id);
+                        if (!sub) return;
+
+                        // GUARD: Check if ANY task in this subject has a running timer
+                        if (app.data.activeTimer) {
+                            const activeTask = app.data.tasks.find(t => t.id === app.data.activeTimer.id);
+                            
+                            // Does the active task belong to the subject we are about to delete?
+                            if (activeTask && activeTask.subject === sub.name) {
+                                const msg = `⚠️ SESSION IN PROGRESS\n\nA timer is running for "${activeTask.subSubject}" in this subject.\n\nStop the timer and delete the subject?`;
+                                
+                                // UX: Explicit approval required
+                                if (await app.uiConfirm(msg)) {
+                                    app.stopTimer(); // Safely stop and log session BEFORE deletion
+                                } else {
+                                    return; // User cancelled
+                                }
+                            }
                         }
 
-                        // Deep check on first few items
-                        const invalid = parsed.tasks.slice(0,3).some(t => !t.id || !t.date || typeof t.duration !== 'number');
-                        if (invalid) {
-                            await this.uiAlert("Backup file incompatible with this app version.");
-                            return;
+                        // Standard Cascade Warning (Preserved existing flow)
+                        const associatedTasks = app.data.tasks.filter(t => t.subject === sub.name);
+                        const msg = associatedTasks.length > 0 
+                            ? `Warning: This will also delete ${associatedTasks.length} tasks/logs associated with "${sub.name}".\n\nAre you sure?`
+                            : `Delete subject "${sub.name}"?`;
+
+                        if (await app.uiConfirm(msg)) {
+                            // 1. CASCADE DELETE: Remove associated tasks
+                            app.data.tasks = app.data.tasks.filter(t => t.subject !== sub.name);
+
+                            // 2. Remove the Subject Definition
+                            app.data.subjects = app.data.subjects.filter(s => s.id !== id);
+                            
+                            app.saveData();
+                            app.render();
                         }
+                    },
+                    renameTopic: async (subId, oldName) => {
+                        const sub = app.data.subjects.find(s => s.id === subId);
+                        if (!sub) return;
+
+                        const newName = await app.uiPrompt("Rename Topic:", oldName);
                         
-                        // Confirmation
-                        if(await this.uiConfirm(`This will overwrite current data.\nTasks: ${parsed.tasks.length}\nSubjects: ${parsed.subjects.length}\nProceed?`)) {
-                            this.data.tasks = parsed.tasks;
-                            this.data.subjects = parsed.subjects;
-                            this.data.targetDate = parsed.targetDate || this.data.targetDate;
-                            this.data.lastBackup = new Date().toISOString();
-                            this.saveData();
-                            this.closeModal('settingsModal');
-                            await this.uiAlert("Import successful!");
+                        if (newName && newName.trim() !== "" && newName !== oldName) {
+                            // 1. Update Topic List
+                            const idx = sub.sub.indexOf(oldName);
+                            if (idx !== -1) {
+                                sub.sub[idx] = newName.trim();
+                                
+                                // 2. CASCADE UPDATE: Fix tasks using this topic
+                                app.data.tasks.forEach(t => {
+                                    if (t.subject === sub.name && t.subSubject === oldName) {
+                                        t.subSubject = newName.trim();
+                                    }
+                                });
+
+                                app.saveData();
+                                app.render();
+                            }
                         }
-                    } catch(err) { 
-                        await this.uiAlert("Error reading backup file. Import aborted.");
+                    },
+
+                    startSession: (subId) => {
+                        app.openTaskModal();
+                        setTimeout(() => {
+                            const select = document.getElementById('taskSubject');
+                            if(select) {
+                                select.value = subId;
+                                select.dispatchEvent(new Event('change'));
+                            }
+                        }, 50);
                     }
                 };
-                reader.readAsText(file);
-                input.value = '';
-            },
+            }
 
-            // --- RENDERING ---
-            render() {
-                this.renderHeader();
-                this.renderDashboard();
-                this.renderCalendar();
-                this.renderSubjects();
-                this.renderAnalytics();
-                this.renderBacklog();
-                this.updateGlobalTimerUI();
-            },
-
-            renderHeader() {
-                const opts = { weekday: 'short', month: 'short', day: 'numeric' };
-                document.getElementById('currentDateDisplay').textContent = new Date().toLocaleDateString('en-US', opts);
+            // --- 2. RECENCY LOGIC ---
+            const getStatus = (lastDateStr) => {
+                if (!lastDateStr) return { label: 'New', color: 'text-emerald-600 bg-emerald-50 border-emerald-100', opacity: 'opacity-100' };
+                const days = Math.floor((new Date() - new Date(lastDateStr)) / (1000 * 60 * 60 * 24));
                 
-                const target = new Date(this.data.targetDate);
-                const diff = target - new Date();
-                const daysLeft = Math.ceil(diff / (1000 * 60 * 60 * 24));
-                document.getElementById('countdownTimer').textContent = daysLeft > 0 ? `${daysLeft}d` : "NOW";
-                document.getElementById('targetDateDisplay').textContent = target.toLocaleDateString('en-US', {month: 'short', year: 'numeric'});
+                if (days === 0) return { label: 'Active Today', color: 'text-indigo-600 bg-indigo-50 border-indigo-100', opacity: 'opacity-100' };
+                if (days < 7)   return { label: 'Fresh', color: 'text-gray-600 bg-gray-50 border-gray-200', opacity: 'opacity-100' };
+                if (days < 14)  return { label: 'Slipping', color: 'text-amber-600 bg-amber-50 border-amber-100', opacity: 'opacity-90' };
+                return { label: 'Stale', color: 'text-gray-400 bg-gray-50 border-dashed border-gray-200', opacity: 'opacity-75 grayscale-[0.5] hover:grayscale-0 hover:opacity-100 transition-all' };
+            };
 
-                const todayStr = this.formatDate(new Date());
-                const activeToday = this.data.tasks.some(t => t.date === todayStr && t.status === 'done');
-                const streakEl = document.getElementById('streakDisplay');
-                if(activeToday) {
-                    streakEl.innerHTML = `<i class="fas fa-fire text-orange-500 animate-pulse"></i> <span class="text-orange-600 dark:text-orange-400">Streak Active</span>`;
-                } else {
-                    streakEl.innerHTML = `<i class="fas fa-snowflake text-blue-300"></i> <span class="text-gray-400">Get Started</span>`;
-                }
-            },
+            // --- 3. RENDER CARDS ---
+            this.data.subjects.forEach(sub => {
+                // Calc Recency
+                const subTasks = this.data.tasks.filter(t => t.subject === sub.name && t.status !== 'pending');
+                const lastTask = subTasks.sort((a,b) => new Date(b.date) - new Date(a.date))[0];
+                const status = getStatus(lastTask ? lastTask.date : null);
+                
+                // Slice Tags (Prevent Overload)
+                const MAX_TAGS = 6;
+                const visibleTags = sub.sub.slice(0, MAX_TAGS);
+                const remaining = sub.sub.length - MAX_TAGS;
 
-            renderDashboard() {
-                if(this.data.currentView !== 'dashboard') return;
-
-                const todayStr = this.formatDate(new Date());
-                const sortOrder = { 'partial': 0, 'pending': 1, 'done': 2, 'backlog': 3 };
-                const todaysTasks = this.data.tasks
-                    .filter(t => t.date === todayStr && t.status !== 'backlog')
-                    .sort((a,b) => sortOrder[a.status] - sortOrder[b.status]);
-
-                const list = document.getElementById('todayTaskList');
-                list.innerHTML = '';
-
-                if (todaysTasks.length === 0) {
-                    // UX: Made button more dominant
-                    list.innerHTML = `<div class="flex flex-col items-center justify-center py-16 px-4 bg-white dark:bg-gray-800 rounded-2xl border-2 border-dashed border-gray-200 dark:border-gray-700">
-                        <div class="w-16 h-16 bg-gray-50 dark:bg-gray-700 rounded-full flex items-center justify-center mb-4">
-                            <i class="fas fa-clipboard-list text-2xl text-gray-300 dark:text-gray-500"></i>
-                        </div>
-                        <p class="text-gray-500 dark:text-gray-400 font-medium text-sm">Your schedule is clear today.</p>
-                        <button onclick="app.openTaskModal()" class="bg-primary text-white hover:bg-primary-700 font-extrabold text-sm mt-4 px-6 py-3 rounded-xl flex items-center gap-2 shadow-lg shadow-primary/30 transition-all">
-                            <i class="fas fa-plus-circle"></i> Plan your day
-                        </button>
-                    </div>`;
-                }
-
-                todaysTasks.forEach(task => {
-                    const isDone = task.status === 'done';
-                    const isPartial = task.status === 'partial';
-                    const active = this.data.activeTimer && this.data.activeTimer.id === task.id;
-                    
-                    let actionHtml = '';
-                    if (!isDone) {
-                        if (active) {
-                            actionHtml = `
-                                <div class="flex items-center gap-3">
-                                    <span class="inline-flex relative flex h-3 w-3">
-                                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary-600 opacity-75"></span>
-                                      <span class="relative inline-flex rounded-full h-3 w-3 bg-primary-600"></span>
-                                    </span>
-                                    <span class="text-primary font-bold text-xs tracking-wider">RUNNING</span>
-                                </div>`;
-                        } else {
-                            actionHtml = `
-                                <div class="flex items-center gap-2">
-                                    <button onclick="app.editTask('${task.id}')" class="w-9 h-9 rounded-full text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 dark:hover:text-gray-200 transition-all flex items-center justify-center" aria-label="Edit" title="Edit"><i class="fas fa-pencil-alt text-sm"></i></button>
-                                    
-                                    <button onclick="app.startTimer('${task.id}')" class="w-9 h-9 rounded-full bg-primary/10 text-primary hover:bg-primary hover:text-white transition-all flex items-center justify-center shadow-sm" aria-label="Start Timer" title="Start Timer"><i class="fas fa-play text-xs pl-0.5"></i></button>
-                                    
-                                    <button onclick="app.manualComplete('${task.id}')" class="w-9 h-9 rounded-full text-gray-400 hover:text-secondary hover:bg-secondary/10 dark:hover:bg-gray-700 transition-all flex items-center justify-center" aria-label="Mark Done" title="Manual Complete"><i class="fas fa-check text-sm"></i></button>
-                                </div>
-                            `;
-                        }
-                    } else {
-                         actionHtml = `<div class="flex flex-col items-end">
-                                        <div class="text-secondary text-xs font-bold flex items-center gap-1.5 bg-secondary/10 px-2 py-1 rounded-md">
-                                            <i class="fas fa-check-circle"></i> Complete
-                                        </div>
-                                        <span class="text-[10px] text-gray-400 mt-1 font-mono">${task.actualTime}m • Focus: ${task.focusScore || '-'}/5</span>
-                                       </div>`;
-                    }
-
-                    let statusBadge = isPartial ? `<span class="ml-2 text-[9px] bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300 px-1.5 py-0.5 rounded font-bold uppercase tracking-wide">In Progress</span>` : '';
-
-                    const containerClass = active 
-                        ? 'ring-2 ring-primary ring-offset-2 ring-offset-gray-50 dark:ring-offset-dark-bg border-primary' 
-                        : (isDone ? 'opacity-75 bg-gray-50/50 dark:bg-gray-800/50 border-transparent' : 'bg-white dark:bg-gray-800 border-gray-100 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600');
-
-                    const html = `
-                        <div class="${containerClass} p-4 sm:p-5 rounded-xl shadow-soft flex flex-col sm:flex-row justify-between sm:items-center gap-4 group transition-all duration-200 border">
-                            <div class="flex-1 min-w-0">
-                                <div class="flex items-center gap-2.5 mb-2">
-                                    <span class="text-[9px] font-bold uppercase tracking-widest text-gray-500 border border-gray-200 dark:border-gray-600 px-1.5 py-0.5 rounded bg-gray-50 dark:bg-gray-700/50 truncate max-w-[120px]">${task.subject}</span>
-                                    ${statusBadge}
-                                </div>
-                                <h4 class="font-bold text-gray-800 dark:text-gray-100 text-base leading-snug truncate pr-2 ${isDone ? 'line-through text-gray-400 dark:text-gray-500' : ''}">${task.desc || task.subSubject}</h4>
-                                <div class="flex items-center gap-3 mt-1.5">
-                                    <div class="text-xs text-gray-400 font-medium flex items-center gap-1.5"><i class="far fa-dot-circle text-[10px]"></i> ${task.subSubject}</div>
-                                    <div class="w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-600"></div>
-                                    <div class="text-xs text-gray-400 font-medium flex items-center gap-1.5"><i class="far fa-clock text-[10px]"></i> ${task.duration}m</div>
-                                </div>
+                const html = `
+                    <div class="bg-white dark:bg-gray-800 rounded-2xl border ${status.color.split(' ').pop()} shadow-sm hover:shadow-md flex flex-col h-full transition-all duration-300 group relative ${status.opacity}">
+                        
+                        <div class="p-5 pb-3 flex justify-between items-start">
+                            <div>
+                                <h3 class="text-lg font-bold text-gray-800 dark:text-gray-100 leading-tight">${sub.name}</h3>
+                                <span class="inline-block mt-1.5 text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded ${status.color}">
+                                    ${status.label}
+                                </span>
                             </div>
-                            <div class="flex items-center justify-between sm:justify-end gap-2 pt-2 sm:pt-0 border-t sm:border-t-0 border-gray-100 dark:border-gray-700">
-                                ${actionHtml}
-                                ${!isDone ? `<button onclick="app.deleteTask('${task.id}')" class="text-gray-300 hover:text-red-500 dark:text-gray-600 dark:hover:text-red-400 ml-2 w-8 h-8 flex items-center justify-center transition-colors" aria-label="Delete"><i class="fas fa-trash-alt text-xs"></i></button>` : ''}
-                            </div>
-                        </div>
-                    `;
-                    list.insertAdjacentHTML('beforeend', html);
-                });
-            },
-
-            renderBacklog() {
-                const backlogTasks = this.data.tasks.filter(t => t.status === 'backlog');
-                const countEl = document.getElementById('backlogCount');
-                countEl.textContent = backlogTasks.length;
-                countEl.classList.toggle('hidden', backlogTasks.length === 0);
-
-                const sidebarList = document.getElementById('sidebarBacklogList');
-                sidebarList.innerHTML = '';
-                if(backlogTasks.length === 0) sidebarList.innerHTML = `<p class="text-gray-400 italic text-[10px] text-center py-2">No backlog.</p>`;
-
-                const dashList = document.getElementById('dashboardBacklogList');
-                if(dashList) dashList.innerHTML = '';
-                if(dashList && backlogTasks.length === 0) dashList.innerHTML = `
-                    <div class="flex flex-col items-center justify-center h-48 text-gray-400">
-                        <i class="fas fa-check-circle text-3xl mb-3 text-emerald-100 dark:text-emerald-900"></i>
-                        <span class="text-sm font-medium">All caught up!</span>
-                    </div>`;
-
-                backlogTasks.forEach(task => {
-                    sidebarList.insertAdjacentHTML('beforeend', `
-                        <div class="group flex justify-between items-center py-2 px-2 hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded-lg transition-colors cursor-default">
-                            <div class="truncate w-24 text-gray-600 dark:text-gray-400 text-xs" title="${task.subSubject}">${task.subSubject}</div>
-                             <button onclick="app.assignToToday('${task.id}')" class="text-primary hover:text-primary-700 text-[10px] font-bold opacity-0 group-hover:opacity-100 transition-opacity">MOVE</button>
-                        </div>
-                    `);
-
-                    if(dashList) {
-                        dashList.insertAdjacentHTML('beforeend', `
-                            <div class="flex justify-between items-center p-3.5 bg-red-50 dark:bg-red-900/10 rounded-xl border border-red-100 dark:border-red-900/20 group hover:border-red-200 dark:hover:border-red-800 transition-colors">
-                                <div class="min-w-0 flex-1 pr-3">
-                                    <div class="flex items-center gap-2 mb-1">
-                                        <div class="text-[9px] font-bold uppercase text-gray-400 tracking-wider">${task.subject}</div>
-                                        <div class="text-[9px] text-red-400 bg-red-100 dark:bg-red-900/40 px-1 rounded font-medium">Missed: ${task.date}</div>
-                                    </div>
-                                    <div class="text-sm font-bold text-gray-800 dark:text-gray-200 truncate">${task.subSubject}</div>
-                                </div>
-                                <button onclick="app.assignToToday('${task.id}')" class="text-xs bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 px-3 py-2 rounded-lg shadow-sm hover:border-primary hover:text-primary transition-all font-bold whitespace-nowrap">
-                                    Do Today
+                            <div class="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <button onclick="window.subjActions.renameSubject('${sub.id}')" class="p-1.5 text-gray-300 hover:text-primary hover:bg-gray-50 rounded-lg transition-colors" title="Rename Subject">
+                                    <i class="fas fa-pencil-alt text-xs"></i>
+                                </button>
+                                <button onclick="window.subjActions.deleteSubject('${sub.id}')" class="p-1.5 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors" title="Delete Subject">
+                                    <i class="fas fa-trash-alt text-xs"></i>
                                 </button>
                             </div>
-                        `);
-                    }
-                });
-            },
+                        </div>
 
-            renderCalendar() {
-                if(this.data.currentView !== 'calendar') return;
-                const grid = document.getElementById('calendarGrid');
-                grid.innerHTML = '';
-                
-                const year = this.data.calendarMonth.getFullYear();
-                const month = this.data.calendarMonth.getMonth();
-                
-                document.getElementById('calendarMonthLabel').innerText = this.data.calendarMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-                const daysInMonth = new Date(year, month + 1, 0).getDate();
-                
-                // Add padding for start day
-                const firstDay = new Date(year, month, 1).getDay();
-                for(let i=0; i<firstDay; i++) {
-                     grid.insertAdjacentHTML('beforeend', `<div class="h-24 md:h-28"></div>`);
-                }
-
-                for (let day = 1; day <= daysInMonth; day++) {
-                    const dateStr = `${year}-${String(month+1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-                    const tasksForDay = this.data.tasks.filter(t => t.date === dateStr && t.status !== 'backlog');
-                    
-                    let bgClass = "bg-white dark:bg-gray-800";
-                    let textClass = "text-gray-700 dark:text-gray-300";
-                    let label = "";
-
-                    if([7, 14, 21, 28].includes(day)) {
-                        bgClass = "bg-amber-50 dark:bg-amber-900/10";
-                        textClass = "text-amber-700 dark:text-amber-500";
-                        label = "REV";
-                    } else if (day >= 29) {
-                        bgClass = "bg-purple-50 dark:bg-purple-900/10";
-                        textClass = "text-purple-700 dark:text-purple-400";
-                        label = "MOCK";
-                    }
-
-                    // Status Dots
-                    let dots = "";
-                    if (tasksForDay.length > 0) {
-                        const completed = tasksForDay.filter(t => t.status === 'done').length;
-                        const ratio = completed / tasksForDay.length;
-                        
-                        let colorClass = "bg-gray-300 dark:bg-gray-600"; // default
-                        if(ratio === 1) colorClass = "bg-secondary";
-                        else if (ratio > 0) colorClass = "bg-blue-400";
-                        else if (new Date(dateStr) < new Date() && ratio < 1) colorClass = "bg-red-400"; // missed
-                        
-                        dots = `<div class="flex gap-0.5 mt-2 flex-wrap">
-                                    ${Array(Math.min(tasksForDay.length, 4)).fill(0).map(() => `<div class="w-1.5 h-1.5 rounded-full ${colorClass}"></div>`).join('')}
-                                    ${tasksForDay.length > 4 ? '<span class="text-[8px] text-gray-400 leading-none">+</span>' : ''}
-                                </div>`;
-                    }
-
-                    const todayClass = (dateStr === this.formatDate(new Date())) ? 'ring-2 ring-primary z-10' : '';
-
-                    const html = `
-                        <div onclick="app.openTaskModal('${dateStr}')" class="${bgClass} ${todayClass} border border-gray-100 dark:border-gray-700 rounded-xl h-24 md:h-28 p-2 md:p-3 relative cursor-pointer hover:shadow-md transition-all flex flex-col justify-between group overflow-hidden">
-                            <div class="flex justify-between items-start">
-                                <span class="font-bold text-sm ${textClass}">${day}</span>
-                                <span class="text-[9px] font-bold text-gray-300 dark:text-gray-600 block uppercase tracking-wider group-hover:text-primary transition-colors">${label}</span>
-                            </div>
-                            <div class="mt-auto">
-                                ${dots}
-                                <span class="text-[9px] text-gray-400 mt-1 block">${tasksForDay.length > 0 ? tasksForDay.length + ' tasks' : ''}</span>
+                        <div class="px-5 flex-1">
+                            <div class="flex flex-wrap gap-2 content-start">
+                                ${visibleTags.map(tag => `
+                                    <span class="group/tag inline-flex items-center text-xs px-2.5 py-1.5 rounded-lg border border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/30 text-gray-600 dark:text-gray-300">
+                                        <span onclick="window.subjActions.renameTopic('${sub.id}', '${tag}')" class="cursor-pointer hover:text-primary hover:underline decoration-dashed underline-offset-2">${tag}</span>
+                                        <button onclick="app.removeSubSubject('${sub.id}', '${tag}')" class="ml-1.5 text-gray-300 hover:text-red-400 w-4 h-4 flex items-center justify-center rounded-full hover:bg-white dark:hover:bg-gray-600 transition-colors">
+                                            <i class="fas fa-times text-[10px]"></i>
+                                        </button>
+                                    </span>
+                                `).join('')}
+                                
+                                ${remaining > 0 ? `<span class="text-[10px] font-bold text-gray-300 px-1 py-1.5">+${remaining} more</span>` : ''}
+                                
+                                <button onclick="app.addSubSubjectPrompt('${sub.id}')" class="text-xs px-2.5 py-1.5 border border-dashed border-gray-300 dark:border-gray-600 rounded-lg text-gray-400 hover:text-primary hover:border-primary hover:bg-indigo-50 dark:hover:bg-gray-700 transition-all flex items-center gap-1">
+                                    <i class="fas fa-plus text-[10px]"></i> Topic
+                                </button>
                             </div>
                         </div>
-                    `;
-                    grid.insertAdjacentHTML('beforeend', html);
-                }
-            },
 
-            renderSubjects() {
-                if(this.data.currentView !== 'subjects') return;
-                const list = document.getElementById('subjectsList');
-                list.innerHTML = '';
-                
-                this.data.subjects.forEach(sub => {
-                    const subTasks = this.data.tasks.filter(t => t.subject === sub.name && t.status === 'done');
-                    const totalMins = subTasks.reduce((acc, t) => acc + (t.actualTime || 0), 0);
-                    const hours = (totalMins / 60).toFixed(1);
-
-                    const html = `
-                        <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-soft border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-all duration-300 group">
-                            <div class="flex justify-between items-start mb-5">
-                                <h3 class="text-lg font-bold text-gray-800 dark:text-gray-100 group-hover:text-primary transition-colors">${sub.name}</h3>
-                                <div class="bg-indigo-50 dark:bg-indigo-900/30 text-primary dark:text-indigo-300 text-xs font-bold px-3 py-1.5 rounded-lg border border-indigo-100 dark:border-indigo-800 font-mono">${hours}h</div>
+                        <div class="mt-4 p-4 border-t border-gray-50 dark:border-gray-700/50 flex justify-between items-center">
+                            <div class="text-[10px] font-medium text-gray-300 flex items-center gap-1">
+                                <i class="fas fa-history"></i> ${lastTask ? new Date(lastTask.date).toLocaleDateString(undefined, {month:'short', day:'numeric'}) : 'Never'}
                             </div>
-                            <div class="space-y-4">
-                                <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-100 dark:border-gray-700 pb-2">Master Syllabus</h4>
-                                <div class="flex flex-wrap gap-2">
-                                    ${sub.sub.map(s => `<span class="bg-gray-50 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-xs px-2.5 py-1.5 rounded-md border border-gray-200 dark:border-gray-600 hover:bg-white dark:hover:bg-gray-600 transition-colors cursor-default">${s} <i class="fas fa-times ml-1.5 cursor-pointer text-gray-300 hover:text-red-500 transition-colors" onclick="app.removeSubSubject('${sub.id}', '${s}')"></i></span>`).join('')}
-                                    <button onclick="app.addSubSubjectPrompt('${sub.id}')" class="text-xs px-2.5 py-1.5 border border-dashed border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-400 hover:text-primary hover:border-primary transition-colors font-medium">+ Add</button>
-                                </div>
-                            </div>
+                            <button onclick="window.subjActions.startSession('${sub.id}')" class="bg-gray-50 dark:bg-gray-700 hover:bg-primary hover:text-white dark:hover:bg-primary text-gray-600 dark:text-gray-300 text-xs font-bold px-3 py-2 rounded-lg transition-all shadow-sm hover:shadow-md flex items-center gap-2 group/btn">
+                                Start Session <i class="fas fa-arrow-right transform group-hover/btn:translate-x-1 transition-transform"></i>
+                            </button>
                         </div>
-                    `;
-                    list.insertAdjacentHTML('beforeend', html);
-                });
-            },
-
-            renderAnalytics() {
-                if(this.data.currentView !== 'analytics') return;
-                const completedOrPartial = this.data.tasks.filter(t => t.actualTime > 0);
-                const totalMins = completedOrPartial.reduce((acc, t) => acc + (t.actualTime || 0), 0);
-                document.getElementById('analyticsTotalHours').innerText = `${(totalMins/60).toFixed(1)}h`;
-
-                const ratedTasks = this.data.tasks.filter(t => t.focusScore);
-                const avgFocus = ratedTasks.length ? (ratedTasks.reduce((acc, t) => acc + parseInt(t.focusScore), 0) / ratedTasks.length).toFixed(1) : "0.0";
-                document.getElementById('analyticsAvgFocus').innerText = avgFocus;
-
-                const completed = this.data.tasks.filter(t => t.status === 'done');
-                const denominator = this.data.tasks.length;
-                const rate = denominator ? Math.round((completed.length / denominator) * 100) : 0;
-                document.getElementById('analyticsCompletion').innerText = `${rate}%`;
-
-                const container = document.getElementById('analyticsSubjectBars');
-                container.innerHTML = '';
-                
-                const sortedSubjects = [...this.data.subjects].map(sub => {
-                    const subMins = completedOrPartial.filter(t => t.subject === sub.name).reduce((acc, t) => acc + (t.actualTime || 0), 0);
-                    return { ...sub, mins: subMins };
-                }).sort((a,b) => b.mins - a.mins);
-
-                const maxMins = sortedSubjects.length > 0 ? sortedSubjects[0].mins : 1;
-
-                sortedSubjects.forEach(sub => {
-                    if(sub.mins > 0) {
-                        const width = (sub.mins / maxMins) * 100;
-                        const hours = (sub.mins/60).toFixed(1);
-                        container.insertAdjacentHTML('beforeend', `
-                            <div class="group">
-                                <div class="flex justify-between text-xs font-bold mb-2 text-gray-600 dark:text-gray-300">
-                                    <span>${sub.name}</span>
-                                    <span class="font-mono text-gray-400 group-hover:text-primary transition-colors">${hours}h</span>
-                                </div>
-                                <div class="w-full bg-gray-100 dark:bg-gray-700 rounded-full h-2.5 overflow-hidden">
-                                    <div class="bg-primary h-2.5 rounded-full transition-all duration-1000 ease-out relative overflow-hidden group-hover:bg-primary-500" style="width: ${width || 0}%">
-                                        <div class="absolute inset-0 bg-white/20 w-full h-full animate-[shimmer_2s_infinite]"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        `);
-                    }
-                });
-            },
-
-            // --- USER ACTIONS ---
+                    </div>
+                `;
+                list.insertAdjacentHTML('beforeend', html);
+            });
             
-            editTask(id) {
-                const task = this.data.tasks.find(t => t.id === id);
-                if (!task) return;
-                const dateToUse = task.date || this.formatDate(new Date());
-                this.openTaskModal(dateToUse, id);
-            },
+            if(this.data.subjects.length === 0) {
+                 list.innerHTML = `<div class="col-span-full flex flex-col items-center justify-center py-16 border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-3xl text-gray-400">
+                    <div class="w-16 h-16 bg-gray-50 dark:bg-gray-800 rounded-full flex items-center justify-center mb-4">
+                        <i class="fas fa-book-open text-2xl text-gray-300"></i>
+                    </div>
+                    <p class="font-medium">No subjects yet.</p>
+                    <p class="text-xs opacity-70 mt-1">Add your syllabus to get started.</p>
+                 </div>`;
+            }
+        }, renderAnalytics() {
+            if(this.data.currentView !== 'analytics') return;
+            const completedOrPartial = this.data.tasks.filter(t => t.actualTime > 0);
+            const totalMins = completedOrPartial.reduce((acc, t) => acc + (t.actualTime || 0), 0);
+            document.getElementById('analyticsTotalHours').innerText = `${(totalMins/60).toFixed(1)}h`;
+
+            const ratedTasks = this.data.tasks.filter(t => t.focusScore);
+            const avgFocus = ratedTasks.length ? (ratedTasks.reduce((acc, t) => acc + parseInt(t.focusScore), 0) / ratedTasks.length).toFixed(1) : "0.0";
+            document.getElementById('analyticsAvgFocus').innerText = avgFocus;
+
+            const completed = this.data.tasks.filter(t => t.status === 'done');
+            const denominator = this.data.tasks.length;
+            const rate = denominator ? Math.round((completed.length / denominator) * 100) : 0;
+            document.getElementById('analyticsCompletion').innerText = `${rate}%`;
+
+            const container = document.getElementById('analyticsSubjectBars');
+            container.innerHTML = '';
             
-            openTaskModal(date = null, editId = null) {
-                document.getElementById('taskModal').classList.remove('hidden');
-                
-                const selectedDate = date || this.formatDate(new Date());
-                document.getElementById('taskDate').value = selectedDate;
-                
-                const dateObj = new Date(selectedDate);
-                const prettyDate = dateObj.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
-                document.getElementById('taskModalTitle').innerText = "Schedule: " + prettyDate;
+            const sortedSubjects = [...this.data.subjects].map(sub => {
+                const subMins = completedOrPartial.filter(t => t.subject === sub.name).reduce((acc, t) => acc + (t.actualTime || 0), 0);
+                return { ...sub, mins: subMins };
+            }).sort((a,b) => b.mins - a.mins);
 
-                // 1. Populate Subjects
-                const subSelect = document.getElementById('taskSubject');
-                subSelect.innerHTML = '<option value="">Select Subject</option>';
-                this.data.subjects.forEach(s => {
-                    subSelect.innerHTML += `<option value="${s.id}">${s.name}</option>`;
-                });
+            const maxMins = sortedSubjects.length > 0 ? sortedSubjects[0].mins : 1;
 
-                // 2. Render Existing List & Load Indicator
-                this.renderDayManagerList(selectedDate);
-
-                // 3. Smart Revision Logic
-                const dayNum = dateObj.getDate();
-                const revisionSection = document.getElementById('smartRevisionSection');
-                if ([7, 14, 21, 28].includes(dayNum)) {
-                    revisionSection.classList.remove('hidden');
-                } else {
-                    revisionSection.classList.add('hidden');
-                }
-
-                // 4. Handle Edit vs New
-                if(editId) {
-                    this.populateEditForm(editId);
-                } else {
-                    this.resetForm();
-                }
-            },
-
-            renderDayManagerList(dateStr) {
-                const list = document.getElementById('dayManagerList');
-                list.innerHTML = '';
-                const tasks = this.data.tasks.filter(t => t.date === dateStr);
-                const editId = document.getElementById('taskEditId').value;
-                const isEditMode = !!editId;
-                
-                // v3.2 Daily Capacity Logic
-                const totalMinutes = tasks.reduce((acc, t) => acc + (t.duration || 0), 0);
-                const totalHours = (totalMinutes / 60).toFixed(1);
-                
-                const bar = document.getElementById('dailyLoadBar');
-                const warningText = document.getElementById('dailyLoadWarning');
-                const loadText = document.getElementById('dailyLoadText');
-                
-                loadText.innerText = `${totalHours}h`;
-                
-                let percentage = Math.min((totalMinutes / 600) * 100, 100); 
-                bar.style.width = `${percentage}%`;
-                
-                bar.className = "h-1.5 rounded-full transition-all duration-500 "; 
-                warningText.classList.add('hidden');
-                
-                if (totalMinutes > 480) { 
-                    bar.classList.add('bg-red-500');
-                    warningText.classList.remove('hidden');
-                } else if (totalMinutes > 360) { 
-                    bar.classList.add('bg-amber-400');
-                } else {
-                    bar.classList.add('bg-secondary');
-                }
-
-                if(tasks.length === 0) {
-                    list.innerHTML = `<div class="text-xs text-gray-400 italic text-center py-8 border-2 border-dashed border-gray-100 dark:border-gray-700 rounded-xl">No tasks planned yet.</div>`;
-                    return;
-                }
-
-                tasks.forEach(task => {
-                    const isEditing = task.id === editId;
-                    let statusColor = "bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400";
-                    if(task.status === 'done') statusColor = "bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400";
-                    if(task.status === 'partial') statusColor = "bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400";
-
-                    // Visual states for Edit Mode
-                    const opacityClass = (isEditMode && !isEditing) ? 'opacity-40 grayscale-[0.5]' : 'opacity-100';
-                    const activeClass = isEditing ? 'ring-2 ring-primary ring-offset-2 ring-offset-gray-50 dark:ring-offset-gray-900 bg-white dark:bg-gray-800 z-10 scale-[1.01] shadow-lg' : 'bg-gray-50 dark:bg-gray-700/30 border border-gray-100 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600';
-
-                    list.insertAdjacentHTML('beforeend', `
-                        <div class="flex justify-between items-center p-3 rounded-xl transition-all duration-200 ${activeClass} ${opacityClass}">
-                            <div class="flex-1 min-w-0 mr-3">
-                                <div class="flex items-center gap-2 mb-1">
-                                    <span class="text-[9px] font-bold uppercase ${statusColor} px-1.5 py-0.5 rounded tracking-wide">${task.status}</span>
-                                    <span class="text-xs font-bold text-gray-700 dark:text-gray-200 truncate">${task.subject}</span>
-                                </div>
-                                <div class="text-xs text-gray-500 font-medium truncate">${task.subSubject}</div>
+            sortedSubjects.forEach(sub => {
+                if(sub.mins > 0) {
+                    const width = (sub.mins / maxMins) * 100;
+                    const hours = (sub.mins/60).toFixed(1);
+                    container.insertAdjacentHTML('beforeend', `
+                        <div class="group">
+                            <div class="flex justify-between text-xs font-bold mb-2 text-gray-600 dark:text-gray-300">
+                                <span>${sub.name}</span>
+                                <span class="font-mono text-gray-400 group-hover:text-primary transition-colors">${hours}h</span>
                             </div>
-                            <div class="flex items-center gap-3">
-                                <span class="text-xs text-gray-400 font-mono bg-white/50 dark:bg-gray-800/50 px-2 py-1 rounded border border-gray-200 dark:border-gray-600">${task.duration}m</span>
-                                <div class="flex gap-1">
-                                    <button onclick="app.populateEditForm('${task.id}'); app.renderDayManagerList('${dateStr}');" class="w-7 h-7 flex items-center justify-center rounded text-gray-400 hover:text-primary hover:bg-white dark:hover:bg-gray-600 transition-all"><i class="fas fa-pencil-alt text-xs"></i></button>
-                                    <button onclick="app.deleteTask('${task.id}')" class="w-7 h-7 flex items-center justify-center rounded text-gray-400 hover:text-red-500 hover:bg-white dark:hover:bg-gray-600 transition-all"><i class="fas fa-trash-alt text-xs"></i></button>
+                            <div class="w-full bg-gray-100 dark:bg-gray-700 rounded-full h-2.5 overflow-hidden">
+                                <div class="bg-primary h-2.5 rounded-full transition-all duration-1000 ease-out relative overflow-hidden group-hover:bg-primary-500" style="width: ${width || 0}%">
+                                    <div class="absolute inset-0 bg-white/20 w-full h-full animate-[shimmer_2s_infinite]"></div>
                                 </div>
                             </div>
                         </div>
                     `);
-                });
-            },
+                }
+            });
+        },
 
-            populateEditForm(id) {
-                const task = this.data.tasks.find(t => t.id === id);
-                if(!task) return;
+        // --- USER ACTIONS ---
+        
+        editTask(id) {
+            const task = this.data.tasks.find(t => t.id === id);
+            if (!task) return;
+            const dateToUse = task.date || this.formatDate(new Date());
+            this.openTaskModal(dateToUse, id);
+        },
+        
+        openTaskModal(date = null, editId = null) {
+            document.getElementById('taskModal').classList.remove('hidden');
+            
+            const selectedDate = date || this.formatDate(new Date());
+            document.getElementById('taskDate').value = selectedDate;
+            
+            const dateObj = new Date(selectedDate);
+            const prettyDate = dateObj.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+            document.getElementById('taskModalTitle').innerText = "Schedule: " + prettyDate;
 
-                document.getElementById('taskEditId').value = task.id;
-                document.getElementById('formModeTitle').innerHTML = '<span class="w-2 h-2 rounded-full bg-accent animate-pulse"></span> Edit Mode';
-                document.getElementById('cancelEditBtn').classList.remove('hidden');
-                document.getElementById('saveTaskBtn').innerText = "Update Task";
-                document.getElementById('saveTaskBtn').classList.add('bg-gray-800', 'hover:bg-black');
-                
-                const subObj = this.data.subjects.find(s => s.name === task.subject);
-                const subSelect = document.getElementById('taskSubject');
-                if(subObj) subSelect.value = subObj.id;
-                
-                this.updateSubSubjects();
-                document.getElementById('taskSubSubject').value = task.subSubject;
-                document.getElementById('taskDuration').value = task.duration;
-                document.getElementById('taskDesc').value = task.desc || "";
-            },
+            // 1. Populate Subjects
+            const subSelect = document.getElementById('taskSubject');
+            subSelect.innerHTML = '<option value="">Select Subject</option>';
+            this.data.subjects.forEach(s => {
+                subSelect.innerHTML += `<option value="${s.id}">${s.name}</option>`;
+            });
 
-            resetForm() {
-                document.getElementById('taskEditId').value = "";
-                document.getElementById('formModeTitle').innerHTML = '<span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span> Plan New Task';
-                document.getElementById('cancelEditBtn').classList.add('hidden');
-                document.getElementById('saveTaskBtn').innerText = "Add to Schedule";
-                document.getElementById('saveTaskBtn').classList.remove('bg-gray-800', 'hover:bg-black');
-                document.getElementById('taskSubject').value = "";
-                document.getElementById('taskSubSubject').value = "";
-                document.getElementById('taskDuration').value = "";
-                document.getElementById('taskDesc').value = "";
-            },
+            // 2. Render Existing List & Load Indicator
+            this.renderDayManagerList(selectedDate);
 
-            updateSubSubjects() {
-                 const subId = document.getElementById('taskSubject').value;
-                 const dataList = document.getElementById('subSubjectList');
-                 dataList.innerHTML = '';
-                 
-                 if(subId) {
-                     const subject = this.data.subjects.find(s => s.id == subId);
-                     if(subject && subject.sub) {
-                         subject.sub.forEach(topic => {
-                             const option = document.createElement('option');
-                             option.value = topic;
-                             dataList.appendChild(option);
-                         });
-                     }
+            // 3. Smart Revision Logic
+            const dayNum = dateObj.getDate();
+            const revisionSection = document.getElementById('smartRevisionSection');
+            if ([7, 14, 21, 28].includes(dayNum)) {
+                revisionSection.classList.remove('hidden');
+            } else {
+                revisionSection.classList.add('hidden');
+            }
+
+            // 4. Handle Edit vs New
+            if(editId) {
+                this.populateEditForm(editId);
+            } else {
+                this.resetForm();
+            }
+        },
+
+        renderDayManagerList(dateStr) {
+            const list = document.getElementById('dayManagerList');
+            list.innerHTML = '';
+            const tasks = this.data.tasks.filter(t => t.date === dateStr);
+            const editId = document.getElementById('taskEditId').value;
+            const isEditMode = !!editId;
+            
+            // v3.2 Daily Capacity Logic
+            const totalMinutes = tasks.reduce((acc, t) => acc + (t.duration || 0), 0);
+            const totalHours = (totalMinutes / 60).toFixed(1);
+            
+            const bar = document.getElementById('dailyLoadBar');
+            const warningText = document.getElementById('dailyLoadWarning');
+            const loadText = document.getElementById('dailyLoadText');
+            
+            loadText.innerText = `${totalHours}h`;
+            
+            let percentage = Math.min((totalMinutes / 600) * 100, 100); 
+            bar.style.width = `${percentage}%`;
+            
+            bar.className = "h-1.5 rounded-full transition-all duration-500 "; 
+            warningText.classList.add('hidden');
+            
+            if (totalMinutes > 480) { 
+                bar.classList.add('bg-red-500');
+                warningText.classList.remove('hidden');
+            } else if (totalMinutes > 360) { 
+                bar.classList.add('bg-amber-400');
+            } else {
+                bar.classList.add('bg-secondary');
+            }
+
+            if(tasks.length === 0) {
+                list.innerHTML = `<div class="text-xs text-gray-400 italic text-center py-8 border-2 border-dashed border-gray-100 dark:border-gray-700 rounded-xl">No tasks planned yet.</div>`;
+                return;
+            }
+
+            tasks.forEach(task => {
+                const isEditing = task.id === editId;
+                let statusColor = "bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400";
+                if(task.status === 'done') statusColor = "bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400";
+                if(task.status === 'partial') statusColor = "bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400";
+
+                // Visual states for Edit Mode
+                const opacityClass = (isEditMode && !isEditing) ? 'opacity-40 grayscale-[0.5]' : 'opacity-100';
+                const activeClass = isEditing ? 'ring-2 ring-primary ring-offset-2 ring-offset-gray-50 dark:ring-offset-gray-900 bg-white dark:bg-gray-800 z-10 scale-[1.01] shadow-lg' : 'bg-gray-50 dark:bg-gray-700/30 border border-gray-100 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600';
+
+                list.insertAdjacentHTML('beforeend', `
+                    <div class="flex justify-between items-center p-3 rounded-xl transition-all duration-200 ${activeClass} ${opacityClass}">
+                        <div class="flex-1 min-w-0 mr-3">
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="text-[9px] font-bold uppercase ${statusColor} px-1.5 py-0.5 rounded tracking-wide">${task.status}</span>
+                                <span class="text-xs font-bold text-gray-700 dark:text-gray-200 truncate">${task.subject}</span>
+                            </div>
+                            <div class="text-xs text-gray-500 font-medium truncate">${task.subSubject}</div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="text-xs text-gray-400 font-mono bg-white/50 dark:bg-gray-800/50 px-2 py-1 rounded border border-gray-200 dark:border-gray-600">${task.duration}m</span>
+                            <div class="flex gap-1">
+                                <button onclick="app.populateEditForm('${task.id}'); app.renderDayManagerList('${dateStr}');" class="w-7 h-7 flex items-center justify-center rounded text-gray-400 hover:text-primary hover:bg-white dark:hover:bg-gray-600 transition-all"><i class="fas fa-pencil-alt text-xs"></i></button>
+                                <button onclick="app.deleteTask('${task.id}')" class="w-7 h-7 flex items-center justify-center rounded text-gray-400 hover:text-red-500 hover:bg-white dark:hover:bg-gray-600 transition-all"><i class="fas fa-trash-alt text-xs"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                `);
+            });
+        },
+
+        populateEditForm(id) {
+            const task = this.data.tasks.find(t => t.id === id);
+            if(!task) return;
+
+            document.getElementById('taskEditId').value = task.id;
+            document.getElementById('formModeTitle').innerHTML = '<span class="w-2 h-2 rounded-full bg-accent animate-pulse"></span> Edit Mode';
+            document.getElementById('cancelEditBtn').classList.remove('hidden');
+            document.getElementById('saveTaskBtn').innerText = "Update Task";
+            document.getElementById('saveTaskBtn').classList.add('bg-gray-800', 'hover:bg-black');
+            
+            const subObj = this.data.subjects.find(s => s.name === task.subject);
+            const subSelect = document.getElementById('taskSubject');
+            if(subObj) subSelect.value = subObj.id;
+            
+            this.updateSubSubjects();
+            document.getElementById('taskSubSubject').value = task.subSubject;
+            document.getElementById('taskDuration').value = task.duration;
+            document.getElementById('taskDesc').value = task.desc || "";
+        },
+
+        resetForm() {
+            document.getElementById('taskEditId').value = "";
+            document.getElementById('formModeTitle').innerHTML = '<span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span> Plan New Task';
+            document.getElementById('cancelEditBtn').classList.add('hidden');
+            document.getElementById('saveTaskBtn').innerText = "Add to Schedule";
+            document.getElementById('saveTaskBtn').classList.remove('bg-gray-800', 'hover:bg-black');
+            document.getElementById('taskSubject').value = "";
+            document.getElementById('taskSubSubject').value = "";
+            document.getElementById('taskDuration').value = "";
+            document.getElementById('taskDesc').value = "";
+        },
+
+        updateSubSubjects() {
+             const subId = document.getElementById('taskSubject').value;
+             const dataList = document.getElementById('subSubjectList');
+             dataList.innerHTML = '';
+             
+             if(subId) {
+                 const subject = this.data.subjects.find(s => s.id == subId);
+                 if(subject && subject.sub) {
+                     subject.sub.forEach(topic => {
+                         const option = document.createElement('option');
+                         option.value = topic;
+                         dataList.appendChild(option);
+                     });
                  }
-            },
+             }
+        },
 
-            saveTask(e) {
-                e.preventDefault();
-                const subId = document.getElementById('taskSubject').value;
-                if(!subId) return;
+        saveTask(e) {
+            e.preventDefault();
+            const subId = document.getElementById('taskSubject').value;
+            if(!subId) return;
 
-                const subjectName = this.data.subjects.find(s => s.id == subId).name;
-                const editId = document.getElementById('taskEditId').value;
-                const dateStr = document.getElementById('taskDate').value;
+            const subjectName = this.data.subjects.find(s => s.id == subId).name;
+            const editId = document.getElementById('taskEditId').value;
+            const dateStr = document.getElementById('taskDate').value;
 
-                if (editId) {
-                    const task = this.data.tasks.find(t => t.id == editId);
-                    task.subject = subjectName;
-                    task.subSubject = document.getElementById('taskSubSubject').value;
-                    task.duration = parseInt(document.getElementById('taskDuration').value);
-                    task.desc = document.getElementById('taskDesc').value;
-                    task.date = dateStr;
+            if (editId) {
+                const task = this.data.tasks.find(t => t.id == editId);
+                task.subject = subjectName;
+                task.subSubject = document.getElementById('taskSubSubject').value;
+                task.duration = parseInt(document.getElementById('taskDuration').value);
+                task.desc = document.getElementById('taskDesc').value;
+                task.date = dateStr;
+            } else {
+                const task = {
+                    id: this.generateUUID(),
+                    subject: subjectName,
+                    subSubject: document.getElementById('taskSubSubject').value,
+                    duration: parseInt(document.getElementById('taskDuration').value),
+                    desc: document.getElementById('taskDesc').value,
+                    date: dateStr,
+                    status: 'pending',
+                    actualTime: 0
+                };
+                this.data.tasks.push(task);
+            }
+            
+            this.saveData();
+            this.resetForm();
+            this.renderDayManagerList(dateStr);
+        },
+
+   async deleteTask(id) {
+                // GUARD: Check if this specific task has a running timer
+                if (this.data.activeTimer && this.data.activeTimer.id === id) {
+                    const task = this.data.tasks.find(t => t.id === id);
+                    const msg = `⚠️ SESSION IN PROGRESS\n\nYou are currently studying "${task.subSubject}".\n\nStop the timer and delete this task?`;
+
+                    // UX: Explicit approval required to stop timer
+                    if (await this.uiConfirm(msg)) {
+                        this.stopTimer(); // Safely stop and log session BEFORE deletion
+                    } else {
+                        return; // User cancelled
+                    }
                 } else {
-                    const task = {
+                    // Standard confirmation for non-active tasks
+                    if (!(await this.uiConfirm('Delete this task?'))) return;
+                }
+
+                // DATA: Safe to delete now
+                this.data.tasks = this.data.tasks.filter(t => t.id !== id);
+                this.saveData();
+                
+                // UI: Refresh view if needed
+                const modalDate = document.getElementById('taskDate').value;
+                if(!document.getElementById('taskModal').classList.contains('hidden')) {
+                     this.renderDayManagerList(modalDate);
+                     this.resetForm();
+                }
+            },
+        async loadRevisionTopics() {
+            const targetVal = document.getElementById('taskDate').value;
+            const parts = targetVal.split('-');
+            const targetDate = new Date(parts[0], parts[1]-1, parts[2]); // Local Midnight
+
+            const intervals = [1, 7, 30];
+            const topics = new Set();
+            
+            intervals.forEach(daysAgo => {
+                const d = new Date(targetDate);
+                d.setDate(targetDate.getDate() - daysAgo);
+                const dStr = this.formatDate(d);
+                const tasks = this.data.tasks.filter(t => t.date === dStr && t.status === 'done');
+                tasks.forEach(t => topics.add(`${t.subject}: ${t.subSubject} (${daysAgo}d ago)`));
+            });
+            
+            if(topics.size === 0) {
+                await this.uiAlert("No completed topics found from 1, 7, or 30 days ago.");
+                return;
+            }
+
+            topics.forEach(topicStr => {
+                const parts = topicStr.match(/(.+): (.+) \((.+) ago\)/);
+                if(parts) {
+                    this.data.tasks.push({
                         id: this.generateUUID(),
-                        subject: subjectName,
-                        subSubject: document.getElementById('taskSubSubject').value,
-                        duration: parseInt(document.getElementById('taskDuration').value),
-                        desc: document.getElementById('taskDesc').value,
-                        date: dateStr,
+                        subject: parts[1],
+                        subSubject: `Review: ${parts[2]}`,
+                        duration: 20,
+                        desc: `Spaced Repetition (${parts[3]})`,
+                        date: document.getElementById('taskDate').value,
                         status: 'pending',
                         actualTime: 0
-                    };
-                    this.data.tasks.push(task);
+                    });
                 }
-                
+            });
+            
+            this.saveData();
+            this.renderDayManagerList(document.getElementById('taskDate').value);
+            await this.uiAlert(`Added ${topics.size} review tasks!`);
+        },
+        
+        checkBacklog() {
+            const today = this.formatDate(new Date());
+            let changed = false;
+            this.data.tasks.forEach(t => {
+                if (t.date < today && t.status !== 'done' && t.status !== 'backlog') {
+                    t.status = 'backlog';
+                    changed = true;
+                }
+            });
+            if(changed) this.saveData();
+        },
+
+        assignToToday(id) {
+            const task = this.data.tasks.find(t => t.id === id);
+            task.date = this.formatDate(new Date());
+            task.status = (task.actualTime > 0) ? 'partial' : 'pending';
+            this.saveData();
+        },
+
+        openSubjectModal() { document.getElementById('subjectModal').classList.remove('hidden'); },
+
+        saveSubject(e) {
+            e.preventDefault();
+            const name = document.getElementById('newSubjectName').value;
+            this.data.subjects.push({ id: this.generateUUID(), name: name, sub: [] });
+            this.saveData();
+            this.closeModal('subjectModal');
+            e.target.reset();
+        },
+        
+        async addSubSubjectPrompt(id) {
+            const sub = await this.uiPrompt("Enter new Topic/Sub-subject name:");
+            if(sub) {
+                this.data.subjects.find(s => s.id === id).sub.push(sub);
                 this.saveData();
-                this.resetForm();
-                this.renderDayManagerList(dateStr);
-            },
-
-            async deleteTask(id) {
-                if(await this.uiConfirm('Delete this task?')) {
-                    if (this.data.activeTimer && this.data.activeTimer.id === id) {
-                        if (this.data.timerInterval) {
-                            clearInterval(this.data.timerInterval);
-                            this.data.timerInterval = null;
-                        }
-                        this.data.activeTimer = null;
-                        this.persistTimerState();
-                        this.updateGlobalTimerUI();
-                    }
-
-                    this.data.tasks = this.data.tasks.filter(t => t.id !== id);
-                    this.saveData();
-                    
-                    const modalDate = document.getElementById('taskDate').value;
-                    if(!document.getElementById('taskModal').classList.contains('hidden')) {
-                         this.renderDayManagerList(modalDate);
-                         this.resetForm();
-                    }
-                }
-            },
+            }
+        },
+        
+        async removeSubSubject(subId, topicName) {
+            const subject = this.data.subjects.find(s => s.id === subId);
+            const associatedTasks = this.data.tasks.filter(t => t.subject === subject.name && t.subSubject === topicName);
             
-            async loadRevisionTopics() {
-                const targetDate = new Date(document.getElementById('taskDate').value);
-                const intervals = [1, 7, 30];
-                const topics = new Set();
-                
-                intervals.forEach(daysAgo => {
-                    const d = new Date(targetDate);
-                    d.setDate(targetDate.getDate() - daysAgo);
-                    const dStr = this.formatDate(d);
-                    const tasks = this.data.tasks.filter(t => t.date === dStr && t.status === 'done');
-                    tasks.forEach(t => topics.add(`${t.subject}: ${t.subSubject} (${daysAgo}d ago)`));
-                });
-                
-                if(topics.size === 0) {
-                    await this.uiAlert("No completed topics found from 1, 7, or 30 days ago.");
-                    return;
-                }
+            let msg = `Remove topic "${topicName}"?`;
+            if (associatedTasks.length > 0) {
+                msg = `Warning: Removing "${topicName}" will also delete ${associatedTasks.length} associated history logs.\n\nProceed?`;
+            }
 
-                topics.forEach(topicStr => {
-                    const parts = topicStr.match(/(.+): (.+) \((.+) ago\)/);
-                    if(parts) {
-                        this.data.tasks.push({
-                            id: this.generateUUID(),
-                            subject: parts[1],
-                            subSubject: `Review: ${parts[2]}`,
-                            duration: 20,
-                            desc: `Spaced Repetition (${parts[3]})`,
-                            date: document.getElementById('taskDate').value,
-                            status: 'pending',
-                            actualTime: 0
-                        });
-                    }
-                });
-                
+            if(await this.uiConfirm(msg)) {
+                if (associatedTasks.length > 0) {
+                    this.data.tasks = this.data.tasks.filter(t => !(t.subject === subject.name && t.subSubject === topicName));
+                }
+                subject.sub = subject.sub.filter(s => s !== topicName);
                 this.saveData();
-                this.renderDayManagerList(document.getElementById('taskDate').value);
-                await this.uiAlert(`Added ${topics.size} review tasks!`);
-            },
-            
-            checkBacklog() {
-                const today = this.formatDate(new Date());
-                let changed = false;
-                this.data.tasks.forEach(t => {
-                    if (t.date < today && t.status !== 'done' && t.status !== 'backlog') {
-                        t.status = 'backlog';
-                        changed = true;
-                    }
-                });
-                if(changed) this.saveData();
-            },
+                this.render();
+            }
+        },
 
-            assignToToday(id) {
-                const task = this.data.tasks.find(t => t.id === id);
-                task.date = this.formatDate(new Date());
-                task.status = (task.actualTime > 0) ? 'partial' : 'pending';
-                this.saveData();
-            },
+        async editTargetDate() {
+            const newDate = await this.uiPrompt("Set Exam Target Date (YYYY-MM-DD):", this.data.targetDate);
+            if(newDate) { this.data.targetDate = newDate; this.saveData(); }
+        },
+        
+        changeMonth(delta) { this.data.calendarMonth.setMonth(this.data.calendarMonth.getMonth() + delta); this.render(); },
+        closeModal(id) { document.getElementById(id).classList.add('hidden'); },
+        formatDate(d) {
+            const year = d.getFullYear();
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+    };
 
-            openSubjectModal() { document.getElementById('subjectModal').classList.remove('hidden'); },
-
-            saveSubject(e) {
-                e.preventDefault();
-                const name = document.getElementById('newSubjectName').value;
-                this.data.subjects.push({ id: this.generateUUID(), name: name, sub: [] });
-                this.saveData();
-                this.closeModal('subjectModal');
-                e.target.reset();
-            },
-            
-            async addSubSubjectPrompt(id) {
-                const sub = await this.uiPrompt("Enter new Topic/Sub-subject name:");
-                if(sub) {
-                    this.data.subjects.find(s => s.id === id).sub.push(sub);
-                    this.saveData();
-                }
-            },
-            
-            async removeSubSubject(subId, topicName) {
-                if(await this.uiConfirm(`Remove topic "${topicName}"?`)) {
-                    const subject = this.data.subjects.find(s => s.id === subId);
-                    subject.sub = subject.sub.filter(s => s !== topicName);
-                    this.saveData();
-                }
-            },
-
-            async editTargetDate() {
-                const newDate = await this.uiPrompt("Set Exam Target Date (YYYY-MM-DD):", this.data.targetDate);
-                if(newDate) { this.data.targetDate = newDate; this.saveData(); }
-            },
-            
-            changeMonth(delta) { this.data.calendarMonth.setMonth(this.data.calendarMonth.getMonth() + delta); this.render(); },
-            closeModal(id) { document.getElementById(id).classList.add('hidden'); },
-            formatDate(d) { return d.toISOString().split('T')[0]; }
-        };
-
-        app.init();
-    </script>
-</body>
-</html>
-
+    app.init();
+</script>
+</body> </html>
