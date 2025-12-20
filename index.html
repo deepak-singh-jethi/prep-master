@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PrepMaster v4.2.0</title>
+    <title>PrepMaster v5.4.2</title>
     <meta name="description" content="PrepMaster - Study Planner & Task Manager for Competitive Exams">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -124,7 +124,7 @@
                 </div>
                 <div>
                     <h1 class="text-lg md:text-xl font-bold tracking-tight leading-none">Prep<span class="text-primary">Master</span></h1>
-                    <span class="text-[10px] font-mono font-medium text-gray-400 dark:text-gray-500 uppercase tracking-widest">v4.1.0</span>
+                    <span class="text-[10px] font-mono font-medium text-gray-400 dark:text-gray-500 uppercase tracking-widest">v5.4.2</span>
                 </div>
             </div>
             
@@ -681,6 +681,8 @@ loadData() {
             parsed = JSON.parse(stored);
         } catch (e) {
             console.error("Storage corrupted. Resetting data to defaults.", e);
+            // FIX: Backup corrupted data before deletion to prevent total loss
+            localStorage.setItem('prepMasterData_v3_corrupted_backup', stored);
             localStorage.removeItem('prepMasterData_v3');
             // parsed remains null, triggering the else block below
         }
@@ -870,20 +872,25 @@ loadData() {
             }, 1000);
         },
 
-        updateTickerDisplay() {
-            if (!this.data.activeTimer) return;
-            
-            const totalMS = this.getElapsedMS();
-            const totalSecs = Math.floor(totalMS / 1000);
-            
-            const h = Math.floor(totalSecs / 3600).toString().padStart(2, '0');
-            const m = Math.floor((totalSecs % 3600) / 60).toString().padStart(2, '0');
-            const s = (totalSecs % 60).toString().padStart(2, '0');
-            
-            const display = document.getElementById('globalTimerDisplay');
-            if (display) display.innerText = `${h}:${m}:${s}`;
-        },
+updateTickerDisplay() {
+    if (!this.data.activeTimer) return;
+    
+    const totalMS = this.getElapsedMS();
+    
+    // FIX: Guard against extreme values (e.g. system clock jumps). Cap display at 24h.
+    // This is DISPLAY ONLY and does not affect the stored start time.
+    const MAX_DISPLAY_MS = 24 * 60 * 60 * 1000; 
+    const safeMS = (totalMS > MAX_DISPLAY_MS) ? MAX_DISPLAY_MS : totalMS;
 
+    const totalSecs = Math.floor(safeMS / 1000);
+    
+    const h = Math.floor(totalSecs / 3600).toString().padStart(2, '0');
+    const m = Math.floor((totalSecs % 3600) / 60).toString().padStart(2, '0');
+    const s = (totalSecs % 60).toString().padStart(2, '0');
+    
+    const display = document.getElementById('globalTimerDisplay');
+    if (display) display.innerText = `${h}:${m}:${s}`;
+},
         updateGlobalTimerUI() {
             const bar = document.getElementById('globalTimerBar');
             if (!bar) return;
@@ -1817,8 +1824,11 @@ deleteSubject: async (id) => {
                      this.resetForm();
                 }
             },
+
 async loadRevisionTopics() {
-    const targetDateStr = document.getElementById('taskDate').value;
+    // FIX: Defensive DOM access. Fallback to today if modal input is missing.
+    const dateInput = document.getElementById('taskDate');
+    const targetDateStr = dateInput ? dateInput.value : this.formatDate(new Date());
     
     // 1. Identify "Latest" Completed Version per Topic to prevent stale suggestions
     const latestMap = new Map();
@@ -1843,7 +1853,6 @@ async loadRevisionTopics() {
     // 2. Filter: Find items where Review Date is Due or Overdue (<= Today)
     const dueTasks = [];
     latestMap.forEach(task => {
-        // FIX: Using <= ensures we catch missed reviews from the past
         if (task.nextReviewDate && task.nextReviewDate <= targetDateStr) {
             dueTasks.push(task);
         }
@@ -1874,13 +1883,11 @@ async loadRevisionTopics() {
                 id: this.generateUUID(),
                 subject: source.subject,
                 subSubject: newSubSubject,
-                duration: 20, // Reviews are faster
+                duration: 20,
                 desc: `SRS Stage ${source.reviewStage || 1} (Due: ${source.nextReviewDate})`,
                 date: targetDateStr,
                 status: 'pending',
                 actualTime: 0,
-                
-                // CRITICAL: Inherit stage and link to source
                 reviewStage: source.reviewStage, 
                 isRevision: true,
                 reviewOf: source.id 
@@ -1890,15 +1897,17 @@ async loadRevisionTopics() {
     });
 
     this.saveData();
-    this.renderDayManagerList(targetDateStr);
+    // Only render the list if we are actually viewing a valid date context (e.g. modal is open)
+    if (dateInput) {
+        this.renderDayManagerList(targetDateStr);
+    }
     
     if (addedCount > 0) {
         await this.uiAlert(`Added ${addedCount} smart reviews to your schedule.`);
     } else {
         await this.uiAlert("All due reviews are already in today's schedule.");
     }
-},     
-
+},
 
 checkBacklog() {
             const today = this.formatDate(new Date());
