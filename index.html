@@ -672,24 +672,34 @@
             this.render();
         },
 
-        loadData() {
-            const stored = localStorage.getItem('prepMasterData_v3');
-            if (stored) {
-                const parsed = JSON.parse(stored);
-                this.data.tasks = parsed.tasks || [];
-                this.data.subjects = parsed.subjects || [];
-                this.data.targetDate = parsed.targetDate || '2026-02-01';
-                this.data.lastBackup = parsed.lastBackup || null;
-            } else {
-                // Seed Data
-                this.data.subjects = [
-                    { id: this.generateUUID(), name: 'History', sub: ['Ancient', 'Medieval', 'Modern'] },
-                    { id: this.generateUUID(), name: 'Polity', sub: ['Constitution', 'Governance'] },
-                    { id: this.generateUUID(), name: 'Geography', sub: ['Physical', 'Indian'] }
-                ];
-            }
-        },
+loadData() {
+    const stored = localStorage.getItem('prepMasterData_v3');
+    let parsed = null;
 
+    if (stored) {
+        try {
+            parsed = JSON.parse(stored);
+        } catch (e) {
+            console.error("Storage corrupted. Resetting data to defaults.", e);
+            localStorage.removeItem('prepMasterData_v3');
+            // parsed remains null, triggering the else block below
+        }
+    }
+
+    if (parsed) {
+        this.data.tasks = parsed.tasks || [];
+        this.data.subjects = parsed.subjects || [];
+        this.data.targetDate = parsed.targetDate || '2026-02-01';
+        this.data.lastBackup = parsed.lastBackup || null;
+    } else {
+        // Seed Data (Fallback)
+        this.data.subjects = [
+            { id: this.generateUUID(), name: 'History', sub: ['Ancient', 'Medieval', 'Modern'] },
+            { id: this.generateUUID(), name: 'Polity', sub: ['Constitution', 'Governance'] },
+            { id: this.generateUUID(), name: 'Geography', sub: ['Physical', 'Indian'] }
+        ];
+    }
+},
         checkBackupStatus() {
             const dot = document.getElementById('backupWarningDot');
             if (!dot) return;
@@ -910,47 +920,115 @@
             document.getElementById('actualTimeInput').value = defaultTime || task.actualTime || task.duration;
             document.getElementById('completeModal').classList.remove('hidden');
         },
+getRecallQuality() {
+    return new Promise(resolve => {
+        const container = document.getElementById('uiDialogContainer');
+        const title = document.getElementById('uiDialogTitle');
+        const msg = document.getElementById('uiDialogMessage');
+        const buttons = document.getElementById('uiDialogButtons');
+        const input = document.getElementById('uiDialogInput');
 
-confirmCompletion(type) {
+        // 1. Setup UI (Reuse generic container)
+        this.isDialogOpen = true;
+        title.innerText = "Recall Check";
+        msg.innerText = "How well did you remember this topic?";
+        input.classList.add('hidden');
+        buttons.innerHTML = '';
+        container.classList.remove('hidden');
+
+        // 2. Define Options
+        const options = [
+            { id: 'again', label: 'Again', cls: 'bg-red-100 text-red-700 hover:bg-red-200' },
+            { id: 'hard',  label: 'Hard',  cls: 'bg-orange-100 text-orange-700 hover:bg-orange-200' },
+            { id: 'good',  label: 'Good',  cls: 'bg-blue-100 text-blue-700 hover:bg-blue-200' },
+            { id: 'easy',  label: 'Easy',  cls: 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200' }
+        ];
+
+        // 3. Render Buttons
+        options.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = `flex-1 py-3 px-2 rounded-xl font-bold text-xs uppercase tracking-wider transition-colors ${opt.cls}`;
+            btn.innerText = opt.label;
+            btn.onclick = () => {
+                finish(opt.id);
+            };
+            buttons.appendChild(btn);
+        });
+
+        // 4. Cleanup & Resolve Helper
+        const finish = (result) => {
+            container.classList.add('hidden');
+            this.isDialogOpen = false;
+            document.removeEventListener('keydown', escHandler);
+            resolve(result);
+        };
+
+        // 5. Safety: Handle Escape Key (Default to 'good')
+        const escHandler = (e) => {
+            if (e.key === 'Escape') finish('good');
+        };
+        document.addEventListener('keydown', escHandler);
+    });
+},
+
+
+        async confirmCompletion(type) {
     const id = this.data.completingTaskId;
     const task = this.data.tasks.find(t => t.id === id);
     
     if (task) {
         task.actualTime = parseInt(document.getElementById('actualTimeInput').value) || 0;
         task.focusScore = document.getElementById('focusScore').value;
-        task.status = type; // 'done' or 'partial'
+        task.status = type; 
 
-        // --- FIXED SRS LOGIC ---
-        // Calculate Next Review Date ONLY when finishing a task
         if (type === 'done') {
-            // 1. Determine Cycle Stage (Inherit or Start New)
-            const currentStage = task.reviewStage || 0;
-            
-            // 2. Increment Stage (Cap at Stage 3: 1d -> 7d -> 30d -> 30d...)
-            const nextStage = currentStage < 3 ? currentStage + 1 : 3;
-            
-            // 3. Define Interval Map
-            const intervals = { 1: 1, 2: 7, 3: 30 };
-            const daysToAdd = intervals[nextStage];
+            // --- NEW: ADAPTIVE RECALL LOGIC (Revision Tasks Only) ---
+            if (task.isRevision) {
+                // 1. Prompt for Quality (Async)
+                const quality = await this.getRecallQuality();
+                
+                // 2. Map Interval (Fixed Rules)
+                const intervals = { 'again': 1, 'hard': 3, 'good': 7, 'easy': 25 };
+                const daysToAdd = intervals[quality] || 7; // Default to good/7
+                
+                // 3. Persist Metrics
+                task.lastRecallQuality = quality;
+                task.lastReviewedAt = this.formatDate(new Date());
+                
+                // 4. Update Next Review Date
+                const nextDate = new Date();
+                nextDate.setDate(nextDate.getDate() + daysToAdd);
+                task.nextReviewDate = this.formatDate(nextDate);
+                
+                // Fix: Reset stage on 'again', otherwise increment capped at 3
+                if (quality === 'again') {
+                    task.reviewStage = 1;
+                } else {
+                    const currentStage = task.reviewStage || 0;
+                    task.reviewStage = currentStage < 3 ? currentStage + 1 : 3;
+                }
 
-            // 4. Calculate Next Date based on TODAY (Completion Date)
-            const nextDate = new Date();
-            nextDate.setDate(nextDate.getDate() + daysToAdd);
-            
-            // 5. Persist Schedule on the Completed Task
-            task.nextReviewDate = this.formatDate(nextDate);
-            task.reviewStage = nextStage;
-            
-            // NOTE: We do NOT set task.isRevision = true here. 
-            // That flag is reserved for the auto-generated tasks in the future.
+            } else {
+                // --- OLD: STANDARD LOGIC (Normal Tasks) ---
+                // Remains completely unchanged as per constraints
+                const currentStage = task.reviewStage || 0;
+                const nextStage = currentStage < 3 ? currentStage + 1 : 3;
+                const intervals = { 1: 1, 2: 7, 3: 30 };
+                
+                const nextDate = new Date();
+                nextDate.setDate(nextDate.getDate() + intervals[nextStage]);
+                
+                task.nextReviewDate = this.formatDate(nextDate);
+                task.reviewStage = nextStage;
+            }
         }
         
         this.saveData();
     }
     this.closeModal('completeModal');
     this.data.completingTaskId = null;
-},   // --- NAVIGATION ---
-        navigate(view) {
+},
+navigate(view) {
             this.data.currentView = view;
             document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
             document.getElementById(`view-${view}`).classList.remove('hidden');
@@ -1742,17 +1820,15 @@ deleteSubject: async (id) => {
 async loadRevisionTopics() {
     const targetDateStr = document.getElementById('taskDate').value;
     
-    // 1. Find the "Latest State" for every unique Topic
-    // (We only care about the most recently completed log for "History", not the one from 2 months ago)
+    // 1. Identify "Latest" Completed Version per Topic to prevent stale suggestions
     const latestMap = new Map();
 
     this.data.tasks.forEach(t => {
         if (t.status === 'done') {
-            // Normalize Topic Name (Remove "Review: " prefix to group effectively)
             const cleanSub = t.subSubject.replace(/^Review:\s*/, '');
             const key = `${t.subject}|${cleanSub}`;
             
-            // Keep the most recent one based on date/ID
+            // Keep only the most recent entry
             if (!latestMap.has(key)) {
                 latestMap.set(key, t);
             } else {
@@ -1764,10 +1840,10 @@ async loadRevisionTopics() {
         }
     });
 
-    // 2. Filter: Which topics are Due or Overdue?
+    // 2. Filter: Find items where Review Date is Due or Overdue (<= Today)
     const dueTasks = [];
     latestMap.forEach(task => {
-        // Safe string comparison works for YYYY-MM-DD
+        // FIX: Using <= ensures we catch missed reviews from the past
         if (task.nextReviewDate && task.nextReviewDate <= targetDateStr) {
             dueTasks.push(task);
         }
@@ -1780,17 +1856,17 @@ async loadRevisionTopics() {
 
     let addedCount = 0;
 
-    // 3. Generate Tasks (With Strict Deduplication)
+    // 3. Generate Tasks (With Strict Duplicate Check)
     dueTasks.forEach(source => {
         const cleanName = source.subSubject.replace(/^Review:\s*/, '');
         const newSubSubject = `Review: ${cleanName}`;
 
-        // GUARD: Does a revision task ALREADY exist for this day/topic?
+        // GUARD: Prevent duplicates on the specific target day
         const alreadyExists = this.data.tasks.some(t => 
             t.date === targetDateStr &&
             t.subject === source.subject &&
             t.subSubject === newSubSubject &&
-            t.isRevision === true // Only check against auto-generated revisions
+            t.isRevision === true 
         );
 
         if (!alreadyExists) {
@@ -1799,15 +1875,13 @@ async loadRevisionTopics() {
                 subject: source.subject,
                 subSubject: newSubSubject,
                 duration: 20, // Reviews are faster
-                desc: `SRS Stage ${source.reviewStage} (Due: ${source.nextReviewDate})`,
+                desc: `SRS Stage ${source.reviewStage || 1} (Due: ${source.nextReviewDate})`,
                 date: targetDateStr,
                 status: 'pending',
                 actualTime: 0,
                 
-                // CRITICAL: Inherit the stage so the cycle continues (1->7->30)
+                // CRITICAL: Inherit stage and link to source
                 reviewStage: source.reviewStage, 
-                
-                // FLAGS: Mark as auto-generated revision
                 isRevision: true,
                 reviewOf: source.id 
             });
@@ -1818,14 +1892,15 @@ async loadRevisionTopics() {
     this.saveData();
     this.renderDayManagerList(targetDateStr);
     
-    // 4. Feedback
     if (addedCount > 0) {
         await this.uiAlert(`Added ${addedCount} smart reviews to your schedule.`);
     } else {
         await this.uiAlert("All due reviews are already in today's schedule.");
     }
-}, 
-        checkBacklog() {
+},     
+
+
+checkBacklog() {
             const today = this.formatDate(new Date());
             let changed = false;
             this.data.tasks.forEach(t => {
