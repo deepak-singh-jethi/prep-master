@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PrepMaster v3.2 - Stability & Sanity</title>
+    <title>PrepMaster v3.2.1 - Fixed</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -51,7 +51,7 @@
         <div class="flex items-center gap-3 md:gap-4">
             <div class="flex items-center gap-2">
                 <i class="fas fa-layer-group text-primary text-2xl"></i>
-                <h1 class="text-lg md:text-xl font-bold tracking-tight">Prep<span class="text-primary">Master</span> <span class="text-[10px] bg-emerald-100 dark:bg-emerald-900 text-emerald-600 dark:text-emerald-400 px-1.5 py-0.5 rounded align-top">v3.2</span></h1>
+                <h1 class="text-lg md:text-xl font-bold tracking-tight">Prep<span class="text-primary">Master</span> <span class="text-[10px] bg-emerald-100 dark:bg-emerald-900 text-emerald-600 dark:text-emerald-400 px-1.5 py-0.5 rounded align-top">v3.2.1</span></h1>
             </div>
             <div class="hidden md:flex flex-col border-l pl-4 border-gray-300 dark:border-gray-600">
                 <span class="text-[10px] uppercase tracking-wider text-gray-500 dark:text-gray-400">Target</span>
@@ -231,7 +231,7 @@
                     </div>
                 </div>
                 <div class="text-xs text-center text-gray-400" id="lastBackupDisplay">
-                    PrepMaster v3.2 • LocalStorage Only
+                    PrepMaster v3.2.1 • LocalStorage Only
                 </div>
             </div>
         </div>
@@ -353,14 +353,16 @@
         </div>
     </div>
 
-    <script>
+<script>
         const app = {
             data: {
                 tasks: [],
                 subjects: [],
                 targetDate: '2026-02-01',
-                activeTimer: null,
+                // TIMER STATE
+                activeTimer: null, // { id, startTime, accumulated, lastSaved }
                 timerInterval: null,
+                // UI STATE
                 currentView: 'dashboard',
                 currentDate: new Date(),
                 calendarMonth: new Date(),
@@ -373,8 +375,8 @@
                 this.render();
                 this.checkBacklog();
                 this.checkBackupStatus(); 
-                this.restoreTimerState();
-                this.setupKeyboardShortcuts(); // v3.2 Accessibility
+                this.restoreTimerState(); // Now uses robust restoration logic
+                this.setupKeyboardShortcuts();
 
                 // Theme Logic
                 if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
@@ -382,8 +384,11 @@
                 }
             },
 
-            // --- v3.2 Helpers ---
+            // --- HELPERS ---
             generateUUID() {
+                if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+                    return crypto.randomUUID();
+                }
                 return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
                     var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
                     return v.toString(16);
@@ -400,8 +405,10 @@
 
             // --- DATA LAYER ---
             saveData() {
+                // We do NOT save activeTimer here anymore to avoid race conditions.
+                // activeTimer is managed by its own persistence cycle.
                 localStorage.setItem('prepMasterData_v3', JSON.stringify({
-                    schema: 3.2, // v3.2 Versioning
+                    schema: 3.2,
                     tasks: this.data.tasks,
                     subjects: this.data.subjects,
                     targetDate: this.data.targetDate,
@@ -430,6 +437,7 @@
 
             checkBackupStatus() {
                 const dot = document.getElementById('backupWarningDot');
+                if (!dot) return;
                 const last = this.data.lastBackup ? new Date(this.data.lastBackup) : new Date(0);
                 const now = new Date();
                 const diffDays = (now - last) / (1000 * 60 * 60 * 24);
@@ -441,8 +449,218 @@
                 }
                 
                 if(this.data.lastBackup) {
-                    document.getElementById('lastBackupDisplay').innerText = "Last Backup: " + new Date(this.data.lastBackup).toLocaleDateString();
+                    const display = document.getElementById('lastBackupDisplay');
+                    if(display) display.innerText = "Last Backup: " + new Date(this.data.lastBackup).toLocaleDateString();
                 }
+            },
+
+            // --- TIMER LOGIC (STABILIZED) ---
+            
+            // 1. Single Source of Truth for Time
+            getElapsedMS() {
+                if (!this.data.activeTimer) return 0;
+                
+                let currentSegment = 0;
+                // If startTime exists, the timer is RUNNING. Calculate delta from now.
+                if (this.data.activeTimer.startTime !== null) {
+                    currentSegment = Math.max(0, Date.now() - this.data.activeTimer.startTime);
+                }
+                
+                return (this.data.activeTimer.accumulated || 0) + currentSegment;
+            },
+
+            // 2. Robust Restoration
+            restoreTimerState() {
+                const saved = localStorage.getItem('prepMasterTimer');
+                if (saved) {
+                    try {
+                        const parsed = JSON.parse(saved);
+                        // Validate that the task still exists
+                        if (this.data.tasks.find(t => t.id === parsed.id)) {
+                            this.data.activeTimer = parsed;
+                            
+                            // If startTime is not null, it means it was left RUNNING.
+                            // We don't need to do any math here. 
+                            // getElapsedMS() will automatically calculate (Now - OldStartTime) + Accumulated.
+                            // This correctly accounts for time while the browser was closed.
+                            
+                            this.updateGlobalTimerUI(); // Update UI immediately
+                            if (this.data.activeTimer.startTime !== null) {
+                                this.startTicker(); // Resume visual updates
+                            }
+                        } else {
+                            // Task deleted while timer saved? Clean up.
+                            localStorage.removeItem('prepMasterTimer');
+                        }
+                    } catch (e) {
+                        console.error("Timer state corrupted", e);
+                        localStorage.removeItem('prepMasterTimer');
+                    }
+                }
+            },
+
+            // 3. Deterministic Persistence
+            persistTimerState() {
+                if (this.data.activeTimer) {
+                    localStorage.setItem('prepMasterTimer', JSON.stringify(this.data.activeTimer));
+                } else {
+                    localStorage.removeItem('prepMasterTimer');
+                }
+            },
+
+            startTimer(id) {
+                // Prevent double-start or hijacking
+                if (this.data.activeTimer) {
+                    if (this.data.activeTimer.id !== id) {
+                        alert("Please stop the current timer first.");
+                        return;
+                    }
+                    // If already running, do nothing
+                    if (this.data.activeTimer.startTime !== null) return;
+                }
+
+                // Initialize State
+                if (!this.data.activeTimer) {
+                    this.data.activeTimer = {
+                        id: id,
+                        startTime: Date.now(),
+                        accumulated: 0
+                    };
+                } else {
+                    // Resuming from pause
+                    this.data.activeTimer.startTime = Date.now();
+                }
+
+                this.persistTimerState();
+                this.render(); // Update play/pause buttons in list
+                this.startTicker();
+            },
+
+            toggleTimer() {
+                if (!this.data.activeTimer) return;
+
+                if (this.data.activeTimer.startTime !== null) {
+                    // PAUSE LOGIC
+                    // 1. Calculate elapsed for this segment
+                    const now = Date.now();
+                    const delta = Math.max(0, now - this.data.activeTimer.startTime);
+                    
+                    // 2. Bank it into accumulated
+                    this.data.activeTimer.accumulated += delta;
+                    
+                    // 3. Nullify startTime to indicate paused state
+                    this.data.activeTimer.startTime = null;
+                    
+                    // 4. Stop visual ticker (optional, but saves resources)
+                    if (this.data.timerInterval) {
+                        clearInterval(this.data.timerInterval);
+                        this.data.timerInterval = null;
+                    }
+                    
+                    // 5. Update UI one last time to show precise pause time
+                    this.updateTickerDisplay();
+                    document.getElementById('globalTimerPauseBtn').innerText = "Resume";
+                } else {
+                    // RESUME LOGIC
+                    // 1. Set new start time
+                    this.data.activeTimer.startTime = Date.now();
+                    
+                    // 2. Restart ticker
+                    this.startTicker();
+                }
+                
+                this.persistTimerState();
+            },
+
+            stopTimer() {
+                if (!this.data.activeTimer) return;
+
+                // 1. Calculate final total time
+                const finalElapsedMS = this.getElapsedMS();
+                const finalMinutes = Math.ceil(finalElapsedMS / 1000 / 60);
+                const taskId = this.data.activeTimer.id;
+
+                // 2. Clean up
+                if (this.data.timerInterval) {
+                    clearInterval(this.data.timerInterval);
+                    this.data.timerInterval = null;
+                }
+                this.data.activeTimer = null;
+                this.persistTimerState(); // Clears localStorage
+
+                // 3. UI Cleanup & Completion
+                this.updateGlobalTimerUI();
+                this.render(); // Resets list buttons
+                this.manualComplete(taskId, finalMinutes);
+            },
+
+            startTicker() {
+                if (this.data.timerInterval) clearInterval(this.data.timerInterval);
+                
+                this.updateGlobalTimerUI(); // Immediate update
+                
+                // Visual update loop (does not affect data integrity)
+                this.data.timerInterval = setInterval(() => {
+                    this.updateTickerDisplay();
+                }, 1000);
+            },
+
+            updateTickerDisplay() {
+                if (!this.data.activeTimer) return;
+                
+                const totalMS = this.getElapsedMS();
+                const totalSecs = Math.floor(totalMS / 1000);
+                
+                const h = Math.floor(totalSecs / 3600).toString().padStart(2, '0');
+                const m = Math.floor((totalSecs % 3600) / 60).toString().padStart(2, '0');
+                const s = (totalSecs % 60).toString().padStart(2, '0');
+                
+                const display = document.getElementById('globalTimerDisplay');
+                if (display) display.innerText = `${h}:${m}:${s}`;
+            },
+
+            updateGlobalTimerUI() {
+                const bar = document.getElementById('globalTimerBar');
+                if (!bar) return;
+
+                if (this.data.activeTimer) {
+                    bar.classList.remove('translate-y-full');
+                    const task = this.data.tasks.find(t => t.id === this.data.activeTimer.id);
+                    if (task) {
+                        document.getElementById('globalTimerTaskName').innerText = `${task.subject}: ${task.subSubject}`;
+                    }
+                    // Update button state based on data, not DOM
+                    const isRunning = this.data.activeTimer.startTime !== null;
+                    document.getElementById('globalTimerPauseBtn').innerText = isRunning ? "Pause" : "Resume";
+                    
+                    // Ensure display is correct immediately
+                    this.updateTickerDisplay();
+                } else {
+                    bar.classList.add('translate-y-full');
+                }
+            },
+
+            // --- COMPLETION LOGIC ---
+            manualComplete(id, defaultTime = null) {
+                this.data.completingTaskId = id;
+                const task = this.data.tasks.find(t => t.id === id);
+                if (!task) return;
+                
+                document.getElementById('actualTimeInput').value = defaultTime || task.actualTime || task.duration;
+                document.getElementById('completeModal').classList.remove('hidden');
+            },
+
+            confirmCompletion(type) {
+                const id = this.data.completingTaskId;
+                const task = this.data.tasks.find(t => t.id === id);
+                if (task) {
+                    task.actualTime = parseInt(document.getElementById('actualTimeInput').value) || 0;
+                    task.focusScore = document.getElementById('focusScore').value;
+                    task.status = type; // 'done' or 'partial'
+                    this.saveData();
+                }
+                this.closeModal('completeModal');
+                this.data.completingTaskId = null;
             },
 
             // --- NAVIGATION ---
@@ -769,18 +987,6 @@
                 });
             },
 
-            updateGlobalTimerUI() {
-                const bar = document.getElementById('globalTimerBar');
-                if (this.data.activeTimer) {
-                    bar.classList.remove('translate-y-full');
-                    const task = this.data.tasks.find(t => t.id === this.data.activeTimer.id);
-                    document.getElementById('globalTimerTaskName').innerText = `${task.subject}: ${task.subSubject}`;
-                    document.getElementById('globalTimerPauseBtn').innerText = this.data.timerInterval ? "Pause" : "Resume";
-                } else {
-                    bar.classList.add('translate-y-full');
-                }
-            },
-
             // --- USER ACTIONS ---
             
             openTaskModal(date = null, editId = null) {
@@ -800,7 +1006,7 @@
                     subSelect.innerHTML += `<option value="${s.id}">${s.name}</option>`;
                 });
 
-                // 2. Render Existing List & Load Indicator (v3.2)
+                // 2. Render Existing List & Load Indicator
                 this.renderDayManagerList(selectedDate);
 
                 // 3. Smart Revision Logic
@@ -829,24 +1035,22 @@
                 const totalMinutes = tasks.reduce((acc, t) => acc + (t.duration || 0), 0);
                 const totalHours = (totalMinutes / 60).toFixed(1);
                 
-                // Update Progress Bar
                 const bar = document.getElementById('dailyLoadBar');
                 const warningText = document.getElementById('dailyLoadWarning');
                 const loadText = document.getElementById('dailyLoadText');
                 
                 loadText.innerText = `${totalHours}h Planned`;
                 
-                let percentage = Math.min((totalMinutes / 600) * 100, 100); // Base on 10h max visual
+                let percentage = Math.min((totalMinutes / 600) * 100, 100); 
                 bar.style.width = `${percentage}%`;
                 
-                // Color Logic
-                bar.className = "h-1.5 rounded-full transition-all duration-500 "; // Reset
+                bar.className = "h-1.5 rounded-full transition-all duration-500 "; 
                 warningText.classList.add('hidden');
                 
-                if (totalMinutes > 480) { // >8h
+                if (totalMinutes > 480) { 
                     bar.classList.add('bg-red-500');
                     warningText.classList.remove('hidden');
-                } else if (totalMinutes > 360) { // >6h
+                } else if (totalMinutes > 360) { 
                     bar.classList.add('bg-yellow-500');
                 } else {
                     bar.classList.add('bg-green-500');
@@ -929,7 +1133,7 @@
                     task.date = dateStr;
                 } else {
                     const task = {
-                        id: this.generateUUID(), // v3.2 UUID
+                        id: this.generateUUID(),
                         subject: subjectName,
                         subSubject: document.getElementById('taskSubSubject').value,
                         duration: parseInt(document.getElementById('taskDuration').value),
@@ -1002,131 +1206,6 @@
                 alert(`Added ${topics.size} review tasks!`);
             },
             
-            // --- TIMER LOGIC ---
-            restoreTimerState() {
-                const saved = localStorage.getItem('prepMasterTimer');
-                if(saved) {
-                    const parsed = JSON.parse(saved);
-                    if(this.data.tasks.find(t => t.id === parsed.id)) {
-                        this.data.activeTimer = parsed;
-                        if (parsed.isRunning) {
-                             const elapsedWhileClosed = Math.floor((Date.now() - parsed.lastTimestamp) / 1000);
-                             this.data.activeTimer.accumulated += elapsedWhileClosed;
-                             this.data.activeTimer.startTime = Date.now();
-                             this.startTicker();
-                        } else {
-                            this.updateTickerDisplay(); 
-                        }
-                    } else {
-                        localStorage.removeItem('prepMasterTimer');
-                    }
-                }
-            },
-
-            saveTimerState(isRunning) {
-                if(!this.data.activeTimer) { localStorage.removeItem('prepMasterTimer'); return; }
-                const state = { ...this.data.activeTimer, isRunning, lastTimestamp: Date.now() };
-                localStorage.setItem('prepMasterTimer', JSON.stringify(state));
-            },
-
-            startTimer(id) {
-                if (this.data.activeTimer && this.data.activeTimer.id !== id) { alert("Stop current timer first!"); return; }
-                if(!this.data.activeTimer) this.data.activeTimer = { id: id, startTime: Date.now(), accumulated: 0 };
-                this.render(); 
-                this.startTicker();
-                this.saveTimerState(true);
-            },
-
-            startTicker() {
-                if(this.data.timerInterval) clearInterval(this.data.timerInterval);
-                this.data.timerInterval = setInterval(() => {
-                    this.updateTickerDisplay();
-                    if(Date.now() % 5000 < 1000) this.saveTimerState(true);
-                }, 1000);
-                document.getElementById('globalTimerPauseBtn').innerText = "Pause";
-            },
-
-            updateTickerDisplay() {
-                if(!this.data.activeTimer) return;
-                const now = this.data.timerInterval ? Date.now() : this.data.activeTimer.startTime;
-                const currentSecs = Math.floor((now - this.data.activeTimer.startTime) / 1000) + this.data.activeTimer.accumulated;
-                const h = Math.floor(currentSecs / 3600).toString().padStart(2,'0');
-                const m = Math.floor((currentSecs % 3600) / 60).toString().padStart(2,'0');
-                const s = (currentSecs % 60).toString().padStart(2,'0');
-                document.getElementById('globalTimerDisplay').innerText = `${h}:${m}:${s}`;
-            },
-
-            toggleTimer() {
-                if(!this.data.timerInterval) {
-                    this.data.activeTimer.startTime = Date.now();
-                    this.startTicker();
-                    this.saveTimerState(true);
-                } else {
-                    clearInterval(this.data.timerInterval);
-                    this.data.timerInterval = null;
-                    this.data.activeTimer.accumulated += Math.floor((Date.now() - this.data.activeTimer.startTime) / 1000);
-                    document.getElementById('globalTimerPauseBtn').innerText = "Resume";
-                    this.saveTimerState(false);
-                }
-            },
-
-            stopTimer() {
-                clearInterval(this.data.timerInterval);
-                this.data.timerInterval = null;
-                let elapsed = this.data.activeTimer.accumulated;
-                if(this.data.activeTimer.startTime && document.getElementById('globalTimerPauseBtn').innerText === "Pause") {
-                     elapsed += Math.floor((Date.now() - this.data.activeTimer.startTime) / 1000);
-                }
-                const mins = Math.ceil(elapsed / 60);
-                const id = this.data.activeTimer.id;
-                this.data.activeTimer = null;
-                localStorage.removeItem('prepMasterTimer');
-                this.updateGlobalTimerUI();
-                this.manualComplete(id, mins);
-            },
-
-            // --- COMPLETION ---
-            manualComplete(id, defaultTime = null) {
-                this.data.completingTaskId = id;
-                const task = this.data.tasks.find(t => t.id === id);
-                document.getElementById('actualTimeInput').value = defaultTime || task.actualTime || task.duration;
-                document.getElementById('completeModal').classList.remove('hidden');
-            },
-
-            confirmCompletion(type) {
-                const id = this.data.completingTaskId;
-                const task = this.data.tasks.find(t => t.id === id);
-                task.actualTime = parseInt(document.getElementById('actualTimeInput').value) || 0; 
-                task.focusScore = document.getElementById('focusScore').value;
-                task.status = type;
-                this.saveData();
-                this.closeModal('completeModal');
-                this.data.completingTaskId = null;
-            },
-
-            // --- HELPERS ---
-            editTask(id) {
-                const task = this.data.tasks.find(t => t.id === id);
-                if(task) this.openTaskModal(task.date, id);
-            },
-            
-            updateSubSubjects() {
-                const subId = document.getElementById('taskSubject').value;
-                const subject = this.data.subjects.find(s => s.id == subId);
-                const datalist = document.getElementById('subSubjectList');
-                datalist.innerHTML = '';
-                if(subject) {
-                    subject.sub.forEach(sub => { datalist.innerHTML += `<option value="${sub}">`; });
-                }
-            },
-            
-            assignToToday(id) {
-                const task = this.data.tasks.find(t => t.id === id);
-                task.date = this.formatDate(new Date());
-                task.status = (task.actualTime > 0) ? 'partial' : 'pending';
-                this.saveData();
-            },
-            
             checkBacklog() {
                 const today = this.formatDate(new Date());
                 let changed = false;
@@ -1138,6 +1217,15 @@
                 });
                 if(changed) this.saveData();
             },
+
+            assignToToday(id) {
+                const task = this.data.tasks.find(t => t.id === id);
+                task.date = this.formatDate(new Date());
+                task.status = (task.actualTime > 0) ? 'partial' : 'pending';
+                this.saveData();
+            },
+
+            openSubjectModal() { document.getElementById('subjectModal').classList.remove('hidden'); },
 
             saveSubject(e) {
                 e.preventDefault();
