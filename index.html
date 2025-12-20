@@ -914,41 +914,42 @@
 confirmCompletion(type) {
     const id = this.data.completingTaskId;
     const task = this.data.tasks.find(t => t.id === id);
+    
     if (task) {
         task.actualTime = parseInt(document.getElementById('actualTimeInput').value) || 0;
         task.focusScore = document.getElementById('focusScore').value;
         task.status = type; // 'done' or 'partial'
 
-        // --- NEW: SPACED REPETITION LOGIC ---
-        // Only calculate next review if fully done
+        // --- FIXED SRS LOGIC ---
+        // Calculate Next Review Date ONLY when finishing a task
         if (type === 'done') {
-            // 1. Determine Current Stage (0=New, 1=1d, 2=7d, 3=30d)
+            // 1. Determine Cycle Stage (Inherit or Start New)
             const currentStage = task.reviewStage || 0;
             
-            // 2. Calculate Next Stage (Cap at Stage 3 for monthly maintenance)
-            let nextStage = currentStage < 3 ? currentStage + 1 : 3;
+            // 2. Increment Stage (Cap at Stage 3: 1d -> 7d -> 30d -> 30d...)
+            const nextStage = currentStage < 3 ? currentStage + 1 : 3;
             
-            // 3. Define Intervals (Days)
+            // 3. Define Interval Map
             const intervals = { 1: 1, 2: 7, 3: 30 };
             const daysToAdd = intervals[nextStage];
 
-            // 4. Calculate Persistent Date
+            // 4. Calculate Next Date based on TODAY (Completion Date)
             const nextDate = new Date();
             nextDate.setDate(nextDate.getDate() + daysToAdd);
             
-            // 5. Save State
+            // 5. Persist Schedule on the Completed Task
             task.nextReviewDate = this.formatDate(nextDate);
             task.reviewStage = nextStage;
-            task.isRevision = true; 
+            
+            // NOTE: We do NOT set task.isRevision = true here. 
+            // That flag is reserved for the auto-generated tasks in the future.
         }
-        // -------------------------------------
         
         this.saveData();
     }
     this.closeModal('completeModal');
     this.data.completingTaskId = null;
-},
-        // --- NAVIGATION ---
+},   // --- NAVIGATION ---
         navigate(view) {
             this.data.currentView = view;
             document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
@@ -1740,22 +1741,21 @@ deleteSubject: async (id) => {
             },
 async loadRevisionTopics() {
     const targetDateStr = document.getElementById('taskDate').value;
-
-    // 1. Identify "Latest" Completed Version per Topic
-    // We group by Subject+Topic to find the most recent completion.
-    // This prevents "Ghost" alerts from tasks completed months ago if a newer one exists.
+    
+    // 1. Find the "Latest State" for every unique Topic
+    // (We only care about the most recently completed log for "History", not the one from 2 months ago)
     const latestMap = new Map();
 
     this.data.tasks.forEach(t => {
         if (t.status === 'done') {
-            // Normalize name to handle previous "Review: " prefixes
+            // Normalize Topic Name (Remove "Review: " prefix to group effectively)
             const cleanSub = t.subSubject.replace(/^Review:\s*/, '');
             const key = `${t.subject}|${cleanSub}`;
             
+            // Keep the most recent one based on date/ID
             if (!latestMap.has(key)) {
                 latestMap.set(key, t);
             } else {
-                // If we already found this topic, keep only the most recently modified/completed one
                 const existing = latestMap.get(key);
                 if (t.date > existing.date || (t.date === existing.date && t.id > existing.id)) {
                     latestMap.set(key, t);
@@ -1764,10 +1764,10 @@ async loadRevisionTopics() {
         }
     });
 
-    // 2. Filter for Due Items (Overdue Catch-up Logic)
+    // 2. Filter: Which topics are Due or Overdue?
     const dueTasks = [];
     latestMap.forEach(task => {
-        // If it has a review date AND that date is today or in the past
+        // Safe string comparison works for YYYY-MM-DD
         if (task.nextReviewDate && task.nextReviewDate <= targetDateStr) {
             dueTasks.push(task);
         }
@@ -1780,17 +1780,17 @@ async loadRevisionTopics() {
 
     let addedCount = 0;
 
-    // 3. Create Tasks (With Strict Duplicate Check)
+    // 3. Generate Tasks (With Strict Deduplication)
     dueTasks.forEach(source => {
         const cleanName = source.subSubject.replace(/^Review:\s*/, '');
         const newSubSubject = `Review: ${cleanName}`;
 
-        // CHECK: Does a revision task for this specific topic ALREADY exist on the target day?
+        // GUARD: Does a revision task ALREADY exist for this day/topic?
         const alreadyExists = this.data.tasks.some(t => 
             t.date === targetDateStr &&
             t.subject === source.subject &&
             t.subSubject === newSubSubject &&
-            t.isRevision === true 
+            t.isRevision === true // Only check against auto-generated revisions
         );
 
         if (!alreadyExists) {
@@ -1798,14 +1798,18 @@ async loadRevisionTopics() {
                 id: this.generateUUID(),
                 subject: source.subject,
                 subSubject: newSubSubject,
-                duration: 20, // Standard shortened duration for reviews
-                desc: `SRS Stage ${source.reviewStage || 1} (Due: ${source.nextReviewDate})`,
+                duration: 20, // Reviews are faster
+                desc: `SRS Stage ${source.reviewStage} (Due: ${source.nextReviewDate})`,
                 date: targetDateStr,
                 status: 'pending',
                 actualTime: 0,
-                // CRITICAL: Inherit stage so the cycle continues (1 -> 7 -> 30)
+                
+                // CRITICAL: Inherit the stage so the cycle continues (1->7->30)
                 reviewStage: source.reviewStage, 
-                isRevision: true
+                
+                // FLAGS: Mark as auto-generated revision
+                isRevision: true,
+                reviewOf: source.id 
             });
             addedCount++;
         }
@@ -1814,14 +1818,13 @@ async loadRevisionTopics() {
     this.saveData();
     this.renderDayManagerList(targetDateStr);
     
-    // 4. Smart Feedback
+    // 4. Feedback
     if (addedCount > 0) {
         await this.uiAlert(`Added ${addedCount} smart reviews to your schedule.`);
     } else {
         await this.uiAlert("All due reviews are already in today's schedule.");
     }
-},
-    
+}, 
         checkBacklog() {
             const today = this.formatDate(new Date());
             let changed = false;
