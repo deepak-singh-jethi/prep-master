@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PrepMaster v3.2.1</title>
+    <title>PrepMaster v4.1.0</title>
     <meta name="description" content="PrepMaster - Study Planner & Task Manager for Competitive Exams">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -99,7 +99,7 @@
                     </div>
                     <div>
                         <h1 class="text-lg md:text-xl font-bold tracking-tight leading-none">Prep<span class="text-primary">Master</span></h1>
-                        <span class="text-[10px] font-mono font-medium text-gray-400 dark:text-gray-500 uppercase tracking-widest">v3.2.1</span>
+                        <span class="text-[10px] font-mono font-medium text-gray-400 dark:text-gray-500 uppercase tracking-widest">v4.1.0</span>
                     </div>
                 </div>
                 
@@ -181,7 +181,7 @@
                                 <h2 class="text-2xl md:text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">Today's Focus</h2>
                                 <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mt-1">Execute your plan consistently.</p>
                             </div>
-                            <button onclick="app.openTaskModal()" class="bg-primary hover:bg-primary-700 text-white pl-4 pr-5 py-2.5 rounded-xl shadow-lg shadow-primary/30 hover:shadow-primary/50 transition-all active:scale-95 flex items-center gap-2 font-semibold text-sm">
+                            <button onclick="app.openTaskModal()" class="bg-primary hover:bg-primary-700 text-white pl-6 pr-7 py-3 rounded-xl shadow-lg shadow-primary/30 hover:shadow-primary/50 transition-all active:scale-95 flex items-center gap-2 font-extrabold text-sm">
                                 <i class="fas fa-plus"></i> <span class="hidden sm:inline">New Task</span>
                             </button>
                         </div>
@@ -349,7 +349,7 @@
                         </div>
                         <div>
                             <span class="text-xs font-bold text-amber-800 dark:text-amber-400 block uppercase tracking-wider">Smart Review</span>
-                            <span class="text-[10px] text-amber-700 dark:text-amber-500">Spaced repetition triggers available.</span>
+                            <span class="text-[10px] text-amber-700 dark:text-amber-500 block mt-0.5">Spaced repetition — auto-suggests review topics on revision days.</span>
                         </div>
                     </div>
                     <button onclick="app.loadRevisionTopics()" class="text-xs bg-amber-500 text-white px-3 py-2 rounded-lg hover:bg-amber-600 font-bold shadow-sm transition-colors">
@@ -446,6 +446,15 @@
             </form>
         </div>
     </div>
+    
+    <div id="uiDialogContainer" class="modal fixed inset-0 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden border border-gray-200 dark:border-gray-700 transform transition-all scale-100 p-6 flex flex-col gap-4">
+             <h3 id="uiDialogTitle" class="text-lg font-bold text-gray-900 dark:text-white"></h3>
+             <p id="uiDialogMessage" class="text-sm text-gray-600 dark:text-gray-300 whitespace-pre-wrap"></p>
+             <input type="text" id="uiDialogInput" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-600 rounded-xl p-3 text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none font-medium hidden">
+             <div id="uiDialogButtons" class="flex justify-end gap-3 mt-2"></div>
+        </div>
+    </div>
 
     <script>
         const app = {
@@ -461,7 +470,10 @@
                 currentDate: new Date(),
                 calendarMonth: new Date(),
                 completingTaskId: null,
-                lastBackup: null 
+                lastBackup: null,
+                // UI DIALOG STATE
+                dialogQueue: [],
+                isDialogOpen: false
             },
 
             init() {
@@ -477,6 +489,103 @@
                     document.documentElement.classList.add('dark');
                 }
             },
+            
+            // --- CUSTOM UI DIALOGS ---
+            processDialogQueue() {
+                if (this.isDialogOpen || this.data.dialogQueue.length === 0) return;
+                
+                const { type, msg, defaultVal, resolve } = this.data.dialogQueue.shift();
+                this.isDialogOpen = true;
+                
+                const container = document.getElementById('uiDialogContainer');
+                const titleEl = document.getElementById('uiDialogTitle');
+                const msgEl = document.getElementById('uiDialogMessage');
+                const inputEl = document.getElementById('uiDialogInput');
+                const btnsEl = document.getElementById('uiDialogButtons');
+                
+                msgEl.innerText = msg;
+                inputEl.classList.add('hidden');
+                inputEl.value = '';
+                btnsEl.innerHTML = '';
+                
+                const closeDialog = (result) => {
+                    container.classList.add('hidden');
+                    this.isDialogOpen = false;
+                    resolve(result);
+                    setTimeout(() => this.processDialogQueue(), 50); // slight delay to allow stack clear
+                };
+                
+                // Setup based on type
+                if (type === 'alert') {
+                    titleEl.innerText = 'Alert';
+                    btnsEl.innerHTML = `<button id="uiBtnOK" class="px-5 py-2.5 bg-primary text-white rounded-xl hover:bg-primary-700 font-bold text-sm shadow-lg shadow-primary/20 transition-all">OK</button>`;
+                    document.getElementById('uiBtnOK').onclick = () => closeDialog(undefined);
+                    container.classList.remove('hidden');
+                    document.getElementById('uiBtnOK').focus();
+                } else if (type === 'confirm') {
+                    titleEl.innerText = 'Confirm';
+                    btnsEl.innerHTML = `
+                        <button id="uiBtnCancel" class="px-5 py-2.5 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl font-medium text-sm transition-colors">Cancel</button>
+                        <button id="uiBtnConfirm" class="px-5 py-2.5 bg-primary text-white rounded-xl hover:bg-primary-700 font-bold text-sm shadow-lg shadow-primary/20 transition-all">Confirm</button>
+                    `;
+                    document.getElementById('uiBtnCancel').onclick = () => closeDialog(false);
+                    document.getElementById('uiBtnConfirm').onclick = () => closeDialog(true);
+                    container.classList.remove('hidden');
+                    document.getElementById('uiBtnConfirm').focus();
+                } else if (type === 'prompt') {
+                    titleEl.innerText = 'Input';
+                    inputEl.value = defaultVal || '';
+                    inputEl.classList.remove('hidden');
+                    btnsEl.innerHTML = `
+                        <button id="uiBtnCancel" class="px-5 py-2.5 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl font-medium text-sm transition-colors">Cancel</button>
+                        <button id="uiBtnConfirm" class="px-5 py-2.5 bg-primary text-white rounded-xl hover:bg-primary-700 font-bold text-sm shadow-lg shadow-primary/20 transition-all">Confirm</button>
+                    `;
+                    document.getElementById('uiBtnCancel').onclick = () => closeDialog(null);
+                    const confirmAction = () => closeDialog(inputEl.value);
+                    document.getElementById('uiBtnConfirm').onclick = confirmAction;
+                    
+                    // Allow Enter to confirm in prompt
+                    inputEl.onkeydown = (e) => {
+                         if(e.key === 'Enter') confirmAction();
+                    };
+                    
+                    container.classList.remove('hidden');
+                    inputEl.focus();
+                    inputEl.select();
+                }
+                
+                // Global Escape handler for this specific dialog instance
+                const escapeHandler = (e) => {
+                     if (e.key === 'Escape' && !container.classList.contains('hidden')) {
+                         if (type === 'alert') closeDialog(undefined);
+                         else if (type === 'confirm') closeDialog(false);
+                         else if (type === 'prompt') closeDialog(null);
+                         document.removeEventListener('keydown', escapeHandler);
+                     }
+                };
+                document.addEventListener('keydown', escapeHandler);
+            },
+            
+            uiAlert(msg) {
+                return new Promise(resolve => {
+                    this.data.dialogQueue.push({ type: 'alert', msg, resolve });
+                    this.processDialogQueue();
+                });
+            },
+            
+            uiConfirm(msg) {
+                return new Promise(resolve => {
+                    this.data.dialogQueue.push({ type: 'confirm', msg, resolve });
+                    this.processDialogQueue();
+                });
+            },
+            
+            uiPrompt(msg, defaultVal = '') {
+                return new Promise(resolve => {
+                    this.data.dialogQueue.push({ type: 'prompt', msg, defaultVal, resolve });
+                    this.processDialogQueue();
+                });
+            },
 
             // --- HELPERS ---
             generateUUID() {
@@ -490,9 +599,32 @@
             },
 
             setupKeyboardShortcuts() {
-                document.addEventListener('keydown', (e) => {
+                document.addEventListener('keydown', async (e) => {
+                    // Ignore global shortcuts if a custom dialog is open (it handles its own keys)
+                    if (this.isDialogOpen) return;
+
                     if (e.key === 'Escape') {
-                        document.querySelectorAll('.modal').forEach(el => el.classList.add('hidden'));
+                        const modals = Array.from(document.querySelectorAll('.modal')).filter(m => !m.classList.contains('hidden') && m.id !== 'uiDialogContainer');
+                        if (modals.length === 0) return;
+                        const top = modals[modals.length - 1];
+
+                        // Heuristic for unsaved edits in Task Modal
+                        if (top.id === 'taskModal') {
+                            const editId = document.getElementById('taskEditId')?.value;
+                            const subjectVal = document.getElementById('taskSubject')?.value || '';
+                            const subSubjectVal = document.getElementById('taskSubSubject')?.value || '';
+                            const durationVal = document.getElementById('taskDuration')?.value || '';
+                            
+                            // Prompt heuristic: editId exists AND fields have values
+                            const isDirty = !!(editId && (subjectVal || subSubjectVal || durationVal));
+        
+                            if (isDirty) {
+                                const proceed = await this.uiConfirm("You have unsaved changes. Close anyway?");
+                                if (!proceed) return;
+                            }
+                        }
+
+                        top.classList.add('hidden');
                     }
                 });
             },
@@ -602,11 +734,11 @@
                 }
             },
 
-            startTimer(id) {
+            async startTimer(id) {
                 // Prevent double-start or hijacking
                 if (this.data.activeTimer) {
                     if (this.data.activeTimer.id !== id) {
-                        alert("Please stop the current timer first.");
+                        await this.uiAlert("Please stop the current timer first.");
                         return;
                     }
                     // If already running, do nothing
@@ -801,21 +933,36 @@
                 const file = input.files[0];
                 if (!file) return;
                 const reader = new FileReader();
-                reader.onload = (e) => {
+                reader.onload = async (e) => {
                     try {
                         const parsed = JSON.parse(e.target.result);
-                        if(parsed.tasks && parsed.subjects) {
-                            if(confirm("Overwrite current data?")) {
-                                this.data.tasks = parsed.tasks;
-                                this.data.subjects = parsed.subjects;
-                                this.data.targetDate = parsed.targetDate || this.data.targetDate;
-                                this.data.lastBackup = new Date().toISOString();
-                                this.saveData();
-                                this.closeModal('settingsModal');
-                                alert("Import successful!");
-                            }
+                        
+                        // Validation
+                        if (!parsed.tasks || !Array.isArray(parsed.tasks) || !parsed.subjects || !Array.isArray(parsed.subjects)) {
+                            await this.uiAlert("Invalid backup file: missing tasks or subjects.");
+                            return;
                         }
-                    } catch(err) { alert("Error reading file."); }
+
+                        // Deep check on first few items
+                        const invalid = parsed.tasks.slice(0,3).some(t => !t.id || !t.date || typeof t.duration !== 'number');
+                        if (invalid) {
+                            await this.uiAlert("Backup file incompatible with this app version.");
+                            return;
+                        }
+                        
+                        // Confirmation
+                        if(await this.uiConfirm(`This will overwrite current data.\nTasks: ${parsed.tasks.length}\nSubjects: ${parsed.subjects.length}\nProceed?`)) {
+                            this.data.tasks = parsed.tasks;
+                            this.data.subjects = parsed.subjects;
+                            this.data.targetDate = parsed.targetDate || this.data.targetDate;
+                            this.data.lastBackup = new Date().toISOString();
+                            this.saveData();
+                            this.closeModal('settingsModal');
+                            await this.uiAlert("Import successful!");
+                        }
+                    } catch(err) { 
+                        await this.uiAlert("Error reading backup file. Import aborted.");
+                    }
                 };
                 reader.readAsText(file);
                 input.value = '';
@@ -865,12 +1012,13 @@
                 list.innerHTML = '';
 
                 if (todaysTasks.length === 0) {
+                    // UX: Made button more dominant
                     list.innerHTML = `<div class="flex flex-col items-center justify-center py-16 px-4 bg-white dark:bg-gray-800 rounded-2xl border-2 border-dashed border-gray-200 dark:border-gray-700">
                         <div class="w-16 h-16 bg-gray-50 dark:bg-gray-700 rounded-full flex items-center justify-center mb-4">
                             <i class="fas fa-clipboard-list text-2xl text-gray-300 dark:text-gray-500"></i>
                         </div>
                         <p class="text-gray-500 dark:text-gray-400 font-medium text-sm">Your schedule is clear today.</p>
-                        <button onclick="app.openTaskModal()" class="text-primary hover:text-primary-700 font-bold text-sm mt-3 flex items-center gap-2 hover:underline">
+                        <button onclick="app.openTaskModal()" class="bg-primary text-white hover:bg-primary-700 font-extrabold text-sm mt-4 px-6 py-3 rounded-xl flex items-center gap-2 shadow-lg shadow-primary/30 transition-all">
                             <i class="fas fa-plus-circle"></i> Plan your day
                         </button>
                     </div>`;
@@ -1323,12 +1471,18 @@
                 this.renderDayManagerList(dateStr);
             },
 
-            deleteTask(id) {
-                if(confirm('Delete this task?')) {
-                    if(this.data.activeTimer && this.data.activeTimer.id === id) {
-                        alert("Stop timer before deleting!");
-                        return;
+            async deleteTask(id) {
+                if(await this.uiConfirm('Delete this task?')) {
+                    if (this.data.activeTimer && this.data.activeTimer.id === id) {
+                        if (this.data.timerInterval) {
+                            clearInterval(this.data.timerInterval);
+                            this.data.timerInterval = null;
+                        }
+                        this.data.activeTimer = null;
+                        this.persistTimerState();
+                        this.updateGlobalTimerUI();
                     }
+
                     this.data.tasks = this.data.tasks.filter(t => t.id !== id);
                     this.saveData();
                     
@@ -1340,7 +1494,7 @@
                 }
             },
             
-            loadRevisionTopics() {
+            async loadRevisionTopics() {
                 const targetDate = new Date(document.getElementById('taskDate').value);
                 const intervals = [1, 7, 30];
                 const topics = new Set();
@@ -1354,7 +1508,7 @@
                 });
                 
                 if(topics.size === 0) {
-                    alert("No completed topics found from 1, 7, or 30 days ago.");
+                    await this.uiAlert("No completed topics found from 1, 7, or 30 days ago.");
                     return;
                 }
 
@@ -1376,7 +1530,7 @@
                 
                 this.saveData();
                 this.renderDayManagerList(document.getElementById('taskDate').value);
-                alert(`Added ${topics.size} review tasks!`);
+                await this.uiAlert(`Added ${topics.size} review tasks!`);
             },
             
             checkBacklog() {
@@ -1409,24 +1563,24 @@
                 e.target.reset();
             },
             
-            addSubSubjectPrompt(id) {
-                const sub = prompt("Enter new Topic/Sub-subject name:");
+            async addSubSubjectPrompt(id) {
+                const sub = await this.uiPrompt("Enter new Topic/Sub-subject name:");
                 if(sub) {
                     this.data.subjects.find(s => s.id === id).sub.push(sub);
                     this.saveData();
                 }
             },
             
-            removeSubSubject(subId, topicName) {
-                if(confirm(`Remove topic "${topicName}"?`)) {
+            async removeSubSubject(subId, topicName) {
+                if(await this.uiConfirm(`Remove topic "${topicName}"?`)) {
                     const subject = this.data.subjects.find(s => s.id === subId);
                     subject.sub = subject.sub.filter(s => s !== topicName);
                     this.saveData();
                 }
             },
 
-            editTargetDate() {
-                const newDate = prompt("Set Exam Target Date (YYYY-MM-DD):", this.data.targetDate);
+            async editTargetDate() {
+                const newDate = await this.uiPrompt("Set Exam Target Date (YYYY-MM-DD):", this.data.targetDate);
                 if(newDate) { this.data.targetDate = newDate; this.saveData(); }
             },
             
