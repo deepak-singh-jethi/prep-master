@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PrepMaster v3.1 - Day Manager</title>
+    <title>PrepMaster v3.2 - Stability & Sanity</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -17,6 +17,7 @@
                         secondary: '#10B981', // Emerald 500
                         accent: '#F59E0B', // Amber 500
                         partial: '#3B82F6', // Blue 500
+                        danger: '#EF4444', // Red 500
                         dark: '#111827',
                         light: '#F9FAFB'
                     },
@@ -50,7 +51,7 @@
         <div class="flex items-center gap-3 md:gap-4">
             <div class="flex items-center gap-2">
                 <i class="fas fa-layer-group text-primary text-2xl"></i>
-                <h1 class="text-lg md:text-xl font-bold tracking-tight">Prep<span class="text-primary">Master</span> <span class="text-[10px] bg-indigo-100 dark:bg-indigo-900 text-primary px-1.5 py-0.5 rounded align-top">v3.1</span></h1>
+                <h1 class="text-lg md:text-xl font-bold tracking-tight">Prep<span class="text-primary">Master</span> <span class="text-[10px] bg-emerald-100 dark:bg-emerald-900 text-emerald-600 dark:text-emerald-400 px-1.5 py-0.5 rounded align-top">v3.2</span></h1>
             </div>
             <div class="hidden md:flex flex-col border-l pl-4 border-gray-300 dark:border-gray-600">
                 <span class="text-[10px] uppercase tracking-wider text-gray-500 dark:text-gray-400">Target</span>
@@ -66,11 +67,11 @@
                 <div class="text-xs font-bold text-secondary" id="streakDisplay">🔥 0 Day Streak</div>
                 <div class="text-[10px] text-gray-400" id="currentDateDisplay"></div>
             </div>
-            <button onclick="app.openSettings()" class="relative p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-gray-500 dark:text-gray-400">
+            <button onclick="app.openSettings()" class="relative p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-gray-500 dark:text-gray-400" aria-label="Settings">
                 <i class="fas fa-cog"></i>
                 <span id="backupWarningDot" class="hidden absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white dark:border-gray-800"></span>
             </button>
-            <button onclick="app.toggleTheme()" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-gray-500 dark:text-yellow-400">
+            <button onclick="app.toggleTheme()" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-gray-500 dark:text-yellow-400" aria-label="Toggle Theme">
                 <i class="fas fa-moon dark:hidden"></i>
                 <i class="fas fa-sun hidden dark:inline"></i>
             </button>
@@ -119,7 +120,7 @@
                                 <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Today's Focus</h2>
                                 <p class="text-sm text-gray-500 dark:text-gray-400">Execute your daily sprint.</p>
                             </div>
-                            <button onclick="app.openTaskModal()" class="bg-primary hover:bg-indigo-700 text-white px-4 py-2 rounded-lg shadow-md transition-all flex items-center gap-2 transform active:scale-95">
+                            <button onclick="app.openTaskModal()" class="bg-primary hover:bg-indigo-700 text-white px-4 py-2 rounded-lg shadow-md transition-all flex items-center gap-2 transform active:scale-95" aria-label="Add Task">
                                 <i class="fas fa-plus"></i> <span class="hidden sm:inline">Add Task</span>
                             </button>
                         </div>
@@ -140,9 +141,9 @@
                 <div class="flex justify-between items-center mb-4">
                     <h2 class="text-2xl font-bold">Sprint Calendar</h2>
                     <div class="flex items-center gap-2 bg-white dark:bg-gray-800 rounded-lg shadow-sm p-1">
-                        <button onclick="app.changeMonth(-1)" class="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded text-gray-500"><i class="fas fa-chevron-left"></i></button>
+                        <button onclick="app.changeMonth(-1)" class="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded text-gray-500" aria-label="Previous Month"><i class="fas fa-chevron-left"></i></button>
                         <span id="calendarMonthLabel" class="font-bold w-32 text-center select-none">December</span>
-                        <button onclick="app.changeMonth(1)" class="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded text-gray-500"><i class="fas fa-chevron-right"></i></button>
+                        <button onclick="app.changeMonth(1)" class="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded text-gray-500" aria-label="Next Month"><i class="fas fa-chevron-right"></i></button>
                     </div>
                 </div>
                 <div class="flex flex-wrap gap-4 text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">
@@ -159,7 +160,7 @@
                         <h2 class="text-2xl font-bold">Subjects & Syllabus</h2>
                         <p class="text-sm text-gray-500">Hybrid Mode: Add Master Topics for suggestions.</p>
                     </div>
-                    <button onclick="app.openSubjectModal()" class="bg-secondary hover:bg-emerald-600 text-white px-4 py-2 rounded-lg shadow flex items-center gap-2">
+                    <button onclick="app.openSubjectModal()" class="bg-secondary hover:bg-emerald-600 text-white px-4 py-2 rounded-lg shadow flex items-center gap-2" aria-label="Add Subject">
                         <i class="fas fa-plus"></i> New Subject
                     </button>
                 </div>
@@ -212,7 +213,7 @@
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-sm overflow-hidden">
             <div class="bg-gray-50 dark:bg-gray-700 px-6 py-4 border-b border-gray-200 dark:border-gray-600 flex justify-between items-center">
                 <h3 class="text-lg font-bold">Settings & Data</h3>
-                <button onclick="app.closeModal('settingsModal')" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times"></i></button>
+                <button onclick="app.closeModal('settingsModal')" class="text-gray-400 hover:text-gray-600" aria-label="Close"><i class="fas fa-times"></i></button>
             </div>
             <div class="p-6 space-y-6">
                 <div>
@@ -230,7 +231,7 @@
                     </div>
                 </div>
                 <div class="text-xs text-center text-gray-400" id="lastBackupDisplay">
-                    PrepMaster v3.1 • LocalStorage Only
+                    PrepMaster v3.2 • LocalStorage Only
                 </div>
             </div>
         </div>
@@ -240,13 +241,22 @@
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-lg overflow-hidden transform transition-all scale-100 max-h-[90vh] flex flex-col">
             <div class="bg-gray-50 dark:bg-gray-700 px-6 py-4 border-b border-gray-200 dark:border-gray-600 flex justify-between items-center shrink-0">
                 <h3 class="text-lg font-bold" id="taskModalTitle">Day Manager</h3>
-                <button onclick="app.closeModal('taskModal')" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times"></i></button>
+                <button onclick="app.closeModal('taskModal')" class="text-gray-400 hover:text-gray-600" aria-label="Close"><i class="fas fa-times"></i></button>
+            </div>
+
+            <div class="px-6 pt-2 pb-0 shrink-0">
+                <div class="flex justify-between items-end mb-1">
+                    <span class="text-[10px] uppercase font-bold text-gray-400">Daily Load</span>
+                    <span class="text-[10px] font-bold text-gray-600 dark:text-gray-300" id="dailyLoadText">0h Planned</span>
+                </div>
+                <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5 overflow-hidden">
+                    <div id="dailyLoadBar" class="bg-green-500 h-1.5 rounded-full transition-all duration-500" style="width: 0%"></div>
+                </div>
+                <div id="dailyLoadWarning" class="hidden text-[10px] text-red-500 font-bold mt-1 text-right">⚠️ Heavy load detected</div>
             </div>
 
             <div class="bg-gray-50/50 dark:bg-gray-800/50 border-b border-gray-200 dark:border-gray-700 flex-1 overflow-y-auto min-h-[150px] p-4">
-                <h4 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Schedule for this day</h4>
-                <div id="dayManagerList" class="space-y-2">
-                    </div>
+                <div id="dayManagerList" class="space-y-2"></div>
             </div>
             
             <div id="smartRevisionSection" class="hidden bg-yellow-50 dark:bg-yellow-900/20 p-3 border-b border-yellow-100 dark:border-yellow-900/30 shrink-0">
@@ -256,7 +266,7 @@
                         <span class="text-sm font-bold text-yellow-800 dark:text-yellow-400">Spaced Repetition Review</span>
                     </div>
                     <button onclick="app.loadRevisionTopics()" class="text-xs bg-yellow-500 text-white px-3 py-1.5 rounded hover:bg-yellow-600 font-bold shadow-sm">
-                        Load Topics (1, 7, 30 days ago)
+                        Load Topics
                     </button>
                 </div>
             </div>
@@ -355,15 +365,16 @@
                 currentDate: new Date(),
                 calendarMonth: new Date(),
                 completingTaskId: null,
-                lastBackup: null // v3.1 Feature
+                lastBackup: null 
             },
 
             init() {
                 this.loadData();
                 this.render();
                 this.checkBacklog();
-                this.checkBackupStatus(); // v3.1 Safety
+                this.checkBackupStatus(); 
                 this.restoreTimerState();
+                this.setupKeyboardShortcuts(); // v3.2 Accessibility
 
                 // Theme Logic
                 if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
@@ -371,13 +382,30 @@
                 }
             },
 
+            // --- v3.2 Helpers ---
+            generateUUID() {
+                return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+                    return v.toString(16);
+                });
+            },
+
+            setupKeyboardShortcuts() {
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape') {
+                        document.querySelectorAll('.modal').forEach(el => el.classList.add('hidden'));
+                    }
+                });
+            },
+
             // --- DATA LAYER ---
             saveData() {
                 localStorage.setItem('prepMasterData_v3', JSON.stringify({
+                    schema: 3.2, // v3.2 Versioning
                     tasks: this.data.tasks,
                     subjects: this.data.subjects,
                     targetDate: this.data.targetDate,
-                    lastBackup: this.data.lastBackup // v3.1
+                    lastBackup: this.data.lastBackup 
                 }));
                 this.render();
             },
@@ -393,15 +421,14 @@
                 } else {
                     // Seed Data
                     this.data.subjects = [
-                        { id: 1, name: 'History', sub: ['Ancient', 'Medieval', 'Modern'] },
-                        { id: 2, name: 'Polity', sub: ['Constitution', 'Governance'] },
-                        { id: 3, name: 'Geography', sub: ['Physical', 'Indian'] }
+                        { id: this.generateUUID(), name: 'History', sub: ['Ancient', 'Medieval', 'Modern'] },
+                        { id: this.generateUUID(), name: 'Polity', sub: ['Constitution', 'Governance'] },
+                        { id: this.generateUUID(), name: 'Geography', sub: ['Physical', 'Indian'] }
                     ];
                 }
             },
 
             checkBackupStatus() {
-                // v3.1 Safety Check
                 const dot = document.getElementById('backupWarningDot');
                 const last = this.data.lastBackup ? new Date(this.data.lastBackup) : new Date(0);
                 const now = new Date();
@@ -541,9 +568,9 @@
                             actionHtml = `<span class="text-primary font-bold text-xs animate-pulse mr-2">RUNNING</span>`;
                         } else {
                             actionHtml = `
-                                <button onclick="app.editTask(${task.id})" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors flex items-center justify-center mr-1"><i class="fas fa-pencil-alt text-xs"></i></button>
-                                <button onclick="app.startTimer(${task.id})" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-500 hover:bg-primary hover:text-white transition-colors flex items-center justify-center"><i class="fas fa-play text-xs pl-0.5"></i></button>
-                                <button onclick="app.manualComplete(${task.id})" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-500 hover:bg-green-500 hover:text-white transition-colors flex items-center justify-center ml-1"><i class="fas fa-check text-xs"></i></button>
+                                <button onclick="app.editTask('${task.id}')" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors flex items-center justify-center mr-1" aria-label="Edit"><i class="fas fa-pencil-alt text-xs"></i></button>
+                                <button onclick="app.startTimer('${task.id}')" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-500 hover:bg-primary hover:text-white transition-colors flex items-center justify-center" aria-label="Start Timer"><i class="fas fa-play text-xs pl-0.5"></i></button>
+                                <button onclick="app.manualComplete('${task.id}')" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-500 hover:bg-green-500 hover:text-white transition-colors flex items-center justify-center ml-1" aria-label="Mark Done"><i class="fas fa-check text-xs"></i></button>
                             `;
                         }
                     } else {
@@ -568,7 +595,7 @@
                             </div>
                             <div class="flex items-center gap-1 ml-2 shrink-0">
                                 ${actionHtml}
-                                <button onclick="app.deleteTask(${task.id})" class="text-gray-300 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity ml-2 w-8 h-8 flex items-center justify-center"><i class="fas fa-trash-alt"></i></button>
+                                <button onclick="app.deleteTask('${task.id}')" class="text-gray-300 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity ml-2 w-8 h-8 flex items-center justify-center" aria-label="Delete"><i class="fas fa-trash-alt"></i></button>
                             </div>
                         </div>
                     `;
@@ -594,7 +621,7 @@
                     sidebarList.insertAdjacentHTML('beforeend', `
                         <div class="group flex justify-between items-center py-1.5 border-b border-gray-100 dark:border-gray-700">
                             <div class="truncate w-24 text-gray-600 dark:text-gray-400" title="${task.subSubject}">${task.subSubject}</div>
-                             <button onclick="app.assignToToday(${task.id})" class="text-blue-500 hover:text-blue-700 text-[10px] font-bold">MOVE</button>
+                             <button onclick="app.assignToToday('${task.id}')" class="text-blue-500 hover:text-blue-700 text-[10px] font-bold">MOVE</button>
                         </div>
                     `);
 
@@ -606,7 +633,7 @@
                                     <div class="text-sm font-medium text-gray-800 dark:text-gray-200 truncate">${task.subSubject}</div>
                                     <div class="text-[10px] text-red-400">Missed: ${task.date}</div>
                                 </div>
-                                <button onclick="app.assignToToday(${task.id})" class="text-xs bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 px-3 py-1.5 rounded shadow-sm hover:border-primary hover:text-primary transition-all font-medium whitespace-nowrap">
+                                <button onclick="app.assignToToday('${task.id}')" class="text-xs bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 px-3 py-1.5 rounded shadow-sm hover:border-primary hover:text-primary transition-all font-medium whitespace-nowrap">
                                     Do Today
                                 </button>
                             </div>
@@ -688,8 +715,8 @@
                             <div class="space-y-3">
                                 <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Master Syllabus</h4>
                                 <div class="flex flex-wrap gap-2">
-                                    ${sub.sub.map(s => `<span class="bg-gray-50 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-xs px-2 py-1 rounded border border-gray-200 dark:border-gray-600">${s} <i class="fas fa-times ml-1 cursor-pointer hover:text-red-500" onclick="app.removeSubSubject(${sub.id}, '${s}')"></i></span>`).join('')}
-                                    <button onclick="app.addSubSubjectPrompt(${sub.id})" class="text-xs px-2 py-1 border border-dashed border-gray-300 rounded hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-400 hover:text-gray-600 transition-colors">+ Add</button>
+                                    ${sub.sub.map(s => `<span class="bg-gray-50 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-xs px-2 py-1 rounded border border-gray-200 dark:border-gray-600">${s} <i class="fas fa-times ml-1 cursor-pointer hover:text-red-500" onclick="app.removeSubSubject('${sub.id}', '${s}')"></i></span>`).join('')}
+                                    <button onclick="app.addSubSubjectPrompt('${sub.id}')" class="text-xs px-2 py-1 border border-dashed border-gray-300 rounded hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-400 hover:text-gray-600 transition-colors">+ Add</button>
                                 </div>
                             </div>
                         </div>
@@ -754,7 +781,7 @@
                 }
             },
 
-            // --- USER ACTIONS (v3.1 MODAL LOGIC) ---
+            // --- USER ACTIONS ---
             
             openTaskModal(date = null, editId = null) {
                 document.getElementById('taskModal').classList.remove('hidden');
@@ -762,7 +789,6 @@
                 const selectedDate = date || this.formatDate(new Date());
                 document.getElementById('taskDate').value = selectedDate;
                 
-                // Format Title Date
                 const dateObj = new Date(selectedDate);
                 const prettyDate = dateObj.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
                 document.getElementById('taskModalTitle').innerText = "Schedule for " + prettyDate;
@@ -774,10 +800,10 @@
                     subSelect.innerHTML += `<option value="${s.id}">${s.name}</option>`;
                 });
 
-                // 2. Render Existing List for Day (The Top View)
+                // 2. Render Existing List & Load Indicator (v3.2)
                 this.renderDayManagerList(selectedDate);
 
-                // 3. Smart Revision Logic (v3.1 Spaced Repetition)
+                // 3. Smart Revision Logic
                 const dayNum = dateObj.getDate();
                 const revisionSection = document.getElementById('smartRevisionSection');
                 if ([7, 14, 21, 28].includes(dayNum)) {
@@ -799,6 +825,33 @@
                 list.innerHTML = '';
                 const tasks = this.data.tasks.filter(t => t.date === dateStr);
                 
+                // v3.2 Daily Capacity Logic
+                const totalMinutes = tasks.reduce((acc, t) => acc + (t.duration || 0), 0);
+                const totalHours = (totalMinutes / 60).toFixed(1);
+                
+                // Update Progress Bar
+                const bar = document.getElementById('dailyLoadBar');
+                const warningText = document.getElementById('dailyLoadWarning');
+                const loadText = document.getElementById('dailyLoadText');
+                
+                loadText.innerText = `${totalHours}h Planned`;
+                
+                let percentage = Math.min((totalMinutes / 600) * 100, 100); // Base on 10h max visual
+                bar.style.width = `${percentage}%`;
+                
+                // Color Logic
+                bar.className = "h-1.5 rounded-full transition-all duration-500 "; // Reset
+                warningText.classList.add('hidden');
+                
+                if (totalMinutes > 480) { // >8h
+                    bar.classList.add('bg-red-500');
+                    warningText.classList.remove('hidden');
+                } else if (totalMinutes > 360) { // >6h
+                    bar.classList.add('bg-yellow-500');
+                } else {
+                    bar.classList.add('bg-green-500');
+                }
+
                 if(tasks.length === 0) {
                     list.innerHTML = `<p class="text-xs text-gray-400 italic text-center py-4">No tasks planned yet.</p>`;
                     return;
@@ -820,8 +873,8 @@
                             </div>
                             <div class="flex items-center gap-2">
                                 <span class="text-xs text-gray-400 font-mono">${task.duration}m</span>
-                                <button onclick="app.populateEditForm(${task.id})" class="text-gray-400 hover:text-primary"><i class="fas fa-pencil-alt"></i></button>
-                                <button onclick="app.deleteTask(${task.id})" class="text-gray-400 hover:text-red-500"><i class="fas fa-trash-alt"></i></button>
+                                <button onclick="app.populateEditForm('${task.id}')" class="text-gray-400 hover:text-primary"><i class="fas fa-pencil-alt"></i></button>
+                                <button onclick="app.deleteTask('${task.id}')" class="text-gray-400 hover:text-red-500"><i class="fas fa-trash-alt"></i></button>
                             </div>
                         </div>
                     `);
@@ -837,7 +890,6 @@
                 document.getElementById('cancelEditBtn').classList.remove('hidden');
                 document.getElementById('saveTaskBtn').innerText = "Update Task";
                 
-                // Select Subject
                 const subObj = this.data.subjects.find(s => s.name === task.subject);
                 const subSelect = document.getElementById('taskSubject');
                 if(subObj) subSelect.value = subObj.id;
@@ -862,7 +914,7 @@
             saveTask(e) {
                 e.preventDefault();
                 const subId = document.getElementById('taskSubject').value;
-                if(!subId) return; // Guard
+                if(!subId) return;
 
                 const subjectName = this.data.subjects.find(s => s.id == subId).name;
                 const editId = document.getElementById('taskEditId').value;
@@ -874,9 +926,10 @@
                     task.subSubject = document.getElementById('taskSubSubject').value;
                     task.duration = parseInt(document.getElementById('taskDuration').value);
                     task.desc = document.getElementById('taskDesc').value;
+                    task.date = dateStr;
                 } else {
                     const task = {
-                        id: Date.now(),
+                        id: this.generateUUID(), // v3.2 UUID
                         subject: subjectName,
                         subSubject: document.getElementById('taskSubSubject').value,
                         duration: parseInt(document.getElementById('taskDuration').value),
@@ -890,7 +943,7 @@
                 
                 this.saveData();
                 this.resetForm();
-                this.renderDayManagerList(dateStr); // Refresh Top View
+                this.renderDayManagerList(dateStr);
             },
 
             deleteTask(id) {
@@ -902,7 +955,6 @@
                     this.data.tasks = this.data.tasks.filter(t => t.id !== id);
                     this.saveData();
                     
-                    // Refresh if modal is open
                     const modalDate = document.getElementById('taskDate').value;
                     if(!document.getElementById('taskModal').classList.contains('hidden')) {
                          this.renderDayManagerList(modalDate);
@@ -911,7 +963,6 @@
                 }
             },
             
-            // v3.1 Spaced Repetition Logic
             loadRevisionTopics() {
                 const targetDate = new Date(document.getElementById('taskDate').value);
                 const intervals = [1, 7, 30];
@@ -931,12 +982,10 @@
                 }
 
                 topics.forEach(topicStr => {
-                    // Parse string to get clean data (simple hack for this modal)
-                    // Format: "History: Mughal (7d ago)"
                     const parts = topicStr.match(/(.+): (.+) \((.+) ago\)/);
                     if(parts) {
                         this.data.tasks.push({
-                            id: Date.now() + Math.random(),
+                            id: this.generateUUID(),
                             subject: parts[1],
                             subSubject: `Review: ${parts[2]}`,
                             duration: 20,
@@ -953,7 +1002,7 @@
                 alert(`Added ${topics.size} review tasks!`);
             },
             
-            // --- TIMER LOGIC (Resilient) ---
+            // --- TIMER LOGIC ---
             restoreTimerState() {
                 const saved = localStorage.getItem('prepMasterTimer');
                 if(saved) {
@@ -1049,15 +1098,14 @@
                 const task = this.data.tasks.find(t => t.id === id);
                 task.actualTime = parseInt(document.getElementById('actualTimeInput').value) || 0; 
                 task.focusScore = document.getElementById('focusScore').value;
-                task.status = type; // 'done' or 'partial'
+                task.status = type;
                 this.saveData();
                 this.closeModal('completeModal');
                 this.data.completingTaskId = null;
             },
 
-            // --- MISC HELPERS ---
+            // --- HELPERS ---
             editTask(id) {
-                // Find task to get date, then open modal
                 const task = this.data.tasks.find(t => t.id === id);
                 if(task) this.openTaskModal(task.date, id);
             },
@@ -1094,7 +1142,7 @@
             saveSubject(e) {
                 e.preventDefault();
                 const name = document.getElementById('newSubjectName').value;
-                this.data.subjects.push({ id: Date.now(), name: name, sub: [] });
+                this.data.subjects.push({ id: this.generateUUID(), name: name, sub: [] });
                 this.saveData();
                 this.closeModal('subjectModal');
                 e.target.reset();
