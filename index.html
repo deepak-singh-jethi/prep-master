@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Exam Prep Dashboard Pro</title>
+    <title>PrepMaster v2.0 - Exam Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -18,22 +18,31 @@
                         accent: '#F59E0B', // Amber 500
                         dark: '#111827',
                         light: '#F9FAFB'
+                    },
+                    animation: {
+                        'slide-up': 'slideUp 0.3s ease-out forwards'
+                    },
+                    keyframes: {
+                        slideUp: {
+                            '0%': { transform: 'translateY(100%)' },
+                            '100%': { transform: 'translateY(0)' }
+                        }
                     }
                 }
             }
         }
     </script>
     <style>
-        /* Custom Scrollbar for sleek look */
+        /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 4px; }
         .dark ::-webkit-scrollbar-thumb { background: #374151; }
         
-        /* Modal Backdrop Blur */
-        .modal { background-color: rgba(0, 0, 0, 0.5); backdrop-filter: blur(2px); }
+        /* Modal Backdrop */
+        .modal { background-color: rgba(0, 0, 0, 0.5); backdrop-filter: blur(3px); }
         
-        /* Custom Calendar Grid */
+        /* Calendar Grid */
         .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.5rem; }
     </style>
 </head>
@@ -43,7 +52,7 @@
         <div class="flex items-center gap-4">
             <div class="flex items-center gap-2">
                 <i class="fas fa-layer-group text-primary text-2xl"></i>
-                <h1 class="text-xl font-bold tracking-tight">Prep<span class="text-primary">Master</span></h1>
+                <h1 class="text-xl font-bold tracking-tight">Prep<span class="text-primary">Master</span> <span class="text-xs bg-gray-200 dark:bg-gray-700 px-1.5 py-0.5 rounded text-gray-500">v2.0</span></h1>
             </div>
             <div class="hidden md:flex flex-col border-l pl-4 border-gray-300 dark:border-gray-600">
                 <span class="text-[10px] uppercase tracking-wider text-gray-500 dark:text-gray-400">Target Date</span>
@@ -59,6 +68,9 @@
                 <div class="text-xs font-bold text-secondary" id="streakDisplay">🔥 0 Day Streak</div>
                 <div class="text-[10px] text-gray-400" id="currentDateDisplay"></div>
             </div>
+            <button onclick="app.openSettings()" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-gray-500 dark:text-gray-400">
+                <i class="fas fa-cog"></i>
+            </button>
             <button onclick="app.toggleTheme()" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-gray-500 dark:text-yellow-400">
                 <i class="fas fa-moon dark:hidden"></i>
                 <i class="fas fa-sun hidden dark:inline"></i>
@@ -66,7 +78,7 @@
         </div>
     </header>
 
-    <div class="flex flex-1 overflow-hidden">
+    <div class="flex flex-1 overflow-hidden relative">
         
         <aside class="w-16 md:w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col justify-between transition-all duration-300 z-0">
             <nav class="flex flex-col py-4 gap-1 px-2">
@@ -88,7 +100,7 @@
                 </button>
             </nav>
             
-            <div class="p-4 border-t border-gray-200 dark:border-gray-700">
+            <div class="p-4 border-t border-gray-200 dark:border-gray-700 pb-20 md:pb-4">
                 <div class="flex items-center justify-between mb-2 cursor-pointer" onclick="app.navigate('dashboard')">
                     <h3 class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase hidden md:block tracking-wider">Backlog Bucket</h3>
                     <span id="backlogCount" class="bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-full font-bold shadow-sm">0</span>
@@ -98,7 +110,7 @@
             </div>
         </aside>
 
-        <main id="mainContent" class="flex-1 overflow-y-auto p-4 md:p-8 relative bg-gray-50 dark:bg-gray-900">
+        <main id="mainContent" class="flex-1 overflow-y-auto p-4 md:p-8 bg-gray-50 dark:bg-gray-900 pb-24">
             
             <div id="view-dashboard" class="view-section space-y-6 max-w-6xl mx-auto">
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -119,21 +131,11 @@
                     </div>
 
                     <div class="space-y-6">
-                        <div id="activeTimerCard" class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border-l-4 border-primary hidden transform transition-all">
-                            <h3 class="text-sm font-bold uppercase text-gray-500 mb-1">Session In Progress</h3>
-                            <div class="text-lg font-semibold truncate text-primary mb-2" id="timerTaskName">History: Indus Valley</div>
-                            <div class="text-4xl font-mono font-bold text-center mb-6 tracking-widest text-gray-800 dark:text-white" id="timerDisplay">00:00:00</div>
-                            <div class="grid grid-cols-2 gap-3">
-                                <button onclick="app.toggleTimer()" id="timerToggleBtn" class="bg-yellow-100 text-yellow-700 hover:bg-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-400 py-2 rounded-lg font-medium">Pause</button>
-                                <button onclick="app.stopTimer()" class="bg-red-500 text-white hover:bg-red-600 py-2 rounded-lg font-medium shadow-md">Stop & Log</button>
-                            </div>
-                        </div>
-
                         <div class="bg-white dark:bg-gray-800 p-5 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
                             <h3 class="text-lg font-bold mb-3 flex items-center gap-2">
                                 <i class="fas fa-inbox text-gray-400"></i> Backlog
                             </h3>
-                            <div id="dashboardBacklogList" class="space-y-2 max-h-80 overflow-y-auto pr-1">
+                            <div id="dashboardBacklogList" class="space-y-2 max-h-[70vh] overflow-y-auto pr-1">
                                 </div>
                         </div>
                     </div>
@@ -202,12 +204,71 @@
         </main>
     </div>
 
-    <div id="taskModal" class="modal fixed inset-0 z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-md overflow-hidden transform transition-all scale-100">
+    <div id="globalTimerBar" class="fixed bottom-0 left-0 w-full bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] z-40 transform translate-y-full transition-transform duration-300 flex items-center justify-between px-4 md:px-8 py-3">
+        <div class="flex items-center gap-4">
+            <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+            <div>
+                <div class="text-[10px] text-gray-500 dark:text-gray-400 uppercase tracking-wider font-bold">In Progress</div>
+                <div id="globalTimerTaskName" class="text-sm font-bold text-gray-800 dark:text-gray-100 truncate max-w-[150px] md:max-w-md">History</div>
+            </div>
+        </div>
+        <div class="flex items-center gap-4 md:gap-8">
+            <div id="globalTimerDisplay" class="font-mono text-2xl font-bold text-primary tracking-widest">00:00:00</div>
+            <div class="flex gap-2">
+                <button onclick="app.toggleTimer()" id="globalTimerPauseBtn" class="bg-yellow-100 text-yellow-700 hover:bg-yellow-200 px-3 py-1.5 rounded font-medium text-sm">Pause</button>
+                <button onclick="app.stopTimer()" class="bg-red-500 text-white hover:bg-red-600 px-3 py-1.5 rounded font-medium text-sm shadow-sm">Stop</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="settingsModal" class="modal fixed inset-0 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-sm overflow-hidden">
             <div class="bg-gray-50 dark:bg-gray-700 px-6 py-4 border-b border-gray-200 dark:border-gray-600 flex justify-between items-center">
-                <h3 class="text-lg font-bold">Plan Session</h3>
+                <h3 class="text-lg font-bold">Settings & Data</h3>
+                <button onclick="app.closeModal('settingsModal')" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="p-6 space-y-6">
+                <div>
+                    <h4 class="text-xs font-bold uppercase text-gray-500 mb-3">Data Backup</h4>
+                    <div class="grid grid-cols-2 gap-4">
+                        <button onclick="app.exportData()" class="flex flex-col items-center justify-center p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-indigo-50 dark:hover:bg-gray-700 hover:border-primary transition-all group">
+                            <i class="fas fa-download text-2xl mb-2 text-gray-400 group-hover:text-primary"></i>
+                            <span class="text-sm font-medium">Export JSON</span>
+                        </button>
+                        <button onclick="document.getElementById('importFile').click()" class="flex flex-col items-center justify-center p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-emerald-50 dark:hover:bg-gray-700 hover:border-secondary transition-all group">
+                            <i class="fas fa-file-upload text-2xl mb-2 text-gray-400 group-hover:text-secondary"></i>
+                            <span class="text-sm font-medium">Import JSON</span>
+                        </button>
+                        <input type="file" id="importFile" class="hidden" accept=".json" onchange="app.importData(this)">
+                    </div>
+                </div>
+                <div class="text-xs text-center text-gray-400">
+                    PrepMaster v2.0 • LocalStorage Only
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="taskModal" class="modal fixed inset-0 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-md overflow-hidden transform transition-all scale-100 max-h-[90vh] overflow-y-auto">
+            <div class="bg-gray-50 dark:bg-gray-700 px-6 py-4 border-b border-gray-200 dark:border-gray-600 flex justify-between items-center">
+                <h3 class="text-lg font-bold" id="taskModalTitle">Plan Session</h3>
                 <button onclick="app.closeModal('taskModal')" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times"></i></button>
             </div>
+            
+            <div id="smartRevisionSection" class="hidden bg-yellow-50 dark:bg-yellow-900/20 p-4 border-b border-yellow-100 dark:border-yellow-900/30">
+                <div class="flex items-start gap-3">
+                    <i class="fas fa-lightbulb text-yellow-500 mt-1"></i>
+                    <div>
+                        <h4 class="text-sm font-bold text-yellow-800 dark:text-yellow-400">Smart Revision Day</h4>
+                        <p class="text-xs text-yellow-700 dark:text-yellow-500 mb-2">This is a buffer day. Load topics from the last 6 days?</p>
+                        <button onclick="app.loadRevisionTopics()" class="bg-yellow-500 text-white text-xs font-bold px-3 py-1.5 rounded hover:bg-yellow-600 transition-colors shadow-sm">
+                            <i class="fas fa-sync-alt mr-1"></i> Load Previous Topics
+                        </button>
+                    </div>
+                </div>
+            </div>
+
             <form onsubmit="app.saveTask(event)" class="p-6">
                 <div class="mb-4">
                     <label class="block text-xs font-bold uppercase text-gray-500 mb-1">Subject</label>
@@ -360,6 +421,55 @@
                 localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
             },
 
+            openSettings() {
+                document.getElementById('settingsModal').classList.remove('hidden');
+            },
+
+            // --- v2.0 DATA IMPORT/EXPORT ---
+            exportData() {
+                const dataStr = JSON.stringify({
+                    tasks: this.data.tasks,
+                    subjects: this.data.subjects,
+                    targetDate: this.data.targetDate,
+                    version: "2.0"
+                });
+                const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+                const exportFileDefaultName = 'prepmaster_backup_' + new Date().toISOString().slice(0,10) + '.json';
+                
+                const linkElement = document.createElement('a');
+                linkElement.setAttribute('href', dataUri);
+                linkElement.setAttribute('download', exportFileDefaultName);
+                linkElement.click();
+            },
+
+            importData(input) {
+                const file = input.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const parsed = JSON.parse(e.target.result);
+                        if(parsed.tasks && parsed.subjects) {
+                            if(confirm("This will overwrite your current data. Continue?")) {
+                                this.data.tasks = parsed.tasks;
+                                this.data.subjects = parsed.subjects;
+                                this.data.targetDate = parsed.targetDate || this.data.targetDate;
+                                this.saveData();
+                                this.closeModal('settingsModal');
+                                alert("Import successful!");
+                            }
+                        } else {
+                            alert("Invalid file format.");
+                        }
+                    } catch(err) {
+                        alert("Error reading file.");
+                    }
+                };
+                reader.readAsText(file);
+                input.value = ''; // Reset input
+            },
+
             // --- RENDERING CORE ---
             render() {
                 this.renderHeader();
@@ -368,6 +478,7 @@
                 this.renderSubjects();
                 this.renderAnalytics();
                 this.renderBacklog();
+                this.updateGlobalTimerUI();
             },
 
             renderHeader() {
@@ -383,13 +494,8 @@
                 document.getElementById('countdownTimer').textContent = daysLeft > 0 ? `${daysLeft}d` : "NOW";
                 document.getElementById('targetDateDisplay').textContent = target.toLocaleDateString('en-US', {month: 'short', year: 'numeric'});
 
-                // Streak Calculation
+                // Streak
                 const todayStr = this.formatDate(new Date());
-                const yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1);
-                const yesterdayStr = this.formatDate(yesterday);
-                
-                // Simple logic: If executed a task today or yesterday, streak is active. 
-                // For a real app, you'd calculate consecutive days.
                 const activeToday = this.data.tasks.some(t => t.date === todayStr && t.status === 'done');
                 document.getElementById('streakDisplay').innerText = activeToday ? `🔥 Streak Active` : `❄️ Get Started`;
                 document.getElementById('streakDisplay').className = activeToday ? "text-xs font-bold text-orange-500" : "text-xs font-bold text-gray-400";
@@ -399,7 +505,6 @@
                 if(this.data.currentView !== 'dashboard') return;
 
                 const todayStr = this.formatDate(new Date());
-                // Sort: Pending first, then Done
                 const todaysTasks = this.data.tasks
                     .filter(t => t.date === todayStr && t.status !== 'backlog')
                     .sort((a,b) => (a.status === 'done') - (b.status === 'done'));
@@ -422,8 +527,7 @@
                     let actionHtml = '';
                     if (!isDone) {
                         if (active) {
-                            actionHtml = `<span class="text-primary font-bold text-xs animate-pulse mr-2">RUNNING</span>
-                                          <button onclick="app.stopTimer()" class="w-8 h-8 rounded-full bg-red-100 text-red-500 hover:bg-red-200 flex items-center justify-center"><i class="fas fa-stop text-xs"></i></button>`;
+                            actionHtml = `<span class="text-primary font-bold text-xs animate-pulse mr-2">RUNNING IN BAR</span>`;
                         } else {
                             actionHtml = `
                                 <button onclick="app.startTimer(${task.id})" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-500 hover:bg-primary hover:text-white transition-colors flex items-center justify-center" title="Start Timer"><i class="fas fa-play text-xs pl-0.5"></i></button>
@@ -517,17 +621,14 @@
 
                 const daysInMonth = new Date(year, month + 1, 0).getDate();
                 
-                // Calendar Grid Logic (1-31)
                 for (let day = 1; day <= daysInMonth; day++) {
                     const dateStr = `${year}-${String(month+1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
                     const tasksForDay = this.data.tasks.filter(t => t.date === dateStr && t.status !== 'backlog');
                     
-                    // Business Logic Colors
                     let bgClass = "bg-white dark:bg-gray-800";
                     let textClass = "text-gray-700 dark:text-gray-300";
                     let label = "";
 
-                    // Sprint Logic: 1-6 Study, 7 Buffer, 29-31 Mock
                     if([7, 14, 21, 28].includes(day)) {
                         bgClass = "bg-yellow-50 dark:bg-yellow-900/10";
                         textClass = "text-yellow-700 dark:text-yellow-500";
@@ -538,7 +639,6 @@
                         label = "MOCK";
                     }
 
-                    // Dot Logic
                     let dots = "";
                     if (tasksForDay.length > 0) {
                         const completed = tasksForDay.filter(t => t.status === 'done').length;
@@ -547,7 +647,7 @@
                     }
 
                     const html = `
-                        <div onclick="app.openDayView('${dateStr}')" class="${bgClass} border border-gray-100 dark:border-gray-700 rounded-lg h-24 p-2 relative cursor-pointer hover:ring-2 hover:ring-primary transition-all flex flex-col justify-between">
+                        <div onclick="app.openDayView('${dateStr}', ${day})" class="${bgClass} border border-gray-100 dark:border-gray-700 rounded-lg h-24 p-2 relative cursor-pointer hover:ring-2 hover:ring-primary transition-all flex flex-col justify-between">
                             <div class="flex justify-between items-start">
                                 <span class="font-bold text-sm ${textClass}">${day}</span>
                                 ${dots}
@@ -595,8 +695,6 @@
                 if(this.data.currentView !== 'analytics') return;
                 
                 const completed = this.data.tasks.filter(t => t.status === 'done');
-                
-                // Stats Logic
                 const totalMins = completed.reduce((acc, t) => acc + (t.actualTime || 0), 0);
                 document.getElementById('analyticsTotalHours').innerText = `${(totalMins/60).toFixed(1)}h`;
 
@@ -604,17 +702,14 @@
                 const avgFocus = ratedTasks.length ? (ratedTasks.reduce((acc, t) => acc + parseInt(t.focusScore), 0) / ratedTasks.length).toFixed(1) : "0.0";
                 document.getElementById('analyticsAvgFocus').innerText = avgFocus;
 
-                // Simple Completion Rate
                 const backlogCount = this.data.tasks.filter(t => t.status === 'backlog').length;
                 const denominator = completed.length + backlogCount; 
                 const rate = denominator ? Math.round((completed.length / denominator) * 100) : 0;
                 document.getElementById('analyticsCompletion').innerText = `${rate}%`;
 
-                // Bars
                 const container = document.getElementById('analyticsSubjectBars');
                 container.innerHTML = '';
                 
-                // Sort subjects by time spent
                 const sortedSubjects = [...this.data.subjects].map(sub => {
                     const subMins = completed.filter(t => t.subject === sub.name).reduce((acc, t) => acc + (t.actualTime || 0), 0);
                     return { ...sub, mins: subMins };
@@ -625,7 +720,6 @@
                 sortedSubjects.forEach(sub => {
                     const width = (sub.mins / maxMins) * 100;
                     const hours = (sub.mins/60).toFixed(1);
-                    
                     container.insertAdjacentHTML('beforeend', `
                         <div>
                             <div class="flex justify-between text-xs font-bold mb-1.5 text-gray-600 dark:text-gray-300">
@@ -640,17 +734,80 @@
                 });
             },
 
+            updateGlobalTimerUI() {
+                const bar = document.getElementById('globalTimerBar');
+                if (this.data.activeTimer) {
+                    bar.classList.remove('translate-y-full');
+                    const task = this.data.tasks.find(t => t.id === this.data.activeTimer.id);
+                    document.getElementById('globalTimerTaskName').innerText = `${task.subject}: ${task.subSubject}`;
+                    document.getElementById('globalTimerPauseBtn').innerText = this.data.timerInterval ? "Pause" : "Resume";
+                } else {
+                    bar.classList.add('translate-y-full');
+                }
+            },
+
             // --- USER ACTIONS ---
             
             openTaskModal(date = null) {
                 document.getElementById('taskModal').classList.remove('hidden');
-                document.getElementById('taskDate').value = date || this.formatDate(new Date());
+                const selectedDate = date || this.formatDate(new Date());
+                document.getElementById('taskDate').value = selectedDate;
+                document.getElementById('taskModalTitle').innerText = "Plan Session for " + selectedDate;
                 
+                // Smart Revision Logic (v2.0)
+                const dayNum = new Date(selectedDate).getDate();
+                const revisionSection = document.getElementById('smartRevisionSection');
+                
+                if ([7, 14, 21, 28].includes(dayNum)) {
+                    revisionSection.classList.remove('hidden');
+                } else {
+                    revisionSection.classList.add('hidden');
+                }
+
                 const subSelect = document.getElementById('taskSubject');
                 subSelect.innerHTML = '<option value="">Select Subject</option>';
                 this.data.subjects.forEach(s => {
                     subSelect.innerHTML += `<option value="${s.id}">${s.name}</option>`;
                 });
+            },
+
+            loadRevisionTopics() {
+                // v2.0 Logic: Find topics from previous 6 days
+                const targetDate = new Date(document.getElementById('taskDate').value);
+                const topics = new Set();
+                
+                for(let i=1; i<=6; i++) {
+                    const d = new Date(targetDate);
+                    d.setDate(targetDate.getDate() - i);
+                    const dStr = this.formatDate(d);
+                    
+                    const dayTasks = this.data.tasks.filter(t => t.date === dStr && t.status === 'done');
+                    dayTasks.forEach(t => topics.add(`${t.subject} - ${t.subSubject}`));
+                }
+                
+                if(topics.size === 0) {
+                    alert("No completed topics found in the last 6 days to review.");
+                    return;
+                }
+
+                // Create revision tasks
+                topics.forEach(topic => {
+                    const [sub, subSub] = topic.split(' - ');
+                    this.data.tasks.push({
+                        id: Date.now() + Math.random(),
+                        subject: sub,
+                        subSubject: subSub,
+                        duration: 30, // Default revision time
+                        desc: "Smart Revision (Auto-generated)",
+                        date: document.getElementById('taskDate').value,
+                        status: 'pending',
+                        actualTime: 0
+                    });
+                });
+                
+                this.saveData();
+                this.closeModal('taskModal');
+                alert(`Added ${topics.size} revision tasks!`);
             },
             
             updateSubSubjects() {
@@ -694,7 +851,7 @@
                 }
             },
 
-            // --- TIMER LOGIC ---
+            // --- TIMER LOGIC (UPDATED FOR GLOBAL BAR) ---
             startTimer(id) {
                 if (this.data.activeTimer) {
                     alert("Please stop the current timer first!");
@@ -703,55 +860,56 @@
                 const task = this.data.tasks.find(t => t.id === id);
                 this.data.activeTimer = { id: id, startTime: Date.now(), accumulated: 0 };
                 
-                document.getElementById('activeTimerCard').classList.remove('hidden');
-                document.getElementById('timerTaskName').innerText = `${task.subject}: ${task.subSubject}`;
-                document.getElementById('timerToggleBtn').innerText = "Pause";
+                this.render(); // Updates UI and shows bar
                 
-                this.render(); // Refreshes buttons
-                
-                // Interval
                 this.data.timerInterval = setInterval(() => {
                     const currentSecs = Math.floor((Date.now() - this.data.activeTimer.startTime) / 1000) + this.data.activeTimer.accumulated;
                     const h = Math.floor(currentSecs / 3600).toString().padStart(2,'0');
                     const m = Math.floor((currentSecs % 3600) / 60).toString().padStart(2,'0');
                     const s = (currentSecs % 60).toString().padStart(2,'0');
-                    document.getElementById('timerDisplay').innerText = `${h}:${m}:${s}`;
+                    // Update global bar only
+                    document.getElementById('globalTimerDisplay').innerText = `${h}:${m}:${s}`;
                 }, 1000);
             },
 
             toggleTimer() {
-                // Pause Logic
-                clearInterval(this.data.timerInterval);
-                const elapsedSecs = Math.floor((Date.now() - this.data.activeTimer.startTime) / 1000);
-                this.data.activeTimer.accumulated += elapsedSecs;
-                
-                // For this single-file constraint, we pause by stopping the UI update but keeping the obj.
-                // Re-start logic requires more complex state, so we simply force a stop flow here or just alert.
-                // Better UX: Just Stop.
-                if(confirm("Pause session? Press OK to Stop & Log, Cancel to continue.")) {
-                    this.stopTimer();
-                } else {
-                    // Reset interval
+                if(!this.data.timerInterval) {
+                    // Resume
                     this.data.activeTimer.startTime = Date.now();
                     this.data.timerInterval = setInterval(() => {
                          const currentSecs = Math.floor((Date.now() - this.data.activeTimer.startTime) / 1000) + this.data.activeTimer.accumulated;
                         const h = Math.floor(currentSecs / 3600).toString().padStart(2,'0');
                         const m = Math.floor((currentSecs % 3600) / 60).toString().padStart(2,'0');
                         const s = (currentSecs % 60).toString().padStart(2,'0');
-                        document.getElementById('timerDisplay').innerText = `${h}:${m}:${s}`;
+                        document.getElementById('globalTimerDisplay').innerText = `${h}:${m}:${s}`;
                     }, 1000);
+                    document.getElementById('globalTimerPauseBtn').innerText = "Pause";
+                } else {
+                    // Pause
+                    clearInterval(this.data.timerInterval);
+                    this.data.timerInterval = null;
+                    const elapsedSecs = Math.floor((Date.now() - this.data.activeTimer.startTime) / 1000);
+                    this.data.activeTimer.accumulated += elapsedSecs;
+                    document.getElementById('globalTimerPauseBtn').innerText = "Resume";
                 }
             },
 
             stopTimer() {
                 clearInterval(this.data.timerInterval);
-                const elapsedSecs = Math.floor((Date.now() - this.data.activeTimer.startTime) / 1000) + this.data.activeTimer.accumulated;
-                const elapsedMins = Math.ceil(elapsedSecs / 60);
+                this.data.timerInterval = null;
                 
+                // Calculate total time
+                let elapsedSecs = this.data.activeTimer.accumulated;
+                // If it was running when stopped, add current segment
+                if(this.data.activeTimer.startTime && document.getElementById('globalTimerPauseBtn').innerText === "Pause") {
+                     elapsedSecs += Math.floor((Date.now() - this.data.activeTimer.startTime) / 1000);
+                }
+
+                const elapsedMins = Math.ceil(elapsedSecs / 60);
                 const task = this.data.tasks.find(t => t.id === this.data.activeTimer.id);
                 
                 this.data.activeTimer = null;
-                document.getElementById('activeTimerCard').classList.add('hidden');
+                this.updateGlobalTimerUI();
                 
                 this.manualComplete(task.id, elapsedMins);
             },
@@ -781,7 +939,6 @@
                 const today = this.formatDate(new Date());
                 let changed = false;
                 this.data.tasks.forEach(t => {
-                    // If task is pending and date is before today
                     if (t.status === 'pending' && t.date < today) {
                         t.status = 'backlog';
                         changed = true;
@@ -832,13 +989,12 @@
             },
             
             openDayView(dateStr) {
-                // If the user clicks a date on the calendar, we open the add task modal pre-filled
                 this.openTaskModal(dateStr);
             },
 
             closeModal(id) { document.getElementById(id).classList.add('hidden'); },
             formatDate(d) { return d.toISOString().split('T')[0]; },
-            startClock() { setInterval(() => { /* Clock updates implicitly via interactions */ }, 60000); }
+            startClock() { setInterval(() => { /* Clock implicit */ }, 60000); }
         };
 
         app.init();
