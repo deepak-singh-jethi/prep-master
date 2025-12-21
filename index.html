@@ -382,28 +382,38 @@
             <h3 class="text-base font-bold text-gray-800 dark:text-white">Settings & Data</h3>
             <button onclick="app.closeModal('settingsModal')" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-200 dark:hover:bg-gray-600"><i class="fas fa-times"></i></button>
         </div>
-        <div class="p-6 space-y-6">
-            <div>
-                <h4 class="text-xs font-bold uppercase text-gray-400 mb-4 tracking-wider">Data Management</h4>
-                <div class="grid grid-cols-2 gap-4">
-                    <button onclick="app.exportData()" class="flex flex-col items-center justify-center p-5 border border-gray-200 dark:border-gray-600 rounded-xl hover:bg-indigo-50 dark:hover:bg-gray-700 hover:border-primary/50 dark:hover:border-primary/50 transition-all group text-gray-600 dark:text-gray-300">
-                        <i class="fas fa-download text-2xl mb-2 text-gray-400 group-hover:text-primary transition-colors"></i>
-                        <span class="text-xs font-bold">Export JSON</span>
-                    </button>
-                    <button onclick="document.getElementById('importFile').click()" class="flex flex-col items-center justify-center p-5 border border-gray-200 dark:border-gray-600 rounded-xl hover:bg-emerald-50 dark:hover:bg-gray-700 hover:border-secondary/50 dark:hover:border-secondary/50 transition-all group text-gray-600 dark:text-gray-300">
-                        <i class="fas fa-file-upload text-2xl mb-2 text-gray-400 group-hover:text-secondary transition-colors"></i>
-                        <span class="text-xs font-bold">Import JSON</span>
-                    </button>
-                    <input type="file" id="importFile" class="hidden" accept=".json" onchange="app.importData(this)">
-                </div>
-                <button onclick="app.restoreSafetyBackup()" class="w-full mt-4 py-2 text-xs font-bold text-amber-600 dark:text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-900/20 rounded-lg transition-colors border border-dashed border-amber-200 dark:border-amber-800">
-    <i class="fas fa-undo-alt mr-2"></i> Restore Last Safety Backup
-</button>
-            </div>
-            <div class="text-[10px] text-center text-gray-400 font-mono bg-gray-50 dark:bg-gray-900 py-2 rounded-lg" id="lastBackupDisplay">
-                Local Storage • No Cloud Sync
+       <div class="p-6 space-y-5">
+    
+    <div id="backupHealthPanel" class="p-4 rounded-xl border transition-colors duration-300">
+        <div class="flex items-center gap-3 mb-2">
+            <i id="backupStatusIcon" class="fas fa-circle-notch text-lg"></i>
+            <div class="flex-1">
+                <h4 id="backupStatusTitle" class="font-bold text-sm leading-none">Checking status...</h4>
+                <p id="backupStatusText" class="text-xs opacity-75 mt-1 font-medium">Please wait</p>
             </div>
         </div>
+        <p class="text-[10px] opacity-60 mt-2 pt-2 border-t border-black/5 dark:border-white/5 leading-relaxed">
+            <i class="fas fa-shield-alt mr-1"></i> Regular exports protect your study plan.
+        </p>
+    </div>
+
+    <div class="grid grid-cols-2 gap-3">
+        <button onclick="app.exportData()" class="flex flex-col items-center justify-center p-4 bg-gray-50 dark:bg-gray-700/50 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 border border-gray-200 dark:border-gray-600 hover:border-primary/50 rounded-xl transition-all group">
+            <i class="fas fa-download text-xl mb-2 text-gray-400 group-hover:text-primary transition-colors"></i>
+            <span class="text-xs font-bold text-gray-700 dark:text-gray-200">Export Now</span>
+        </button>
+
+        <button onclick="document.getElementById('importFile').click()" class="flex flex-col items-center justify-center p-4 bg-gray-50 dark:bg-gray-700/50 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 border border-gray-200 dark:border-gray-600 hover:border-secondary/50 rounded-xl transition-all group">
+            <i class="fas fa-file-upload text-xl mb-2 text-gray-400 group-hover:text-secondary transition-colors"></i>
+            <span class="text-xs font-bold text-gray-700 dark:text-gray-200">Import File</span>
+        </button>
+        <input type="file" id="importFile" class="hidden" accept=".json" onchange="app.importData(this)">
+    </div>
+
+    <button onclick="app.restoreSafetyBackup()" class="w-full py-3 text-xs font-bold text-amber-600 dark:text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-900/10 rounded-xl transition-colors border border-dashed border-amber-200 dark:border-amber-800/50 flex items-center justify-center gap-2">
+        <i class="fas fa-history"></i> Restore Last Safety Backup
+    </button>
+</div>
     </div>
 </div>
 
@@ -559,6 +569,41 @@
          <p id="uiDialogMessage" class="text-sm text-gray-600 dark:text-gray-300 whitespace-pre-wrap"></p>
          <input type="text" id="uiDialogInput" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-600 rounded-xl p-3 text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none font-medium hidden">
          <div id="uiDialogButtons" class="flex justify-end gap-3 mt-2"></div>
+    </div>
+</div>
+<div id="importPreviewModal" class="modal fixed inset-0 z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-sm p-6 border border-gray-100 dark:border-gray-700 transform transition-all scale-100">
+        <h3 class="text-xl font-bold mb-4 text-gray-900 dark:text-white flex items-center gap-2">
+            <i class="fas fa-file-import text-primary"></i> Backup Preview
+        </h3>
+        
+        <div class="space-y-3 mb-6">
+            <div class="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-700/30 rounded-xl border border-gray-100 dark:border-gray-700">
+                <span class="text-xs font-bold text-gray-500 uppercase tracking-wide">Tasks</span>
+                <span class="font-mono font-bold text-gray-800 dark:text-gray-200" id="previewTaskCount">0</span>
+            </div>
+            <div class="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-700/30 rounded-xl border border-gray-100 dark:border-gray-700">
+                <span class="text-xs font-bold text-gray-500 uppercase tracking-wide">Subjects</span>
+                <span class="font-mono font-bold text-gray-800 dark:text-gray-200" id="previewSubCount">0</span>
+            </div>
+            <div class="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-700/30 rounded-xl border border-gray-100 dark:border-gray-700">
+                <span class="text-xs font-bold text-gray-500 uppercase tracking-wide">Date Range</span>
+                <span class="font-mono font-bold text-gray-800 dark:text-gray-200 text-xs" id="previewDateRange">-</span>
+            </div>
+        </div>
+
+        <div class="text-[10px] text-amber-700 dark:text-amber-500 font-bold bg-amber-50 dark:bg-amber-900/20 p-3 rounded-xl mb-6 border border-amber-100 dark:border-amber-900/30 flex gap-3 items-start">
+            <i class="fas fa-exclamation-triangle mt-0.5 text-base"></i>
+            <div>
+                <span class="block uppercase tracking-wider mb-0.5 opacity-75">Caution</span>
+                This action will replace your current data. A safety backup will be created automatically.
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+            <button id="btnPreviewCancel" class="px-4 py-3 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl font-bold text-xs uppercase tracking-wider transition-colors">Cancel</button>
+            <button id="btnPreviewConfirm" class="px-4 py-3 bg-primary text-white rounded-xl hover:bg-primary-700 font-bold text-xs uppercase tracking-wider shadow-lg shadow-primary/20 transition-all">Confirm Import</button>
+        </div>
     </div>
 </div>
 
@@ -783,24 +828,59 @@
         },
         
         checkBackupStatus() {
-            const dot = document.getElementById('backupWarningDot');
-            if (!dot) return;
-            const last = this.data.lastBackup ? new Date(this.data.lastBackup) : new Date(0);
-            const now = new Date();
-            const diffDays = (now - last) / (1000 * 60 * 60 * 24);
-            
-            if (diffDays > 7) {
-                dot.classList.remove('hidden');
-            } else {
-                dot.classList.add('hidden');
-            }
-            
-            if(this.data.lastBackup) {
-                const display = document.getElementById('lastBackupDisplay');
-                if(display) display.innerText = "Last Backup: " + new Date(this.data.lastBackup).toLocaleDateString();
-            }
-        },
+    // 1. Existing Warning Dot Logic (Preserved)
+    const dot = document.getElementById('backupWarningDot');
+    const last = this.data.lastBackup ? new Date(this.data.lastBackup) : null;
+    const now = new Date();
+    // If no backup, treat as infinite days
+    const diffDays = last ? (now - last) / (1000 * 60 * 60 * 24) : 999;
+    
+    if (dot) {
+        if (diffDays > 7) dot.classList.remove('hidden');
+        else dot.classList.add('hidden');
+    }
 
+    // 2. NEW: Update Health Panel UI
+    const panel = document.getElementById('backupHealthPanel');
+    const title = document.getElementById('backupStatusTitle');
+    const text = document.getElementById('backupStatusText');
+    const icon = document.getElementById('backupStatusIcon');
+
+    // Safety check in case modal DOM isn't loaded
+    if (!panel || !title) return;
+
+    // Reset Base Classes
+    panel.className = "p-4 rounded-xl border transition-all duration-300 mb-4 shadow-sm";
+    icon.className = "fas text-xl";
+
+    if (!last) {
+        // STATE: No Backup Found
+        panel.classList.add('bg-gray-50', 'border-gray-200', 'dark:bg-gray-700/30', 'dark:border-gray-600');
+        title.innerText = "No Backup Found";
+        title.className = "font-bold text-sm text-gray-600 dark:text-gray-300";
+        text.innerText = "Export data to start protection.";
+        icon.classList.add('fa-exclamation-circle', 'text-gray-400');
+        
+    } else if (diffDays > 7) {
+        // STATE: Overdue (Yellow/Amber)
+        panel.classList.add('bg-amber-50', 'border-amber-200', 'dark:bg-amber-900/20', 'dark:border-amber-800');
+        title.innerText = "Backup Overdue";
+        title.className = "font-bold text-sm text-amber-700 dark:text-amber-500";
+        text.innerText = `Last saved ${Math.floor(diffDays)} days ago.`;
+        icon.classList.add('fa-exclamation-triangle', 'text-amber-500');
+        
+    } else {
+        // STATE: Healthy (Green/Emerald)
+        panel.classList.add('bg-emerald-50', 'border-emerald-200', 'dark:bg-emerald-900/20', 'dark:border-emerald-800');
+        title.innerText = "System Healthy";
+        title.className = "font-bold text-sm text-emerald-700 dark:text-emerald-500";
+        
+        // Human readable date format
+        const dateStr = last.toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute:'2-digit' });
+        text.innerText = `Last saved: ${dateStr}`;
+        icon.classList.add('fa-check-circle', 'text-emerald-500');
+    }
+},
         // --- TIMER LOGIC ---
         getElapsedMS() {
             if (!this.data.activeTimer) return 0;
@@ -1099,13 +1179,22 @@
             this.saveData();
             this.checkBackupStatus();
 
-            const dataStr = JSON.stringify({ ...this.data, activeTimer: null, timerInterval: null });
+            // FIX: Explicitly add schema: 3.2 here
+            const exportObj = {
+                schema: 3.2,
+                ...this.data,
+                activeTimer: null,
+                timerInterval: null
+            };
+
+            const dataStr = JSON.stringify(exportObj);
             const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
             const linkElement = document.createElement('a');
             linkElement.setAttribute('href', dataUri);
             linkElement.setAttribute('download', 'prepmaster_backup.json');
             linkElement.click();
         },
+
         validateImportData(data) {
             // 1. Schema & Structure
             if (!data || typeof data !== 'object') return { ok: false, error: "Invalid JSON structure." };
@@ -1152,7 +1241,57 @@
             return { ok: true };
         },
         
-       importData(input) {
+        showImportPreview(data) {
+            return new Promise(resolve => {
+                // 1. Extract Stats
+                const taskCount = data.tasks ? data.tasks.length : 0;
+                const subCount = data.subjects ? data.subjects.length : 0;
+                
+                // 2. Calculate Date Range
+                let dateRange = "No tasks";
+                if (taskCount > 0) {
+                    // Extract timestamps, filter invalids, and sort
+                    const timestamps = data.tasks
+                        .map(t => new Date(t.date).getTime())
+                        .filter(ts => !isNaN(ts));
+                    
+                    if (timestamps.length > 0) {
+                        const minDate = new Date(Math.min(...timestamps));
+                        const maxDate = new Date(Math.max(...timestamps));
+                        
+                        const opts = { month: 'short', day: 'numeric', year: '2-digit' };
+                        const start = minDate.toLocaleDateString('en-US', opts);
+                        const end = maxDate.toLocaleDateString('en-US', opts);
+                        
+                        dateRange = (start === end) ? start : `${start} - ${end}`;
+                    }
+                }
+
+                // 3. Populate Modal
+                document.getElementById('previewTaskCount').innerText = taskCount;
+                document.getElementById('previewSubCount').innerText = subCount;
+                document.getElementById('previewDateRange').innerText = dateRange;
+
+                // 4. Show Modal & Attach Listeners
+                const modal = document.getElementById('importPreviewModal');
+                modal.classList.remove('hidden');
+
+                const cleanup = () => {
+                    modal.classList.add('hidden');
+                    // Remove listeners to prevent memory leaks/duplicate firings
+                    cancelBtn.onclick = null;
+                    confirmBtn.onclick = null;
+                };
+
+                const cancelBtn = document.getElementById('btnPreviewCancel');
+                const confirmBtn = document.getElementById('btnPreviewConfirm');
+
+                cancelBtn.onclick = () => { cleanup(); resolve(false); };
+                confirmBtn.onclick = () => { cleanup(); resolve(true); };
+            });
+        },
+        
+        importData(input) {
             const file = input.files[0];
             if (!file) return;
             const reader = new FileReader();
@@ -1169,7 +1308,14 @@
                         return;
                     }
 
-                    // 2. SAFETY RESTORE POINT
+                    // 2. SHOW PREVIEW (Replaces simple uiConfirm)
+                    const userConfirmed = await this.showImportPreview(parsed);
+                    if (!userConfirmed) {
+                        input.value = ''; // Reset input so same file can be selected again
+                        return;
+                    }
+
+                    // 3. SAFETY RESTORE POINT
                     try {
                         const safetyBackup = JSON.stringify(this.data);
                         localStorage.setItem('prepMaster_safety_restore', safetyBackup);
@@ -1178,28 +1324,25 @@
                         return;
                     }
 
-                    // 3. CONFIRMATION
-                    const msg = `✅ VALIDATION PASSED\n\nTasks: ${parsed.tasks.length}\nSubjects: ${parsed.subjects.length}\n\nA safety backup of your current data has been saved to device storage.\n\nOverwrite current data?`;
-                    
-                    if(await this.uiConfirm(msg)) {
-                        // FIX #2: Clear Active Timer to prevent ghost state
-                        if (this.data.timerInterval) clearInterval(this.data.timerInterval);
-                        this.data.activeTimer = null;
-                        this.data.timerInterval = null;
-                        localStorage.removeItem('prepMasterTimer');
+                    // 4. ATOMIC UPDATE & CLEANUP
+                    // Clear active timer to prevent ghost state
+                    if (this.data.timerInterval) clearInterval(this.data.timerInterval);
+                    this.data.activeTimer = null;
+                    this.data.timerInterval = null;
+                    localStorage.removeItem('prepMasterTimer');
 
-                        // 4. ATOMIC UPDATE
-                        this.data.tasks = parsed.tasks;
-                        this.data.subjects = parsed.subjects;
-                        this.data.targetDate = parsed.targetDate || this.data.targetDate;
-                        this.data.lastBackup = new Date().toISOString();
-                        
-                        this.saveData({ render: false });
-                        this.scheduleRender();
-                        
-                        this.closeModal('settingsModal');
-                        await this.uiAlert("Import successful!");
-                    }
+                    // Apply Data
+                    this.data.tasks = parsed.tasks;
+                    this.data.subjects = parsed.subjects;
+                    this.data.targetDate = parsed.targetDate || this.data.targetDate;
+                    this.data.lastBackup = new Date().toISOString();
+                    
+                    this.saveData({ render: false });
+                    this.scheduleRender();
+                    
+                    this.closeModal('settingsModal');
+                    await this.uiAlert("Import successful!");
+
                 } catch(err) { 
                     console.error(err);
                     await this.uiAlert("CRITICAL ERROR: File is not valid JSON.");
