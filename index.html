@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PrepMaster v5.4.3</title>
-    <meta name="description" content="PrepMaster - Study Planner & Task Manager for Competitive Exams deepujethi@gmail.com">
+    <title>PrepMaster v5.4.4</title>
+    <meta name="description" content="PrepMaster - Study Planner & Task Manager for Competitive Exams">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,7 +14,6 @@
     
     <script src="https://cdn.tailwindcss.com"></script>
     
-
 <script>
     tailwind.config = {
         darkMode: 'class',
@@ -122,7 +121,7 @@
                 </div>
                 <div>
                     <h1 class="text-lg md:text-xl font-bold tracking-tight leading-none">Prep<span class="text-primary">Master</span></h1>
-                    <span class="text-[10px] font-mono font-medium text-gray-400 dark:text-gray-500 uppercase tracking-widest">v5.4.3</span>
+                    <span class="text-[10px] font-mono font-medium text-gray-400 dark:text-gray-500 uppercase tracking-widest">v5.4.4</span>
                 </div>
             </div>
             
@@ -875,7 +874,7 @@
             this.persistTimerState();
         },
 
-        stopTimer() {
+         stopTimer(silent = false) {
             if (!this.data.activeTimer) return;
 
             const finalElapsedMS = this.getElapsedMS();
@@ -891,7 +890,11 @@
 
             this.updateGlobalTimerUI();
             this.render(); 
-            this.manualComplete(taskId, finalMinutes);
+            
+            // FIX: Only trigger completion modal if NOT silent
+            if (!silent) {
+                this.manualComplete(taskId, finalMinutes);
+            }
         },
 
         startTicker() {
@@ -1709,30 +1712,36 @@
         },
 
         async deleteTask(id) {
-                if (this.data.activeTimer && this.data.activeTimer.id === id) {
-                    const task = this.data.tasks.find(t => t.id === id);
-                    const msg = `⚠️ SESSION IN PROGRESS\n\nYou are currently studying "${task.subSubject}".\n\nStop the timer and delete this task?`;
+            // 1. Check if the task being deleted has the Active Timer
+            if (this.data.activeTimer && this.data.activeTimer.id === id) {
+                const task = this.data.tasks.find(t => t.id === id);
+                const msg = `⚠️ SESSION IN PROGRESS\n\nYou are currently studying "${task.subSubject}".\n\nStop the timer and delete this task?`;
 
-                    if (await this.uiConfirm(msg)) {
-                        this.stopTimer(); 
-                    } else {
-                        return; 
-                    }
+                if (await this.uiConfirm(msg)) {
+                    // ✅ CRITICAL FIX: Stop timer silently (true = suppress modal)
+                    this.stopTimer(true); 
                 } else {
-                    if (!(await this.uiConfirm('Delete this task?'))) return;
+                    return; // User cancelled
                 }
+            } else {
+                // Standard confirmation for non-active tasks
+                if (!(await this.uiConfirm('Delete this task?'))) return;
+            }
 
-                this.data.tasks = this.data.tasks.filter(t => t.id !== id);
-                this.saveData();
-                
-                const modalDate = document.getElementById('taskDate').value;
-                if(!document.getElementById('taskModal').classList.contains('hidden')) {
-                     this.renderDayManagerList(modalDate);
-                     this.resetForm();
-                }
-            },
-
-        async loadRevisionTopics() {
+            // 2. Proceed with deletion
+            this.data.tasks = this.data.tasks.filter(t => t.id !== id);
+            this.saveData();
+            
+            // 3. Update UI if Modal is open
+            const modalDate = document.getElementById('taskDate').value;
+            if(!document.getElementById('taskModal').classList.contains('hidden')) {
+                 this.renderDayManagerList(modalDate);
+                 this.resetForm();
+            }
+        },     
+       
+       
+            async loadRevisionTopics() {
             const dateInput = document.getElementById('taskDate');
             const targetDateStr = dateInput ? dateInput.value : this.formatDate(new Date());
             
