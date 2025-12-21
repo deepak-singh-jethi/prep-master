@@ -727,7 +727,8 @@
         },
 
         // --- DATA LAYER ---
-        saveData() {
+// MODIFIED: Support optional rendering
+        saveData(options = { render: true }) {
             localStorage.setItem('prepMasterData_v3', JSON.stringify({
                 schema: 3.2,
                 tasks: this.data.tasks,
@@ -735,7 +736,19 @@
                 targetDate: this.data.targetDate,
                 lastBackup: this.data.lastBackup 
             }));
-            this.render();
+            
+            // FIX: Use debounced render instead of synchronous this.render()
+            if (options.render) {
+                this.scheduleRender();
+            }
+        },
+        // NEW: Debounced render to prevent UI jank
+        scheduleRender() {
+            if (this._renderTimer) clearTimeout(this._renderTimer);
+            this._renderTimer = setTimeout(() => {
+                this.render();
+                this._renderTimer = null;
+            }, 120); // 120ms debounce
         },
 
         loadData() {
@@ -1119,12 +1132,16 @@
                         msg = "WARNING: You are importing OLDER data over NEWER data.\n\n" + msg;
                     }
                     
-                    if(await this.uiConfirm(msg)) {
+                   if(await this.uiConfirm(msg)) {
                         this.data.tasks = parsed.tasks;
                         this.data.subjects = parsed.subjects;
                         this.data.targetDate = parsed.targetDate || this.data.targetDate;
                         this.data.lastBackup = new Date().toISOString();
-                        this.saveData();
+                        
+                        // FIX: Save without immediate render, then schedule
+                        this.saveData({ render: false });
+                        this.scheduleRender();
+                        
                         this.closeModal('settingsModal');
                         await this.uiAlert("Import successful!");
                     }
@@ -1323,6 +1340,7 @@
                 }
             });
         },
+
 
         renderCalendar() {
             if(this.data.currentView !== 'calendar') return;
