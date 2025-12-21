@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PrepMaster v5.4.4</title>
+    <title>PrepMaster v5.5.0</title>
     <meta name="description" content="PrepMaster - Study Planner & Task Manager for Competitive Exams">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -121,7 +121,7 @@
                 </div>
                 <div>
                     <h1 class="text-lg md:text-xl font-bold tracking-tight leading-none">Prep<span class="text-primary">Master</span></h1>
-                    <span class="text-[10px] font-mono font-medium text-gray-400 dark:text-gray-500 uppercase tracking-widest">v5.4.4</span>
+                    <span class="text-[10px] font-mono font-medium text-gray-400 dark:text-gray-500 uppercase tracking-widest">v5.5.0</span>
                 </div>
             </div>
             
@@ -396,6 +396,9 @@
                     </button>
                     <input type="file" id="importFile" class="hidden" accept=".json" onchange="app.importData(this)">
                 </div>
+                <button onclick="app.restoreSafetyBackup()" class="w-full mt-4 py-2 text-xs font-bold text-amber-600 dark:text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-900/20 rounded-lg transition-colors border border-dashed border-amber-200 dark:border-amber-800">
+    <i class="fas fa-undo-alt mr-2"></i> Restore Last Safety Backup
+</button>
             </div>
             <div class="text-[10px] text-center text-gray-400 font-mono bg-gray-50 dark:bg-gray-900 py-2 rounded-lg" id="lastBackupDisplay">
                 Local Storage • No Cloud Sync
@@ -1103,42 +1106,94 @@
             linkElement.setAttribute('download', 'prepmaster_backup.json');
             linkElement.click();
         },
+        validateImportData(data) {
+            // 1. Schema & Structure
+            if (!data || typeof data !== 'object') return { ok: false, error: "Invalid JSON structure." };
+            if (data.schema !== 3.2) return { ok: false, error: `Version mismatch. Expected 3.2, got ${data.schema}.` };
+            if (!Array.isArray(data.tasks)) return { ok: false, error: "Missing tasks array." };
+            if (!Array.isArray(data.subjects)) return { ok: false, error: "Missing subjects array." };
 
-        importData(input) {
+            // 2. Subject Validation (Check Duplicates)
+            const validSubjectNames = new Set();
+            const subjectIds = new Set(); // NEW: Track Subject IDs
+
+            for (let i = 0; i < data.subjects.length; i++) {
+                const s = data.subjects[i];
+                if (!s.id || typeof s.name !== 'string' || !s.name.trim()) 
+                    return { ok: false, error: `Subject[${i}] is invalid (missing ID or Name).` };
+                
+                // FIX #1: Duplicate Subject ID Check
+                if (subjectIds.has(s.id)) return { ok: false, error: `Duplicate Subject ID detected: ${s.id}` };
+                subjectIds.add(s.id);
+
+                if (validSubjectNames.has(s.name)) return { ok: false, error: `Duplicate subject name: ${s.name}` };
+                validSubjectNames.add(s.name);
+            }
+
+            // 3. Task Validation (Check Duplicates)
+            const taskIds = new Set(); // NEW: Track Task IDs
+
+            for (let i = 0; i < data.tasks.length; i++) {
+                const t = data.tasks[i];
+                // Mandatory Fields
+                if (!t.id || typeof t.id !== 'string') return { ok: false, error: `Task[${i}] missing valid ID.` };
+                
+                // FIX #1: Duplicate Task ID Check
+                if (taskIds.has(t.id)) return { ok: false, error: `Duplicate Task ID detected: ${t.id}` };
+                taskIds.add(t.id);
+
+                if (typeof t.duration !== 'number' || t.duration < 0) return { ok: false, error: `Task[${i}] has invalid duration.` };
+                if (!t.date || isNaN(new Date(t.date).getTime())) return { ok: false, error: `Task[${i}] has invalid date.` };
+                
+                // Referential Integrity
+                if (!validSubjectNames.has(t.subject)) return { ok: false, error: `Task[${i}] refers to missing subject: "${t.subject}".` };
+            }
+
+            return { ok: true };
+        },
+        
+       importData(input) {
             const file = input.files[0];
             if (!file) return;
             const reader = new FileReader();
+            
             reader.onload = async (e) => {
                 try {
                     const parsed = JSON.parse(e.target.result);
                     
-                    if (!parsed.tasks || !Array.isArray(parsed.tasks) || !parsed.subjects || !Array.isArray(parsed.subjects)) {
-                        await this.uiAlert("Invalid backup file: missing tasks or subjects.");
+                    // 1. STRICT VALIDATION
+                    const validation = this.validateImportData(parsed);
+                    if (!validation.ok) {
+                        await this.uiAlert(`⛔ Import Blocked\n\n${validation.error}\n\nNo changes were made.`);
+                        input.value = ''; 
                         return;
                     }
 
-                    const invalid = parsed.tasks.slice(0,3).some(t => !t.id || !t.date || typeof t.duration !== 'number');
-                    if (invalid) {
-                        await this.uiAlert("Backup file incompatible with this app version.");
+                    // 2. SAFETY RESTORE POINT
+                    try {
+                        const safetyBackup = JSON.stringify(this.data);
+                        localStorage.setItem('prepMaster_safety_restore', safetyBackup);
+                    } catch (err) {
+                        await this.uiAlert("Warning: Could not create safety backup. Import aborted.");
                         return;
                     }
 
-                    const currentBackup = this.data.lastBackup ? new Date(this.data.lastBackup) : new Date(0);
-                    const importBackup = parsed.lastBackup ? new Date(parsed.lastBackup) : new Date(0);
-
-                    let msg = `This will overwrite current data.\nTasks: ${parsed.tasks.length}\nSubjects: ${parsed.subjects.length}\nProceed?`;
-
-                    if (importBackup < currentBackup) {
-                        msg = "WARNING: You are importing OLDER data over NEWER data.\n\n" + msg;
-                    }
+                    // 3. CONFIRMATION
+                    const msg = `✅ VALIDATION PASSED\n\nTasks: ${parsed.tasks.length}\nSubjects: ${parsed.subjects.length}\n\nA safety backup of your current data has been saved to device storage.\n\nOverwrite current data?`;
                     
-                   if(await this.uiConfirm(msg)) {
+                    if(await this.uiConfirm(msg)) {
+                        // FIX #2: Clear Active Timer to prevent ghost state
+                        if (this.data.timerInterval) clearInterval(this.data.timerInterval);
+                        this.data.activeTimer = null;
+                        this.data.timerInterval = null;
+                        localStorage.removeItem('prepMasterTimer');
+
+                        // 4. ATOMIC UPDATE
                         this.data.tasks = parsed.tasks;
                         this.data.subjects = parsed.subjects;
                         this.data.targetDate = parsed.targetDate || this.data.targetDate;
                         this.data.lastBackup = new Date().toISOString();
                         
-                        // FIX: Save without immediate render, then schedule
                         this.saveData({ render: false });
                         this.scheduleRender();
                         
@@ -1146,15 +1201,57 @@
                         await this.uiAlert("Import successful!");
                     }
                 } catch(err) { 
-                    await this.uiAlert("Error reading backup file. Import aborted.");
+                    console.error(err);
+                    await this.uiAlert("CRITICAL ERROR: File is not valid JSON.");
                 }
             };
             reader.readAsText(file);
             input.value = '';
         },
-
         // --- RENDERING ---
         // [FIX] Added safe-guard for renderAnalytics call
+        async restoreSafetyBackup() {
+            const raw = localStorage.getItem('prepMaster_safety_restore');
+            if (!raw) {
+                await this.uiAlert("No safety backup found on this device.");
+                return;
+            }
+
+            try {
+                const parsed = JSON.parse(raw);
+                // Validate before restoring to ensure backup isn't corrupt
+                const validation = this.validateImportData(parsed);
+                if (!validation.ok) {
+                    await this.uiAlert(`Cannot restore: Backup is corrupt.\n${validation.error}`);
+                    return;
+                }
+
+                if (await this.uiConfirm("⚠️ RESTORE BACKUP\n\nThis will overwrite your current data with the last safety backup created during import.\n\nContinue?")) {
+                    // Clear timer state (Safety)
+                    if (this.data.timerInterval) clearInterval(this.data.timerInterval);
+                    this.data.activeTimer = null;
+                    this.data.timerInterval = null;
+                    localStorage.removeItem('prepMasterTimer');
+
+                    // Apply Data
+                    this.data.tasks = parsed.tasks;
+                    this.data.subjects = parsed.subjects;
+                    this.data.targetDate = parsed.targetDate;
+                    this.data.lastBackup = parsed.lastBackup;
+
+                    this.saveData({ render: false });
+                    this.scheduleRender();
+                    
+                    this.closeModal('settingsModal');
+                    await this.uiAlert("Safety backup restored successfully.");
+                }
+            } catch (e) {
+                await this.uiAlert("Error reading backup file.");
+            }
+        },
+        
+        
+        
         render() {
             this.renderHeader();
             this.renderDashboard();
