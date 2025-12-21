@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PrepMaster v5.4.2</title>
-    <meta name="description" content="PrepMaster - Study Planner & Task Manager for Competitive Exams">
+    <title>PrepMaster v5.4.3</title>
+    <meta name="description" content="PrepMaster - Study Planner & Task Manager for Competitive Exams deepujethi@gmail.com">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,6 +14,7 @@
     
     <script src="https://cdn.tailwindcss.com"></script>
     
+
 <script>
     tailwind.config = {
         darkMode: 'class',
@@ -36,7 +37,6 @@
                         50: '#ECFDF5',
                         600: '#059669',
                     },
-                    // FINAL "HIGH DEFINITION" SLATE PALETTE
                     gray: {
                         50: '#F8FAFC',  // Bg: Soft Slate
                         100: '#F1F5F9', // Hover: Crisp Slate
@@ -102,8 +102,6 @@
     }
 
     /* --- SPECIFIC FIX: CALENDAR BORDERS --- */
-    /* Forces calendar tiles to use the darker Gray-200 color in light mode 
-       so they don't disappear against the background */
     html:not(.dark) #calendarGrid > div {
         border-color: #CBD5E1 !important;
     }
@@ -124,7 +122,7 @@
                 </div>
                 <div>
                     <h1 class="text-lg md:text-xl font-bold tracking-tight leading-none">Prep<span class="text-primary">Master</span></h1>
-                    <span class="text-[10px] font-mono font-medium text-gray-400 dark:text-gray-500 uppercase tracking-widest">v5.4.2</span>
+                    <span class="text-[10px] font-mono font-medium text-gray-400 dark:text-gray-500 uppercase tracking-widest">v5.4.3</span>
                 </div>
             </div>
             
@@ -246,7 +244,84 @@
             <div id="calendarGrid" class="calendar-grid select-none">
                 </div>
         </div>
-<div id="view-subjects" class="view-section hidden max-w-6xl mx-auto pb-20"> <div class="flex justify-between items-end mb-8"> <div> <h2 class="text-2xl md:text-3xl font-extrabold text-gray-900 dark:text-white">Curriculum</h2> <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mt-1">Manage syllabus & steering.</p> </div> <button onclick="app.openSubjectModal()" class="bg-secondary hover:bg-secondary-600 text-white px-4 py-2.5 rounded-xl shadow-lg shadow-secondary/20 hover:shadow-secondary/40 transition-all flex items-center gap-2 text-sm font-semibold active:scale-95"> <i class="fas fa-plus"></i> New Subject </button> </div> <div id="subjectsList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"> </div> </div>
+
+        <div id="view-subjects" class="view-section hidden max-w-6xl mx-auto pb-20">
+            <div id="subjectsGridView">
+                <div class="flex flex-col md:flex-row justify-between items-end mb-8 gap-4">
+                    <div>
+                        <h2 class="text-2xl md:text-3xl font-extrabold text-gray-900 dark:text-white">Curriculum</h2>
+                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mt-1">Manage syllabus & steering.</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="flex items-center gap-2 mr-2">
+                            <input type="checkbox" id="showArchivedSubjects" onchange="app.renderSubjects()" class="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary">
+                            <label for="showArchivedSubjects" class="text-xs font-bold text-gray-500 cursor-pointer">Show Archived</label>
+                        </div>
+                        <button onclick="app.openSubjectModal()" class="bg-secondary hover:bg-secondary-600 text-white px-5 py-2.5 rounded-xl shadow-lg shadow-secondary/20 hover:shadow-secondary/40 transition-all flex items-center gap-2 text-sm font-bold active:scale-95">
+                            <i class="fas fa-plus"></i> New Subject
+                        </button>
+                    </div>
+                </div>
+                <div id="subjectsList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    </div>
+            </div>
+
+            <div id="subjectFocusPanel" class="hidden animate-fade-in">
+                <div class="sticky top-0 z-20 bg-gray-50/95 dark:bg-dark-bg/95 backdrop-blur-sm border-b border-gray-200 dark:border-gray-700 pb-4 mb-6 pt-2">
+                    <div class="flex items-center gap-4">
+                        <button onclick="window.subjActions.closeFocus()" class="w-10 h-10 flex items-center justify-center rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-gray-500 group">
+                            <i class="fas fa-arrow-left transform group-hover:-translate-x-1 transition-transform"></i>
+                        </button>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-3">
+                                <h2 id="focusPanelTitle" class="text-2xl font-extrabold text-gray-900 dark:text-white truncate"></h2>
+                                <button onclick="window.subjActions.editCurrentSubjectName()" class="text-gray-400 hover:text-primary transition-colors"><i class="fas fa-pencil-alt text-sm"></i></button>
+                            </div>
+                            <p id="focusPanelStats" class="text-xs font-mono text-gray-400 mt-1 truncate"></p>
+                        </div>
+                        <div class="relative hidden sm:block">
+                            <input type="text" id="topicSearch" oninput="window.subjActions.renderFocusList()" placeholder="Filter topics..." class="pl-9 pr-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm w-48 focus:ring-2 focus:ring-primary outline-none transition-all">
+                            <i class="fas fa-search absolute left-3 top-2.5 text-gray-400 text-xs"></i>
+                        </div>
+                    </div>
+                    <div class="sm:hidden mt-3 relative">
+                        <input type="text" id="topicSearchMobile" oninput="document.getElementById('topicSearch').value=this.value; window.subjActions.renderFocusList()" placeholder="Filter topics..." class="w-full pl-9 pr-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm outline-none">
+                        <i class="fas fa-search absolute left-3 top-2.5 text-gray-400 text-xs"></i>
+                    </div>
+                </div>
+
+                <div class="bg-white dark:bg-gray-800 p-2 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm mb-6 flex gap-2">
+                    <input type="text" id="newTopicInput" class="flex-1 bg-transparent border-none focus:ring-0 text-sm px-4 font-medium text-gray-800 dark:text-gray-200" placeholder="Type new topic name and press Enter..." onkeydown="if(event.key==='Enter') window.subjActions.addTopic()">
+                    <button onclick="window.subjActions.addTopic()" class="bg-gray-100 dark:bg-gray-700 hover:bg-primary hover:text-white dark:hover:bg-primary text-gray-600 dark:text-gray-300 px-4 py-1.5 rounded-lg text-xs font-bold transition-all">
+                        ADD
+                    </button>
+                </div>
+
+                <div class="space-y-8">
+                    <div>
+                        <div class="flex justify-between items-end mb-3">
+                            <h3 class="text-xs font-bold uppercase text-gray-400 tracking-wider">
+                                Active Topics <span id="activeTopicCount" class="ml-2 bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 px-1.5 py-0.5 rounded text-[10px]">0</span>
+                            </h3>
+                        </div>
+                        <div id="activeTopicsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3" data-show-all="false">
+                            </div>
+                        <button id="showMoreTopicsBtn" onclick="window.subjActions.showAllTopics()" class="hidden w-full mt-3 py-3 text-xs font-bold text-gray-400 hover:text-primary border border-dashed border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors">
+                            Show All Topics
+                        </button>
+                    </div>
+
+                    <div id="archivedTopicsSection" class="hidden pt-4 border-t border-gray-200 dark:border-gray-700">
+                        <button onclick="document.getElementById('archivedTopicsList').classList.toggle('hidden');" class="flex items-center gap-2 text-xs font-bold text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors mb-4 w-full group">
+                            <i class="fas fa-archive"></i> Archived Topics (<span id="archivedTopicCount">0</span>) 
+                            <i class="fas fa-chevron-down text-[10px] transform transition-transform group-focus:rotate-180"></i>
+                        </button>
+                        <div id="archivedTopicsList" class="hidden grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 opacity-75">
+                            </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <div id="view-analytics" class="view-section hidden max-w-5xl mx-auto space-y-8">
             <h2 class="text-2xl md:text-3xl font-extrabold text-gray-900 dark:text-white">Performance Analytics</h2>
@@ -492,7 +567,7 @@
             subjects: [],
             targetDate: '2026-02-01',
             // TIMER STATE
-            activeTimer: null, // { id, startTime, accumulated, lastSaved }
+            activeTimer: null, 
             timerInterval: null,
             // UI STATE
             currentView: 'dashboard',
@@ -502,7 +577,8 @@
             lastBackup: null,
             // UI DIALOG STATE
             dialogQueue: [],
-            isDialogOpen: false
+            isDialogOpen: false,
+            focusSubjectId: null 
         },
 
         init() {
@@ -510,10 +586,9 @@
             this.render();
             this.checkBacklog();
             this.checkBackupStatus(); 
-            this.restoreTimerState(); // Now uses robust restoration logic
+            this.restoreTimerState(); 
             this.setupKeyboardShortcuts();
 
-            // Theme Logic
             if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
                 document.documentElement.classList.add('dark');
             }
@@ -541,10 +616,9 @@
                 container.classList.add('hidden');
                 this.isDialogOpen = false;
                 resolve(result);
-                setTimeout(() => this.processDialogQueue(), 50); // slight delay to allow stack clear
+                setTimeout(() => this.processDialogQueue(), 50); 
             };
             
-            // Setup based on type
             if (type === 'alert') {
                 titleEl.innerText = 'Alert';
                 btnsEl.innerHTML = `<button id="uiBtnOK" class="px-5 py-2.5 bg-primary text-white rounded-xl hover:bg-primary-700 font-bold text-sm shadow-lg shadow-primary/20 transition-all">OK</button>`;
@@ -573,7 +647,6 @@
                 const confirmAction = () => closeDialog(inputEl.value);
                 document.getElementById('uiBtnConfirm').onclick = confirmAction;
                 
-                // Allow Enter to confirm in prompt
                 inputEl.onkeydown = (e) => {
                      if(e.key === 'Enter') confirmAction();
                 };
@@ -583,7 +656,6 @@
                 inputEl.select();
             }
             
-            // Global Escape handler for this specific dialog instance
             const escapeHandler = (e) => {
                  if (e.key === 'Escape' && !container.classList.contains('hidden')) {
                      if (type === 'alert') closeDialog(undefined);
@@ -629,7 +701,6 @@
 
         setupKeyboardShortcuts() {
             document.addEventListener('keydown', async (e) => {
-                // Ignore global shortcuts if a custom dialog is open (it handles its own keys)
                 if (this.isDialogOpen) return;
 
                 if (e.key === 'Escape') {
@@ -637,14 +708,12 @@
                     if (modals.length === 0) return;
                     const top = modals[modals.length - 1];
 
-                    // Heuristic for unsaved edits in Task Modal
                     if (top.id === 'taskModal') {
                         const editId = document.getElementById('taskEditId')?.value;
                         const subjectVal = document.getElementById('taskSubject')?.value || '';
                         const subSubjectVal = document.getElementById('taskSubSubject')?.value || '';
                         const durationVal = document.getElementById('taskDuration')?.value || '';
                         
-                        // Prompt heuristic: editId exists AND fields have values
                         const isDirty = !!(editId && (subjectVal || subSubjectVal || durationVal));
     
                         if (isDirty) {
@@ -660,8 +729,6 @@
 
         // --- DATA LAYER ---
         saveData() {
-            // We do NOT save activeTimer here anymore to avoid race conditions.
-            // activeTimer is managed by its own persistence cycle.
             localStorage.setItem('prepMasterData_v3', JSON.stringify({
                 schema: 3.2,
                 tasks: this.data.tasks,
@@ -672,36 +739,34 @@
             this.render();
         },
 
-loadData() {
-    const stored = localStorage.getItem('prepMasterData_v3');
-    let parsed = null;
+        loadData() {
+            const stored = localStorage.getItem('prepMasterData_v3');
+            let parsed = null;
 
-    if (stored) {
-        try {
-            parsed = JSON.parse(stored);
-        } catch (e) {
-            console.error("Storage corrupted. Resetting data to defaults.", e);
-            // FIX: Backup corrupted data before deletion to prevent total loss
-            localStorage.setItem('prepMasterData_v3_corrupted_backup', stored);
-            localStorage.removeItem('prepMasterData_v3');
-            // parsed remains null, triggering the else block below
-        }
-    }
+            if (stored) {
+                try {
+                    parsed = JSON.parse(stored);
+                } catch (e) {
+                    console.error("Storage corrupted. Resetting data to defaults.", e);
+                    localStorage.setItem('prepMasterData_v3_corrupted_backup', stored);
+                    localStorage.removeItem('prepMasterData_v3');
+                }
+            }
 
-    if (parsed) {
-        this.data.tasks = parsed.tasks || [];
-        this.data.subjects = parsed.subjects || [];
-        this.data.targetDate = parsed.targetDate || '2026-02-01';
-        this.data.lastBackup = parsed.lastBackup || null;
-    } else {
-        // Seed Data (Fallback)
-        this.data.subjects = [
-            { id: this.generateUUID(), name: 'History', sub: ['Ancient', 'Medieval', 'Modern'] },
-            { id: this.generateUUID(), name: 'Polity', sub: ['Constitution', 'Governance'] },
-            { id: this.generateUUID(), name: 'Geography', sub: ['Physical', 'Indian'] }
-        ];
-    }
-},
+            if (parsed) {
+                this.data.tasks = parsed.tasks || [];
+                this.data.subjects = parsed.subjects || [];
+                this.data.targetDate = parsed.targetDate || '2026-02-01';
+                this.data.lastBackup = parsed.lastBackup || null;
+            } else {
+                this.data.subjects = [
+                    { id: this.generateUUID(), name: 'History', sub: ['Ancient', 'Medieval', 'Modern'] },
+                    { id: this.generateUUID(), name: 'Polity', sub: ['Constitution', 'Governance'] },
+                    { id: this.generateUUID(), name: 'Geography', sub: ['Physical', 'Indian'] }
+                ];
+            }
+        },
+        
         checkBackupStatus() {
             const dot = document.getElementById('backupWarningDot');
             if (!dot) return;
@@ -721,14 +786,11 @@ loadData() {
             }
         },
 
-        // --- TIMER LOGIC (STABILIZED) ---
-        
-        // 1. Single Source of Truth for Time
+        // --- TIMER LOGIC ---
         getElapsedMS() {
             if (!this.data.activeTimer) return 0;
             
             let currentSegment = 0;
-            // If startTime exists, the timer is RUNNING. Calculate delta from now.
             if (this.data.activeTimer.startTime !== null) {
                 currentSegment = Math.max(0, Date.now() - this.data.activeTimer.startTime);
             }
@@ -736,27 +798,18 @@ loadData() {
             return (this.data.activeTimer.accumulated || 0) + currentSegment;
         },
 
-        // 2. Robust Restoration
         restoreTimerState() {
             const saved = localStorage.getItem('prepMasterTimer');
             if (saved) {
                 try {
                     const parsed = JSON.parse(saved);
-                    // Validate that the task still exists
                     if (this.data.tasks.find(t => t.id === parsed.id)) {
                         this.data.activeTimer = parsed;
-                        
-                        // If startTime is not null, it means it was left RUNNING.
-                        // We don't need to do any math here. 
-                        // getElapsedMS() will automatically calculate (Now - OldStartTime) + Accumulated.
-                        // This correctly accounts for time while the browser was closed.
-                        
-                        this.updateGlobalTimerUI(); // Update UI immediately
+                        this.updateGlobalTimerUI();
                         if (this.data.activeTimer.startTime !== null) {
-                            this.startTicker(); // Resume visual updates
+                            this.startTicker();
                         }
                     } else {
-                        // Task deleted while timer saved? Clean up.
                         localStorage.removeItem('prepMasterTimer');
                     }
                 } catch (e) {
@@ -766,7 +819,6 @@ loadData() {
             }
         },
 
-        // 3. Deterministic Persistence
         persistTimerState() {
             if (this.data.activeTimer) {
                 localStorage.setItem('prepMasterTimer', JSON.stringify(this.data.activeTimer));
@@ -776,17 +828,14 @@ loadData() {
         },
 
         async startTimer(id) {
-            // Prevent double-start or hijacking
             if (this.data.activeTimer) {
                 if (this.data.activeTimer.id !== id) {
                     await this.uiAlert("Please stop the current timer first.");
                     return;
                 }
-                // If already running, do nothing
                 if (this.data.activeTimer.startTime !== null) return;
             }
 
-            // Initialize State
             if (!this.data.activeTimer) {
                 this.data.activeTimer = {
                     id: id,
@@ -794,12 +843,11 @@ loadData() {
                     accumulated: 0
                 };
             } else {
-                // Resuming from pause
                 this.data.activeTimer.startTime = Date.now();
             }
 
             this.persistTimerState();
-            this.render(); // Update play/pause buttons in list
+            this.render();
             this.startTicker();
         },
 
@@ -807,32 +855,20 @@ loadData() {
             if (!this.data.activeTimer) return;
 
             if (this.data.activeTimer.startTime !== null) {
-                // PAUSE LOGIC
-                // 1. Calculate elapsed for this segment
                 const now = Date.now();
                 const delta = Math.max(0, now - this.data.activeTimer.startTime);
-                
-                // 2. Bank it into accumulated
                 this.data.activeTimer.accumulated += delta;
-                
-                // 3. Nullify startTime to indicate paused state
                 this.data.activeTimer.startTime = null;
                 
-                // 4. Stop visual ticker (optional, but saves resources)
                 if (this.data.timerInterval) {
                     clearInterval(this.data.timerInterval);
                     this.data.timerInterval = null;
                 }
                 
-                // 5. Update UI one last time to show precise pause time
                 this.updateTickerDisplay();
                 document.getElementById('globalTimerPauseBtn').innerText = "Resume";
             } else {
-                // RESUME LOGIC
-                // 1. Set new start time
                 this.data.activeTimer.startTime = Date.now();
-                
-                // 2. Restart ticker
                 this.startTicker();
             }
             
@@ -842,55 +878,49 @@ loadData() {
         stopTimer() {
             if (!this.data.activeTimer) return;
 
-            // 1. Calculate final total time
             const finalElapsedMS = this.getElapsedMS();
             const finalMinutes = Math.ceil(finalElapsedMS / 1000 / 60);
             const taskId = this.data.activeTimer.id;
 
-            // 2. Clean up
             if (this.data.timerInterval) {
                 clearInterval(this.data.timerInterval);
                 this.data.timerInterval = null;
             }
             this.data.activeTimer = null;
-            this.persistTimerState(); // Clears localStorage
+            this.persistTimerState(); 
 
-            // 3. UI Cleanup & Completion
             this.updateGlobalTimerUI();
-            this.render(); // Resets list buttons
+            this.render(); 
             this.manualComplete(taskId, finalMinutes);
         },
 
         startTicker() {
             if (this.data.timerInterval) clearInterval(this.data.timerInterval);
             
-            this.updateGlobalTimerUI(); // Immediate update
+            this.updateGlobalTimerUI();
             
-            // Visual update loop (does not affect data integrity)
             this.data.timerInterval = setInterval(() => {
                 this.updateTickerDisplay();
             }, 1000);
         },
 
-updateTickerDisplay() {
-    if (!this.data.activeTimer) return;
-    
-    const totalMS = this.getElapsedMS();
-    
-    // FIX: Guard against extreme values (e.g. system clock jumps). Cap display at 24h.
-    // This is DISPLAY ONLY and does not affect the stored start time.
-    const MAX_DISPLAY_MS = 24 * 60 * 60 * 1000; 
-    const safeMS = (totalMS > MAX_DISPLAY_MS) ? MAX_DISPLAY_MS : totalMS;
+       updateTickerDisplay() {
+            if (!this.data.activeTimer) return;
+            
+            const totalMS = this.getElapsedMS();
+            const MAX_DISPLAY_MS = 24 * 60 * 60 * 1000; 
+            const safeMS = (totalMS > MAX_DISPLAY_MS) ? MAX_DISPLAY_MS : totalMS;
 
-    const totalSecs = Math.floor(safeMS / 1000);
-    
-    const h = Math.floor(totalSecs / 3600).toString().padStart(2, '0');
-    const m = Math.floor((totalSecs % 3600) / 60).toString().padStart(2, '0');
-    const s = (totalSecs % 60).toString().padStart(2, '0');
-    
-    const display = document.getElementById('globalTimerDisplay');
-    if (display) display.innerText = `${h}:${m}:${s}`;
-},
+            const totalSecs = Math.floor(safeMS / 1000);
+            
+            const h = Math.floor(totalSecs / 3600).toString().padStart(2, '0');
+            const m = Math.floor((totalSecs % 3600) / 60).toString().padStart(2, '0');
+            const s = (totalSecs % 60).toString().padStart(2, '0');
+            
+            const display = document.getElementById('globalTimerDisplay');
+            if (display) display.innerText = `${h}:${m}:${s}`;
+        },
+       
         updateGlobalTimerUI() {
             const bar = document.getElementById('globalTimerBar');
             if (!bar) return;
@@ -901,17 +931,13 @@ updateTickerDisplay() {
                 if (task) {
                     document.getElementById('globalTimerTaskName').innerText = `${task.subject}: ${task.subSubject}`;
                 } else {
-                    // Defensive: Timer exists but task doesn't?
                     this.data.activeTimer = null;
                     this.persistTimerState();
                     bar.classList.add('translate-y-full');
                     return;
                 }
-                // Update button state based on data, not DOM
                 const isRunning = this.data.activeTimer.startTime !== null;
                 document.getElementById('globalTimerPauseBtn').innerText = isRunning ? "Pause" : "Resume";
-                
-                // Ensure display is correct immediately
                 this.updateTickerDisplay();
             } else {
                 bar.classList.add('translate-y-full');
@@ -927,115 +953,103 @@ updateTickerDisplay() {
             document.getElementById('actualTimeInput').value = defaultTime || task.actualTime || task.duration;
             document.getElementById('completeModal').classList.remove('hidden');
         },
-getRecallQuality() {
-    return new Promise(resolve => {
-        const container = document.getElementById('uiDialogContainer');
-        const title = document.getElementById('uiDialogTitle');
-        const msg = document.getElementById('uiDialogMessage');
-        const buttons = document.getElementById('uiDialogButtons');
-        const input = document.getElementById('uiDialogInput');
+        
+        getRecallQuality() {
+            return new Promise(resolve => {
+                const container = document.getElementById('uiDialogContainer');
+                const title = document.getElementById('uiDialogTitle');
+                const msg = document.getElementById('uiDialogMessage');
+                const buttons = document.getElementById('uiDialogButtons');
+                const input = document.getElementById('uiDialogInput');
 
-        // 1. Setup UI (Reuse generic container)
-        this.isDialogOpen = true;
-        title.innerText = "Recall Check";
-        msg.innerText = "How well did you remember this topic?";
-        input.classList.add('hidden');
-        buttons.innerHTML = '';
-        container.classList.remove('hidden');
+                this.isDialogOpen = true;
+                title.innerText = "Recall Check";
+                msg.innerText = "How well did you remember this topic?";
+                input.classList.add('hidden');
+                buttons.innerHTML = '';
+                container.classList.remove('hidden');
 
-        // 2. Define Options
-        const options = [
-            { id: 'again', label: 'Again', cls: 'bg-red-100 text-red-700 hover:bg-red-200' },
-            { id: 'hard',  label: 'Hard',  cls: 'bg-orange-100 text-orange-700 hover:bg-orange-200' },
-            { id: 'good',  label: 'Good',  cls: 'bg-blue-100 text-blue-700 hover:bg-blue-200' },
-            { id: 'easy',  label: 'Easy',  cls: 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200' }
-        ];
+                const options = [
+                    { id: 'again', label: 'Again', cls: 'bg-red-100 text-red-700 hover:bg-red-200' },
+                    { id: 'hard',  label: 'Hard',  cls: 'bg-orange-100 text-orange-700 hover:bg-orange-200' },
+                    { id: 'good',  label: 'Good',  cls: 'bg-blue-100 text-blue-700 hover:bg-blue-200' },
+                    { id: 'easy',  label: 'Easy',  cls: 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200' }
+                ];
 
-        // 3. Render Buttons
-        options.forEach(opt => {
-            const btn = document.createElement('button');
-            btn.className = `flex-1 py-3 px-2 rounded-xl font-bold text-xs uppercase tracking-wider transition-colors ${opt.cls}`;
-            btn.innerText = opt.label;
-            btn.onclick = () => {
-                finish(opt.id);
-            };
-            buttons.appendChild(btn);
-        });
+                options.forEach(opt => {
+                    const btn = document.createElement('button');
+                    btn.className = `flex-1 py-3 px-2 rounded-xl font-bold text-xs uppercase tracking-wider transition-colors ${opt.cls}`;
+                    btn.innerText = opt.label;
+                    btn.onclick = () => {
+                        finish(opt.id);
+                    };
+                    buttons.appendChild(btn);
+                });
 
-        // 4. Cleanup & Resolve Helper
-        const finish = (result) => {
-            container.classList.add('hidden');
-            this.isDialogOpen = false;
-            document.removeEventListener('keydown', escHandler);
-            resolve(result);
-        };
+                const finish = (result) => {
+                    container.classList.add('hidden');
+                    this.isDialogOpen = false;
+                    document.removeEventListener('keydown', escHandler);
+                    resolve(result);
+                };
 
-        // 5. Safety: Handle Escape Key (Default to 'good')
-        const escHandler = (e) => {
-            if (e.key === 'Escape') finish('good');
-        };
-        document.addEventListener('keydown', escHandler);
-    });
-},
+                const escHandler = (e) => {
+                    if (e.key === 'Escape') finish('good');
+                };
+                document.addEventListener('keydown', escHandler);
+            });
+        },
 
 
         async confirmCompletion(type) {
-    const id = this.data.completingTaskId;
-    const task = this.data.tasks.find(t => t.id === id);
-    
-    if (task) {
-        task.actualTime = parseInt(document.getElementById('actualTimeInput').value) || 0;
-        task.focusScore = document.getElementById('focusScore').value;
-        task.status = type; 
+            const id = this.data.completingTaskId;
+            const task = this.data.tasks.find(t => t.id === id);
+            
+            if (task) {
+                task.actualTime = parseInt(document.getElementById('actualTimeInput').value) || 0;
+                task.focusScore = document.getElementById('focusScore').value;
+                task.status = type; 
 
-        if (type === 'done') {
-            // --- NEW: ADAPTIVE RECALL LOGIC (Revision Tasks Only) ---
-            if (task.isRevision) {
-                // 1. Prompt for Quality (Async)
-                const quality = await this.getRecallQuality();
-                
-                // 2. Map Interval (Fixed Rules)
-                const intervals = { 'again': 1, 'hard': 3, 'good': 7, 'easy': 25 };
-                const daysToAdd = intervals[quality] || 7; // Default to good/7
-                
-                // 3. Persist Metrics
-                task.lastRecallQuality = quality;
-                task.lastReviewedAt = this.formatDate(new Date());
-                
-                // 4. Update Next Review Date
-                const nextDate = new Date();
-                nextDate.setDate(nextDate.getDate() + daysToAdd);
-                task.nextReviewDate = this.formatDate(nextDate);
-                
-                // Fix: Reset stage on 'again', otherwise increment capped at 3
-                if (quality === 'again') {
-                    task.reviewStage = 1;
-                } else {
-                    const currentStage = task.reviewStage || 0;
-                    task.reviewStage = currentStage < 3 ? currentStage + 1 : 3;
+                if (type === 'done') {
+                    if (task.isRevision) {
+                        const quality = await this.getRecallQuality();
+                        const intervals = { 'again': 1, 'hard': 3, 'good': 7, 'easy': 25 };
+                        const daysToAdd = intervals[quality] || 7;
+                        
+                        task.lastRecallQuality = quality;
+                        task.lastReviewedAt = this.formatDate(new Date());
+                        
+                        const nextDate = new Date();
+                        nextDate.setDate(nextDate.getDate() + daysToAdd);
+                        task.nextReviewDate = this.formatDate(nextDate);
+                        
+                        if (quality === 'again') {
+                            task.reviewStage = 1;
+                        } else {
+                            const currentStage = task.reviewStage || 0;
+                            task.reviewStage = currentStage < 3 ? currentStage + 1 : 3;
+                        }
+
+                    } else {
+                        const currentStage = task.reviewStage || 0;
+                        const nextStage = currentStage < 3 ? currentStage + 1 : 3;
+                        const intervals = { 1: 1, 2: 7, 3: 30 };
+                        
+                        const nextDate = new Date();
+                        nextDate.setDate(nextDate.getDate() + intervals[nextStage]);
+                        
+                        task.nextReviewDate = this.formatDate(nextDate);
+                        task.reviewStage = nextStage;
+                    }
                 }
-
-            } else {
-                // --- OLD: STANDARD LOGIC (Normal Tasks) ---
-                // Remains completely unchanged as per constraints
-                const currentStage = task.reviewStage || 0;
-                const nextStage = currentStage < 3 ? currentStage + 1 : 3;
-                const intervals = { 1: 1, 2: 7, 3: 30 };
                 
-                const nextDate = new Date();
-                nextDate.setDate(nextDate.getDate() + intervals[nextStage]);
-                
-                task.nextReviewDate = this.formatDate(nextDate);
-                task.reviewStage = nextStage;
+                this.saveData();
             }
-        }
-        
-        this.saveData();
-    }
-    this.closeModal('completeModal');
-    this.data.completingTaskId = null;
-},
-navigate(view) {
+            this.closeModal('completeModal');
+            this.data.completingTaskId = null;
+        },
+
+        navigate(view) {
             this.data.currentView = view;
             document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
             document.getElementById(`view-${view}`).classList.remove('hidden');
@@ -1082,13 +1096,11 @@ navigate(view) {
                 try {
                     const parsed = JSON.parse(e.target.result);
                     
-                    // Validation
                     if (!parsed.tasks || !Array.isArray(parsed.tasks) || !parsed.subjects || !Array.isArray(parsed.subjects)) {
                         await this.uiAlert("Invalid backup file: missing tasks or subjects.");
                         return;
                     }
 
-                    // Deep check on first few items
                     const invalid = parsed.tasks.slice(0,3).some(t => !t.id || !t.date || typeof t.duration !== 'number');
                     if (invalid) {
                         await this.uiAlert("Backup file incompatible with this app version.");
@@ -1104,7 +1116,6 @@ navigate(view) {
                         msg = "WARNING: You are importing OLDER data over NEWER data.\n\n" + msg;
                     }
                     
-                    // Confirmation
                     if(await this.uiConfirm(msg)) {
                         this.data.tasks = parsed.tasks;
                         this.data.subjects = parsed.subjects;
@@ -1123,16 +1134,38 @@ navigate(view) {
         },
 
         // --- RENDERING ---
+        // [FIX] Added safe-guard for renderAnalytics call
         render() {
             this.renderHeader();
             this.renderDashboard();
             this.renderCalendar();
             this.renderSubjects();
-            this.renderAnalytics();
+            
+            // ANALYTICS SAFETY FIX: Try/Catch wrapper with UI fallback
+            try {
+                if (typeof this.renderAnalytics === 'function') {
+                    this.renderAnalytics();
+                } else {
+                    throw new Error("renderAnalytics missing");
+                }
+            } catch (e) {
+                console.warn("Analytics Error:", e);
+                const container = document.getElementById('view-analytics');
+                // Ensure we don't overwrite if it's hidden (optimization)
+                if (container && !container.classList.contains('hidden')) {
+                    container.innerHTML = `
+                        <div class="flex flex-col items-center justify-center h-64 text-gray-400">
+                            <i class="fas fa-exclamation-triangle text-2xl mb-2 text-yellow-500"></i>
+                            <p class="font-medium">Analytics temporarily unavailable</p>
+                            <p class="text-xs mt-1 opacity-70">Please refresh the page.</p>
+                        </div>
+                    `;
+                }
+            }
+            
             this.renderBacklog();
             this.updateGlobalTimerUI();
         },
-
         renderHeader() {
             const opts = { weekday: 'short', month: 'short', day: 'numeric' };
             document.getElementById('currentDateDisplay').textContent = new Date().toLocaleDateString('en-US', opts);
@@ -1166,7 +1199,6 @@ navigate(view) {
             list.innerHTML = '';
 
             if (todaysTasks.length === 0) {
-                // UX: Made button more dominant
                 list.innerHTML = `<div class="flex flex-col items-center justify-center py-16 px-4 bg-white dark:bg-gray-800 rounded-2xl border-2 border-dashed border-gray-200 dark:border-gray-700">
                     <div class="w-16 h-16 bg-gray-50 dark:bg-gray-700 rounded-full flex items-center justify-center mb-4">
                         <i class="fas fa-clipboard-list text-2xl text-gray-300 dark:text-gray-500"></i>
@@ -1300,7 +1332,6 @@ navigate(view) {
             document.getElementById('calendarMonthLabel').innerText = this.data.calendarMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
             const daysInMonth = new Date(year, month + 1, 0).getDate();
             
-            // Add padding for start day
             const firstDay = new Date(year, month, 1).getDay();
             for(let i=0; i<firstDay; i++) {
                  grid.insertAdjacentHTML('beforeend', `<div class="h-24 md:h-28"></div>`);
@@ -1324,16 +1355,15 @@ navigate(view) {
                     label = "MOCK";
                 }
 
-                // Status Dots
                 let dots = "";
                 if (tasksForDay.length > 0) {
                     const completed = tasksForDay.filter(t => t.status === 'done').length;
                     const ratio = completed / tasksForDay.length;
                     
-                    let colorClass = "bg-gray-300 dark:bg-gray-600"; // default
+                    let colorClass = "bg-gray-300 dark:bg-gray-600";
                     if(ratio === 1) colorClass = "bg-secondary";
                     else if (ratio > 0) colorClass = "bg-blue-400";
-                    else if (new Date(dateStr) < new Date() && ratio < 1) colorClass = "bg-red-400"; // missed
+                    else if (new Date(dateStr) < new Date() && ratio < 1) colorClass = "bg-red-400";
                     
                     dots = `<div class="flex gap-0.5 mt-2 flex-wrap">
                                 ${Array(Math.min(tasksForDay.length, 4)).fill(0).map(() => `<div class="w-1.5 h-1.5 rounded-full ${colorClass}"></div>`).join('')}
@@ -1358,217 +1388,106 @@ navigate(view) {
                 grid.insertAdjacentHTML('beforeend', html);
             }
         },
-renderSubjects() { if(this.data.currentView !== 'subjects') return; const list = document.getElementById('subjectsList'); list.innerHTML = '';
 
-            // --- 1. CRUD HELPER (Injected Safely) ---
-            // We attach this to window to allow HTML onclicks to access logic 
-            // without refactoring the main 'app' object structure.
-         // --- 1. CRUD HELPER (With Data Cascading) ---
-            if (!window.subjActions) {
-                window.subjActions = {
-                    renameSubject: async (id) => {
-                        const sub = app.data.subjects.find(s => s.id === id);
-                        if (!sub) return;
-
-                        const oldName = sub.name; // Capture old name before change
-                        const newName = await app.uiPrompt("Rename Subject:", oldName);
-                        
-                        if (newName && newName.trim() !== "" && newName !== oldName) {
-                            // 1. Update the Subject Definition
-                            sub.name = newName.trim();
-
-                            // 2. CASCADE UPDATE: Fix all existing tasks
-                            let count = 0;
-                            app.data.tasks.forEach(t => {
-                                if (t.subject === oldName) {
-                                    t.subject = newName.trim();
-                                    count++;
-                                }
-                            });
-
-                            app.saveData();
-                            app.render();
-                            await app.uiAlert(`Renamed subject and updated ${count} history records.`);
-                        }
-                    },
-
-deleteSubject: async (id) => {
-                        const sub = app.data.subjects.find(s => s.id === id);
-                        if (!sub) return;
-
-                        // GUARD: Check if ANY task in this subject has a running timer
-                        if (app.data.activeTimer) {
-                            const activeTask = app.data.tasks.find(t => t.id === app.data.activeTimer.id);
-                            
-                            // Does the active task belong to the subject we are about to delete?
-                            if (activeTask && activeTask.subject === sub.name) {
-                                const msg = `⚠️ SESSION IN PROGRESS\n\nA timer is running for "${activeTask.subSubject}" in this subject.\n\nStop the timer and delete the subject?`;
-                                
-                                // UX: Explicit approval required
-                                if (await app.uiConfirm(msg)) {
-                                    app.stopTimer(); // Safely stop and log session BEFORE deletion
-                                } else {
-                                    return; // User cancelled
-                                }
-                            }
-                        }
-
-                        // Standard Cascade Warning (Preserved existing flow)
-                        const associatedTasks = app.data.tasks.filter(t => t.subject === sub.name);
-                        const msg = associatedTasks.length > 0 
-                            ? `Warning: This will also delete ${associatedTasks.length} tasks/logs associated with "${sub.name}".\n\nAre you sure?`
-                            : `Delete subject "${sub.name}"?`;
-
-                        if (await app.uiConfirm(msg)) {
-                            // 1. CASCADE DELETE: Remove associated tasks
-                            app.data.tasks = app.data.tasks.filter(t => t.subject !== sub.name);
-
-                            // 2. Remove the Subject Definition
-                            app.data.subjects = app.data.subjects.filter(s => s.id !== id);
-                            
-                            app.saveData();
-                            app.render();
-                        }
-                    },
-                    renameTopic: async (subId, oldName) => {
-                        const sub = app.data.subjects.find(s => s.id === subId);
-                        if (!sub) return;
-
-                        const newName = await app.uiPrompt("Rename Topic:", oldName);
-                        
-                        if (newName && newName.trim() !== "" && newName !== oldName) {
-                            // 1. Update Topic List
-                            const idx = sub.sub.indexOf(oldName);
-                            if (idx !== -1) {
-                                sub.sub[idx] = newName.trim();
-                                
-                                // 2. CASCADE UPDATE: Fix tasks using this topic
-                                app.data.tasks.forEach(t => {
-                                    if (t.subject === sub.name && t.subSubject === oldName) {
-                                        t.subSubject = newName.trim();
-                                    }
-                                });
-
-                                app.saveData();
-                                app.render();
-                            }
-                        }
-                    },
-
-                    startSession: (subId) => {
-                        app.openTaskModal();
-                        setTimeout(() => {
-                            const select = document.getElementById('taskSubject');
-                            if(select) {
-                                select.value = subId;
-                                select.dispatchEvent(new Event('change'));
-                            }
-                        }, 50);
-                    }
-                };
+        renderSubjects() {
+            if(this.data.currentView !== 'subjects') return;
+            
+            if (this.data.focusSubjectId) {
+                document.getElementById('subjectsGridView').classList.add('hidden');
+                document.getElementById('subjectFocusPanel').classList.remove('hidden');
+                if(window.subjActions && window.subjActions.renderFocusList) {
+                    window.subjActions.renderFocusList();
+                }
+                return; 
             }
 
-            // --- 2. RECENCY LOGIC ---
-            const getStatus = (lastDateStr) => {
-                if (!lastDateStr) return { label: 'New', color: 'text-emerald-600 bg-emerald-50 border-emerald-100', opacity: 'opacity-100' };
-                const days = Math.floor((new Date() - new Date(lastDateStr)) / (1000 * 60 * 60 * 24));
-                
-                if (days === 0) return { label: 'Active Today', color: 'text-indigo-600 bg-indigo-50 border-indigo-100', opacity: 'opacity-100' };
-                if (days < 7)   return { label: 'Fresh', color: 'text-gray-600 bg-gray-50 border-gray-200', opacity: 'opacity-100' };
-                if (days < 14)  return { label: 'Slipping', color: 'text-amber-600 bg-amber-50 border-amber-100', opacity: 'opacity-90' };
-                return { label: 'Stale', color: 'text-gray-400 bg-gray-50 border-dashed border-gray-200', opacity: 'opacity-75 grayscale-[0.5] hover:grayscale-0 hover:opacity-100 transition-all' };
-            };
+            document.getElementById('subjectsGridView').classList.remove('hidden');
+            document.getElementById('subjectFocusPanel').classList.add('hidden');
+            
+            const list = document.getElementById('subjectsList');
+            list.innerHTML = '';
 
-            // --- 3. RENDER CARDS ---
-            this.data.subjects.forEach(sub => {
-                // Calc Recency
-                const subTasks = this.data.tasks.filter(t => t.subject === sub.name && t.status !== 'pending');
-                const lastTask = subTasks.sort((a,b) => new Date(b.date) - new Date(a.date))[0];
-                const status = getStatus(lastTask ? lastTask.date : null);
-                
-                // Slice Tags (Prevent Overload)
-                const MAX_TAGS = 6;
-                const visibleTags = sub.sub.slice(0, MAX_TAGS);
-                const remaining = sub.sub.length - MAX_TAGS;
+            const showArchived = document.getElementById('showArchivedSubjects')?.checked || false;
+
+            const visibleSubjects = this.data.subjects.filter(s => showArchived ? true : !s.isArchived);
+
+            if (visibleSubjects.length === 0) {
+                list.innerHTML = `<div class="col-span-full flex flex-col items-center justify-center py-16 border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-3xl text-gray-400">
+                    <div class="w-16 h-16 bg-gray-50 dark:bg-gray-800 rounded-full flex items-center justify-center mb-4">
+                        <i class="fas fa-layer-group text-2xl text-gray-300"></i>
+                    </div>
+                    <p class="font-medium">No active subjects.</p>
+                    <p class="text-xs opacity-70 mt-1">Create one or check "Show Archived".</p>
+                </div>`;
+                return;
+            }
+
+            visibleSubjects.forEach(sub => {
+                const topicCount = (sub.sub || []).length;
+                const taskCount = this.data.tasks.filter(t => t.subject === sub.name).length;
+                const opacity = sub.isArchived ? 'opacity-60 grayscale' : 'opacity-100';
+                const badge = sub.isArchived ? '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-gray-200 text-gray-600">ARCHIVED</span>' : '';
 
                 const html = `
-                    <div class="bg-white dark:bg-gray-800 rounded-2xl border ${status.color.split(' ').pop()} shadow-sm hover:shadow-md flex flex-col h-full transition-all duration-300 group relative ${status.opacity}">
-                        
-                        <div class="p-5 pb-3 flex justify-between items-start">
+                    <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-all group flex flex-col h-full ${opacity}">
+                        <div class="p-5 flex justify-between items-start">
                             <div>
-                                <h3 class="text-lg font-bold text-gray-800 dark:text-gray-100 leading-tight">${sub.name}</h3>
-                                <span class="inline-block mt-1.5 text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded ${status.color}">
-                                    ${status.label}
-                                </span>
-                            </div>
-                            <div class="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                <button onclick="window.subjActions.renameSubject('${sub.id}')" class="p-1.5 text-gray-300 hover:text-primary hover:bg-gray-50 rounded-lg transition-colors" title="Rename Subject">
-                                    <i class="fas fa-pencil-alt text-xs"></i>
-                                </button>
-                                <button onclick="window.subjActions.deleteSubject('${sub.id}')" class="p-1.5 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors" title="Delete Subject">
-                                    <i class="fas fa-trash-alt text-xs"></i>
-                                </button>
+                                <div class="flex items-center gap-2 mb-1">
+                                    <h3 class="text-lg font-bold text-gray-800 dark:text-gray-100 truncate max-w-[180px]" title="${sub.name}">${sub.name}</h3>
+                                    ${badge}
+                                </div>
+                                <div class="text-xs text-gray-500 font-medium">${topicCount} Topics • ${taskCount} Logs</div>
                             </div>
                         </div>
-
-                        <div class="px-5 flex-1">
-                            <div class="flex flex-wrap gap-2 content-start">
-                                ${visibleTags.map(tag => `
-                                    <span class="group/tag inline-flex items-center text-xs px-2.5 py-1.5 rounded-lg border border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/30 text-gray-600 dark:text-gray-300">
-                                        <span onclick="window.subjActions.renameTopic('${sub.id}', '${tag}')" class="cursor-pointer hover:text-primary hover:underline decoration-dashed underline-offset-2">${tag}</span>
-                                        <button onclick="app.removeSubSubject('${sub.id}', '${tag}')" class="ml-1.5 text-gray-300 hover:text-red-400 w-4 h-4 flex items-center justify-center rounded-full hover:bg-white dark:hover:bg-gray-600 transition-colors">
-                                            <i class="fas fa-times text-[10px]"></i>
-                                        </button>
-                                    </span>
-                                `).join('')}
-                                
-                                ${remaining > 0 ? `<span class="text-[10px] font-bold text-gray-300 px-1 py-1.5">+${remaining} more</span>` : ''}
-                                
-                                <button onclick="app.addSubSubjectPrompt('${sub.id}')" class="text-xs px-2.5 py-1.5 border border-dashed border-gray-300 dark:border-gray-600 rounded-lg text-gray-400 hover:text-primary hover:border-primary hover:bg-indigo-50 dark:hover:bg-gray-700 transition-all flex items-center gap-1">
-                                    <i class="fas fa-plus text-[10px]"></i> Topic
-                                </button>
-                            </div>
-                        </div>
-
-                        <div class="mt-4 p-4 border-t border-gray-50 dark:border-gray-700/50 flex justify-between items-center">
-                            <div class="text-[10px] font-medium text-gray-300 flex items-center gap-1">
-                                <i class="fas fa-history"></i> ${lastTask ? new Date(lastTask.date).toLocaleDateString(undefined, {month:'short', day:'numeric'}) : 'Never'}
-                            </div>
-                            <button onclick="window.subjActions.startSession('${sub.id}')" class="bg-gray-50 dark:bg-gray-700 hover:bg-primary hover:text-white dark:hover:bg-primary text-gray-600 dark:text-gray-300 text-xs font-bold px-3 py-2 rounded-lg transition-all shadow-sm hover:shadow-md flex items-center gap-2 group/btn">
-                                Start Session <i class="fas fa-arrow-right transform group-hover/btn:translate-x-1 transition-transform"></i>
+                        
+                        <div class="px-5 pb-5 mt-auto flex gap-3">
+                            <button onclick="window.subjActions.openFocus('${sub.id}')" class="flex-1 bg-gray-50 dark:bg-gray-700/50 hover:bg-primary hover:text-white dark:hover:bg-primary text-gray-600 dark:text-gray-300 text-xs font-bold py-2.5 rounded-xl transition-all flex items-center justify-center gap-2 group/btn">
+                                View Topics <i class="fas fa-arrow-right transform group-hover/btn:translate-x-1 transition-transform"></i>
+                            </button>
+                            ${!sub.isArchived ? `
+                            <button onclick="window.subjActions.startSession('${sub.id}')" class="w-10 flex items-center justify-center bg-emerald-50 text-emerald-600 hover:bg-emerald-100 dark:bg-emerald-900/20 dark:text-emerald-400 dark:hover:bg-emerald-900/40 rounded-xl transition-colors" title="Quick Start">
+                                <i class="fas fa-play text-xs"></i>
+                            </button>` : ''}
+                            <button onclick="window.subjActions.toggleSubjectArchive('${sub.id}')" class="w-10 flex items-center justify-center bg-gray-50 text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:bg-gray-700/30 dark:hover:bg-gray-700 rounded-xl transition-colors" title="${sub.isArchived ? 'Restore' : 'Archive'}">
+                                <i class="fas fa-${sub.isArchived ? 'undo' : 'archive'} text-xs"></i>
                             </button>
                         </div>
                     </div>
                 `;
                 list.insertAdjacentHTML('beforeend', html);
             });
-            
-            if(this.data.subjects.length === 0) {
-                 list.innerHTML = `<div class="col-span-full flex flex-col items-center justify-center py-16 border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-3xl text-gray-400">
-                    <div class="w-16 h-16 bg-gray-50 dark:bg-gray-800 rounded-full flex items-center justify-center mb-4">
-                        <i class="fas fa-book-open text-2xl text-gray-300"></i>
-                    </div>
-                    <p class="font-medium">No subjects yet.</p>
-                    <p class="text-xs opacity-70 mt-1">Add your syllabus to get started.</p>
-                 </div>`;
-            }
-        }, renderAnalytics() {
+        }, 
+       
+        renderAnalytics() {
             if(this.data.currentView !== 'analytics') return;
+
+            // ANALYTICS SAFETY FIX: Defensive DOM checks
+            // We verify all required elements exist before attempting updates
+            const els = {
+                total: document.getElementById('analyticsTotalHours'),
+                avg: document.getElementById('analyticsAvgFocus'),
+                comp: document.getElementById('analyticsCompletion'),
+                bars: document.getElementById('analyticsSubjectBars')
+            };
+
+            // If any critical element is missing (e.g., partial DOM load), abort safely
+            if (!els.total || !els.avg || !els.comp || !els.bars) return;
+
+            // --- Safe Logic Execution ---
             const completedOrPartial = this.data.tasks.filter(t => t.actualTime > 0);
             const totalMins = completedOrPartial.reduce((acc, t) => acc + (t.actualTime || 0), 0);
-            document.getElementById('analyticsTotalHours').innerText = `${(totalMins/60).toFixed(1)}h`;
+            els.total.innerText = `${(totalMins/60).toFixed(1)}h`;
 
             const ratedTasks = this.data.tasks.filter(t => t.focusScore);
             const avgFocus = ratedTasks.length ? (ratedTasks.reduce((acc, t) => acc + parseInt(t.focusScore), 0) / ratedTasks.length).toFixed(1) : "0.0";
-            document.getElementById('analyticsAvgFocus').innerText = avgFocus;
+            els.avg.innerText = avgFocus;
 
             const completed = this.data.tasks.filter(t => t.status === 'done');
             const denominator = this.data.tasks.length;
             const rate = denominator ? Math.round((completed.length / denominator) * 100) : 0;
-            document.getElementById('analyticsCompletion').innerText = `${rate}%`;
+            els.comp.innerText = `${rate}%`;
 
-            const container = document.getElementById('analyticsSubjectBars');
-            container.innerHTML = '';
+            els.bars.innerHTML = '';
             
             const sortedSubjects = [...this.data.subjects].map(sub => {
                 const subMins = completedOrPartial.filter(t => t.subject === sub.name).reduce((acc, t) => acc + (t.actualTime || 0), 0);
@@ -1581,7 +1500,7 @@ deleteSubject: async (id) => {
                 if(sub.mins > 0) {
                     const width = (sub.mins / maxMins) * 100;
                     const hours = (sub.mins/60).toFixed(1);
-                    container.insertAdjacentHTML('beforeend', `
+                    els.bars.insertAdjacentHTML('beforeend', `
                         <div class="group">
                             <div class="flex justify-between text-xs font-bold mb-2 text-gray-600 dark:text-gray-300">
                                 <span>${sub.name}</span>
@@ -1597,7 +1516,6 @@ deleteSubject: async (id) => {
                 }
             });
         },
-
         // --- USER ACTIONS ---
         
         editTask(id) {
@@ -1617,17 +1535,14 @@ deleteSubject: async (id) => {
             const prettyDate = dateObj.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
             document.getElementById('taskModalTitle').innerText = "Schedule: " + prettyDate;
 
-            // 1. Populate Subjects
             const subSelect = document.getElementById('taskSubject');
             subSelect.innerHTML = '<option value="">Select Subject</option>';
             this.data.subjects.forEach(s => {
                 subSelect.innerHTML += `<option value="${s.id}">${s.name}</option>`;
             });
 
-            // 2. Render Existing List & Load Indicator
             this.renderDayManagerList(selectedDate);
 
-            // 3. Smart Revision Logic
             const dayNum = dateObj.getDate();
             const revisionSection = document.getElementById('smartRevisionSection');
             if ([7, 14, 21, 28].includes(dayNum)) {
@@ -1636,7 +1551,6 @@ deleteSubject: async (id) => {
                 revisionSection.classList.add('hidden');
             }
 
-            // 4. Handle Edit vs New
             if(editId) {
                 this.populateEditForm(editId);
             } else {
@@ -1651,7 +1565,6 @@ deleteSubject: async (id) => {
             const editId = document.getElementById('taskEditId').value;
             const isEditMode = !!editId;
             
-            // v3.2 Daily Capacity Logic
             const totalMinutes = tasks.reduce((acc, t) => acc + (t.duration || 0), 0);
             const totalHours = (totalMinutes / 60).toFixed(1);
             
@@ -1687,7 +1600,6 @@ deleteSubject: async (id) => {
                 if(task.status === 'done') statusColor = "bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400";
                 if(task.status === 'partial') statusColor = "bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400";
 
-                // Visual states for Edit Mode
                 const opacityClass = (isEditMode && !isEditing) ? 'opacity-40 grayscale-[0.5]' : 'opacity-100';
                 const activeClass = isEditing ? 'ring-2 ring-primary ring-offset-2 ring-offset-gray-50 dark:ring-offset-gray-900 bg-white dark:bg-gray-800 z-10 scale-[1.01] shadow-lg' : 'bg-gray-50 dark:bg-gray-700/30 border border-gray-100 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600';
 
@@ -1796,28 +1708,23 @@ deleteSubject: async (id) => {
             this.renderDayManagerList(dateStr);
         },
 
-   async deleteTask(id) {
-                // GUARD: Check if this specific task has a running timer
+        async deleteTask(id) {
                 if (this.data.activeTimer && this.data.activeTimer.id === id) {
                     const task = this.data.tasks.find(t => t.id === id);
                     const msg = `⚠️ SESSION IN PROGRESS\n\nYou are currently studying "${task.subSubject}".\n\nStop the timer and delete this task?`;
 
-                    // UX: Explicit approval required to stop timer
                     if (await this.uiConfirm(msg)) {
-                        this.stopTimer(); // Safely stop and log session BEFORE deletion
+                        this.stopTimer(); 
                     } else {
-                        return; // User cancelled
+                        return; 
                     }
                 } else {
-                    // Standard confirmation for non-active tasks
                     if (!(await this.uiConfirm('Delete this task?'))) return;
                 }
 
-                // DATA: Safe to delete now
                 this.data.tasks = this.data.tasks.filter(t => t.id !== id);
                 this.saveData();
                 
-                // UI: Refresh view if needed
                 const modalDate = document.getElementById('taskDate').value;
                 if(!document.getElementById('taskModal').classList.contains('hidden')) {
                      this.renderDayManagerList(modalDate);
@@ -1825,91 +1732,84 @@ deleteSubject: async (id) => {
                 }
             },
 
-async loadRevisionTopics() {
-    // FIX: Defensive DOM access. Fallback to today if modal input is missing.
-    const dateInput = document.getElementById('taskDate');
-    const targetDateStr = dateInput ? dateInput.value : this.formatDate(new Date());
-    
-    // 1. Identify "Latest" Completed Version per Topic to prevent stale suggestions
-    const latestMap = new Map();
-
-    this.data.tasks.forEach(t => {
-        if (t.status === 'done') {
-            const cleanSub = t.subSubject.replace(/^Review:\s*/, '');
-            const key = `${t.subject}|${cleanSub}`;
+        async loadRevisionTopics() {
+            const dateInput = document.getElementById('taskDate');
+            const targetDateStr = dateInput ? dateInput.value : this.formatDate(new Date());
             
-            // Keep only the most recent entry
-            if (!latestMap.has(key)) {
-                latestMap.set(key, t);
-            } else {
-                const existing = latestMap.get(key);
-                if (t.date > existing.date || (t.date === existing.date && t.id > existing.id)) {
-                    latestMap.set(key, t);
+            const latestMap = new Map();
+
+            this.data.tasks.forEach(t => {
+                if (t.status === 'done') {
+                    const cleanSub = t.subSubject.replace(/^Review:\s*/, '');
+                    const key = `${t.subject}|${cleanSub}`;
+                    
+                    if (!latestMap.has(key)) {
+                        latestMap.set(key, t);
+                    } else {
+                        const existing = latestMap.get(key);
+                        if (t.date > existing.date || (t.date === existing.date && t.id > existing.id)) {
+                            latestMap.set(key, t);
+                        }
+                    }
                 }
-            }
-        }
-    });
-
-    // 2. Filter: Find items where Review Date is Due or Overdue (<= Today)
-    const dueTasks = [];
-    latestMap.forEach(task => {
-        if (task.nextReviewDate && task.nextReviewDate <= targetDateStr) {
-            dueTasks.push(task);
-        }
-    });
-
-    if (dueTasks.length === 0) {
-        await this.uiAlert("No reviews are currently due.");
-        return;
-    }
-
-    let addedCount = 0;
-
-    // 3. Generate Tasks (With Strict Duplicate Check)
-    dueTasks.forEach(source => {
-        const cleanName = source.subSubject.replace(/^Review:\s*/, '');
-        const newSubSubject = `Review: ${cleanName}`;
-
-        // GUARD: Prevent duplicates on the specific target day
-        const alreadyExists = this.data.tasks.some(t => 
-            t.date === targetDateStr &&
-            t.subject === source.subject &&
-            t.subSubject === newSubSubject &&
-            t.isRevision === true 
-        );
-
-        if (!alreadyExists) {
-            this.data.tasks.push({
-                id: this.generateUUID(),
-                subject: source.subject,
-                subSubject: newSubSubject,
-                duration: 20,
-                desc: `SRS Stage ${source.reviewStage || 1} (Due: ${source.nextReviewDate})`,
-                date: targetDateStr,
-                status: 'pending',
-                actualTime: 0,
-                reviewStage: source.reviewStage, 
-                isRevision: true,
-                reviewOf: source.id 
             });
-            addedCount++;
-        }
-    });
 
-    this.saveData();
-    // Only render the list if we are actually viewing a valid date context (e.g. modal is open)
-    if (dateInput) {
-        this.renderDayManagerList(targetDateStr);
-    }
-    
-    if (addedCount > 0) {
-        await this.uiAlert(`Added ${addedCount} smart reviews to your schedule.`);
-    } else {
-        await this.uiAlert("All due reviews are already in today's schedule.");
-    }
-},
+            const dueTasks = [];
+            latestMap.forEach(task => {
+                if (task.nextReviewDate && task.nextReviewDate <= targetDateStr) {
+                    dueTasks.push(task);
+                }
+            });
 
-checkBacklog() {
+            if (dueTasks.length === 0) {
+                await this.uiAlert("No reviews are currently due.");
+                return;
+            }
+
+            let addedCount = 0;
+
+            dueTasks.forEach(source => {
+                const cleanName = source.subSubject.replace(/^Review:\s*/, '');
+                const newSubSubject = `Review: ${cleanName}`;
+
+                const alreadyExists = this.data.tasks.some(t => 
+                    t.date === targetDateStr &&
+                    t.subject === source.subject &&
+                    t.subSubject === newSubSubject &&
+                    t.isRevision === true 
+                );
+
+                if (!alreadyExists) {
+                    this.data.tasks.push({
+                        id: this.generateUUID(),
+                        subject: source.subject,
+                        subSubject: newSubSubject,
+                        duration: 20,
+                        desc: `SRS Stage ${source.reviewStage || 1} (Due: ${source.nextReviewDate})`,
+                        date: targetDateStr,
+                        status: 'pending',
+                        actualTime: 0,
+                        reviewStage: source.reviewStage, 
+                        isRevision: true,
+                        reviewOf: source.id 
+                    });
+                    addedCount++;
+                }
+            });
+
+            this.saveData();
+            if (dateInput) {
+                this.renderDayManagerList(targetDateStr);
+            }
+            
+            if (addedCount > 0) {
+                await this.uiAlert(`Added ${addedCount} smart reviews to your schedule.`);
+            } else {
+                await this.uiAlert("All due reviews are already in today's schedule.");
+            }
+        },
+
+        checkBacklog() {
             const today = this.formatDate(new Date());
             let changed = false;
             this.data.tasks.forEach(t => {
@@ -1939,30 +1839,25 @@ checkBacklog() {
             e.target.reset();
         },
         
-        async addSubSubjectPrompt(id) {
-            const sub = await this.uiPrompt("Enter new Topic/Sub-subject name:");
-            if(sub) {
-                this.data.subjects.find(s => s.id === id).sub.push(sub);
-                this.saveData();
-            }
-        },
-        
+        // [FIX] Converted legacy hard-delete to safe archive flow
         async removeSubSubject(subId, topicName) {
-            const subject = this.data.subjects.find(s => s.id === subId);
-            const associatedTasks = this.data.tasks.filter(t => t.subject === subject.name && t.subSubject === topicName);
-            
-            let msg = `Remove topic "${topicName}"?`;
-            if (associatedTasks.length > 0) {
-                msg = `Warning: Removing "${topicName}" will also delete ${associatedTasks.length} associated history logs.\n\nProceed?`;
-            }
+            if (window.subjActions && typeof window.subjActions.archiveTopic === 'function') {
+                const subject = this.data.subjects.find(s => s.id === subId);
+                if (!subject) return;
 
-            if(await this.uiConfirm(msg)) {
-                if (associatedTasks.length > 0) {
-                    this.data.tasks = this.data.tasks.filter(t => !(t.subject === subject.name && t.subSubject === topicName));
+                // 1. SAFETY: Check Active Timer
+                if (await window.subjActions.checkActiveTimerConflict(subject.name, topicName)) return;
+
+                // 2. CONFIRMATION (Archive vs Delete)
+                if (await this.uiConfirm(`Archive "${topicName}"?\n\nIt will be hidden from new tasks, but history is preserved.`)) {
+                     // Move to archive
+                     subject.sub = subject.sub.filter(s => s !== topicName);
+                     if (!subject.archivedSub) subject.archivedSub = [];
+                     if (!subject.archivedSub.includes(topicName)) subject.archivedSub.push(topicName);
+                     
+                     this.saveData();
+                     this.render();
                 }
-                subject.sub = subject.sub.filter(s => s !== topicName);
-                this.saveData();
-                this.render();
             }
         },
 
@@ -1981,6 +1876,292 @@ checkBacklog() {
         }
     };
 
-    app.init();
+// --- SUBJECT & TOPIC CONTROLLER (FINAL SIGN-OFF v5.4.3) ---
+// 1. Deduplicated controller.
+// 2. Added checkActiveTimerConflict() middleware.
+// 3. Added cascade updates for renames (Subject & Topic).
+// 4. Implemented Pagination (Limit 20) with Show More.
+// 5. Converted Delete to Archive-first flow.
+
+window.subjActions = {
+    // --- MIDDLEWARE: ACTIVE TIMER SAFETY ---
+    checkActiveTimerConflict: async (subjectName, topicName = null) => {
+        // 1. Check if timer exists and is running (startTime != null)
+        if (!app.data.activeTimer || app.data.activeTimer.startTime === null) return false;
+
+        // 2. Resolve the active task
+        const currentTask = app.data.tasks.find(t => t.id === app.data.activeTimer.id);
+        if (!currentTask) return false;
+
+        // 3. Check for Collision
+        const subMatch = currentTask.subject === subjectName;
+        // If topicName is null, we are modifying the whole subject -> Match!
+        // If topicName is present, we match only if subSubject also matches.
+        const topicMatch = topicName ? (currentTask.subSubject === topicName) : true;
+
+        if (subMatch && topicMatch) {
+            const context = topicName ? `topic "${topicName}"` : `subject "${subjectName}"`;
+            await app.uiAlert(`⛔ ACTION BLOCKED\n\nA timer is currently running for ${context}.\n\nPlease stop the timer before making changes to ensure data consistency.`);
+            return true; // Conflict found
+        }
+        return false; // No conflict
+    },
+
+    // --- NAVIGATION ---
+    openFocus: (id) => {
+        app.data.focusSubjectId = id;
+        app.render(); 
+    },
+
+    closeFocus: () => {
+        app.data.focusSubjectId = null;
+        app.render(); 
+    },
+
+    // --- RENDERING ---
+    renderFocusList: () => {
+        const subId = app.data.focusSubjectId;
+        if (!subId) return;
+        
+        const sub = app.data.subjects.find(s => s.id === subId);
+        if (!sub) return window.subjActions.closeFocus();
+
+        // 1. Setup Data
+        const activeTopics = sub.sub || [];
+        if (!sub.archivedSub) sub.archivedSub = [];
+        const totalHistory = app.data.tasks.filter(t => t.subject === sub.name).length;
+
+        // 2. Header UI
+        document.getElementById('focusPanelTitle').innerText = sub.name;
+        document.getElementById('focusPanelStats').innerText = `${activeTopics.length} Active • ${sub.archivedSub.length} Archived • ${totalHistory} Historical Tasks`;
+
+        // 3. Search & Pagination Logic
+        const searchInput = document.getElementById('topicSearch');
+        const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
+        
+        const activeGrid = document.getElementById('activeTopicsGrid');
+        const showAll = activeGrid.dataset.showAll === 'true' || searchTerm.length > 0;
+        const LIMIT = 20;
+
+        const filteredActive = activeTopics.filter(t => t.toLowerCase().includes(searchTerm));
+        const filteredArchived = sub.archivedSub.filter(t => t.toLowerCase().includes(searchTerm));
+
+        // 4. Render Active Topics
+        activeGrid.innerHTML = '';
+        const displayList = showAll ? filteredActive : filteredActive.slice(0, LIMIT);
+
+        displayList.forEach(topic => {
+            const usageCount = app.data.tasks.filter(t => t.subject === sub.name && t.subSubject === topic).length;
+            
+            activeGrid.insertAdjacentHTML('beforeend', `
+                <div class="flex justify-between items-center p-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl group hover:border-primary/50 transition-colors shadow-sm">
+                    <div class="min-w-0 flex-1">
+                        <div class="text-sm font-bold text-gray-800 dark:text-gray-200 truncate pr-2" title="${topic}">${topic}</div>
+                        <div class="text-[10px] text-gray-400 font-mono">${usageCount} tasks</div>
+                    </div>
+                    <div class="flex gap-1 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button onclick="window.subjActions.renameTopic('${topic}')" class="p-2 text-gray-400 hover:text-primary transition-colors bg-gray-50 dark:bg-gray-700 rounded-lg" title="Rename"><i class="fas fa-pencil-alt text-xs"></i></button>
+                        <button onclick="window.subjActions.archiveTopic('${topic}')" class="p-2 text-gray-400 hover:text-amber-500 transition-colors bg-gray-50 dark:bg-gray-700 rounded-lg" title="Archive"><i class="fas fa-archive text-xs"></i></button>
+                    </div>
+                </div>
+            `);
+        });
+
+        // 5. "Show More" Button
+        const btn = document.getElementById('showMoreTopicsBtn');
+        if (filteredActive.length > LIMIT && !showAll) {
+            btn.classList.remove('hidden');
+            btn.innerText = `Show ${filteredActive.length - LIMIT} More`;
+        } else {
+            btn.classList.add('hidden');
+        }
+        document.getElementById('activeTopicCount').innerText = filteredActive.length;
+
+        // 6. Render Archived Topics
+        const archivedSection = document.getElementById('archivedTopicsSection');
+        const archivedGrid = document.getElementById('archivedTopicsList');
+        archivedGrid.innerHTML = '';
+        
+        if (filteredArchived.length > 0) {
+            archivedSection.classList.remove('hidden');
+            document.getElementById('archivedTopicCount').innerText = filteredArchived.length;
+            filteredArchived.forEach(topic => {
+                const usageCount = app.data.tasks.filter(t => t.subject === sub.name && t.subSubject === topic).length;
+                archivedGrid.insertAdjacentHTML('beforeend', `
+                    <div class="flex justify-between items-center p-2 bg-gray-50 dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-lg">
+                        <div class="min-w-0">
+                            <div class="text-xs font-medium text-gray-500 line-through truncate">${topic}</div>
+                            <div class="text-[9px] text-gray-400">${usageCount} logs</div>
+                        </div>
+                        <button onclick="window.subjActions.restoreTopic('${topic}')" class="text-xs font-bold text-primary hover:underline px-2">Restore</button>
+                    </div>
+                `);
+            });
+        } else {
+            archivedSection.classList.add('hidden');
+        }
+    },
+
+    showAllTopics: () => {
+        document.getElementById('activeTopicsGrid').dataset.showAll = 'true';
+        window.subjActions.renderFocusList();
+    },
+
+    // --- MUTATIONS: TOPICS ---
+
+    addTopic: async () => {
+        const input = document.getElementById('newTopicInput');
+        const name = input.value.trim();
+        if (!name) return;
+
+        const sub = app.data.subjects.find(s => s.id === app.data.focusSubjectId);
+        
+        // 1. Check Duplicates (Case-Insensitive)
+        if (sub.sub.some(t => t.toLowerCase() === name.toLowerCase())) {
+            await app.uiAlert("Topic already exists.");
+            return;
+        }
+        
+        // 2. Check Archive (Restore suggestion)
+        if (sub.archivedSub && sub.archivedSub.some(t => t.toLowerCase() === name.toLowerCase())) {
+             const archivedName = sub.archivedSub.find(t => t.toLowerCase() === name.toLowerCase());
+             if(await app.uiConfirm(`"${archivedName}" is currently archived. Restore it?`)) {
+                 window.subjActions.restoreTopic(archivedName);
+                 input.value = '';
+                 return;
+             }
+             return;
+        }
+
+        // 3. Add
+        sub.sub.unshift(name);
+        app.saveData();
+        input.value = '';
+        window.subjActions.renderFocusList();
+    },
+
+    renameTopic: async (oldName) => {
+        const sub = app.data.subjects.find(s => s.id === app.data.focusSubjectId);
+        
+        // 1. SAFETY CHECK
+        if (await window.subjActions.checkActiveTimerConflict(sub.name, oldName)) return;
+
+        // 2. Identify Scope
+        const affectedTasks = app.data.tasks.filter(t => t.subject === sub.name && t.subSubject === oldName);
+        
+        // 3. Prompt
+        const newName = await app.uiPrompt("Rename Topic:", oldName);
+        
+        if (newName && newName.trim() !== "" && newName !== oldName) {
+            const cleanName = newName.trim();
+            if (sub.sub.includes(cleanName)) {
+                await app.uiAlert("Topic name already exists.");
+                return;
+            }
+
+            // 4. Update Definition
+            const idx = sub.sub.indexOf(oldName);
+            if (idx !== -1) sub.sub[idx] = cleanName;
+
+            // 5. CASCADE UPDATE (Crucial for Analytics)
+            if (affectedTasks.length > 0) {
+                affectedTasks.forEach(t => t.subSubject = cleanName);
+            }
+
+            app.saveData();
+            window.subjActions.renderFocusList();
+        }
+    },
+
+    archiveTopic: async (name) => {
+        const sub = app.data.subjects.find(s => s.id === app.data.focusSubjectId);
+        
+        // 1. SAFETY CHECK
+        if (await window.subjActions.checkActiveTimerConflict(sub.name, name)) return;
+
+        // 2. Soft Confirm
+        if (await app.uiConfirm(`Archive "${name}"? It will be hidden from new tasks.`)) {
+            // Move from sub to archivedSub
+            sub.sub = sub.sub.filter(t => t !== name);
+            if (!sub.archivedSub) sub.archivedSub = [];
+            sub.archivedSub.push(name);
+            
+            app.saveData();
+            window.subjActions.renderFocusList();
+        }
+    },
+
+    restoreTopic: (name) => {
+        const sub = app.data.subjects.find(s => s.id === app.data.focusSubjectId);
+        sub.archivedSub = sub.archivedSub.filter(t => t !== name);
+        sub.sub.push(name); // Add back to active
+        app.saveData();
+        window.subjActions.renderFocusList();
+    },
+
+    // --- MUTATIONS: SUBJECTS ---
+
+    editCurrentSubjectName: async () => {
+        const sub = app.data.subjects.find(s => s.id === app.data.focusSubjectId);
+        const oldName = sub.name;
+
+        // 1. SAFETY CHECK (Subject Level)
+        if (await window.subjActions.checkActiveTimerConflict(oldName)) return;
+
+        const newName = await app.uiPrompt("Rename Subject:", oldName);
+
+        if (newName && newName.trim() !== "" && newName !== oldName) {
+            const cleanName = newName.trim();
+            
+            // 2. Cascade Warning
+            const affectedTasks = app.data.tasks.filter(t => t.subject === oldName);
+            if (affectedTasks.length > 0) {
+                 if (!await app.uiConfirm(`Rename "${oldName}" to "${cleanName}"?\n\nThis will update ${affectedTasks.length} tasks to preserve analytics.`)) return;
+            }
+
+            // 3. Update Definition
+            sub.name = cleanName;
+            
+            // 4. Cascade Update
+            affectedTasks.forEach(t => t.subject = cleanName);
+
+            app.saveData();
+            app.render(); // Update Header
+            window.subjActions.renderFocusList(); // Update Panel
+        }
+    },
+
+    toggleSubjectArchive: async (id) => {
+        const sub = app.data.subjects.find(s => s.id === id);
+        
+        // 1. SAFETY CHECK
+        if (!sub.isArchived) {
+             if (await window.subjActions.checkActiveTimerConflict(sub.name)) return;
+        }
+
+        const msg = sub.isArchived 
+            ? `Restore "${sub.name}"?`
+            : `Archive "${sub.name}"?\n\nTasks are preserved, but subject is hidden from dashboard.`;
+
+        if (await app.uiConfirm(msg)) {
+            sub.isArchived = !sub.isArchived;
+            app.saveData();
+            app.renderSubjects();
+        }
+    },
+
+    startSession: (subId) => {
+        app.openTaskModal();
+        setTimeout(() => {
+            const select = document.getElementById('taskSubject');
+            if(select) {
+                select.value = subId;
+                select.dispatchEvent(new Event('change'));
+            }
+        }, 50);
+    }
+};
+   
+   app.init();
 </script>
 </body> </html>
