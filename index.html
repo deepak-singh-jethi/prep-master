@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PrepMaster v5.6.0</title>
+    <title>PrepMaster v6.0.0</title>
     <meta name="description" content="PrepMaster - Study Planner & Task Manager for Competitive Exams">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -121,7 +121,7 @@
                 </div>
                 <div>
                     <h1 class="text-lg md:text-xl font-bold tracking-tight leading-none">Prep<span class="text-primary">Master</span></h1>
-                    <span class="text-[10px] font-mono font-medium text-gray-400 dark:text-gray-500 uppercase tracking-widest">v5.6.0</span>
+                    <span class="text-[10px] font-mono font-medium text-gray-400 dark:text-gray-500 uppercase tracking-widest">v6.0.0</span>
                 </div>
             </div>
             
@@ -322,35 +322,163 @@
             </div>
         </div>
 
-        <div id="view-analytics" class="view-section hidden max-w-5xl mx-auto space-y-8">
+<div id="view-analytics" class="view-section hidden max-w-6xl mx-auto space-y-6 pb-24">
+    <div class="flex flex-col md:flex-row justify-between items-end gap-4">
+        <div>
             <h2 class="text-2xl md:text-3xl font-extrabold text-gray-900 dark:text-white">Performance Analytics</h2>
-            
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-soft border border-gray-200 dark:border-gray-700 flex flex-col items-center justify-center relative overflow-hidden">
-                    <div class="absolute top-0 right-0 p-4 text-primary opacity-10"><i class="fas fa-clock text-6xl"></i></div>
-                    <h3 class="text-gray-400 text-xxs uppercase font-bold tracking-widest z-10">Total Study Time</h3>
-                    <div class="text-5xl font-extrabold text-primary mt-2 z-10" id="analyticsTotalHours">0h</div>
+            <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mt-1">Metrics to optimize your prep.</p>
+        </div>
+        
+        <div class="bg-white dark:bg-gray-800 p-1 rounded-xl border border-gray-200 dark:border-gray-700 inline-flex shadow-sm">
+            <button onclick="app.setAnalyticsRange(1)" class="analytics-toggle px-4 py-1.5 rounded-lg text-xs font-bold transition-all text-gray-500 hover:text-primary" id="btnRange1">Today</button>
+            <button onclick="app.setAnalyticsRange(7)" class="analytics-toggle px-4 py-1.5 rounded-lg text-xs font-bold transition-all bg-indigo-50 text-primary dark:bg-gray-700 dark:text-white shadow-sm" id="btnRange7">7 Days</button>
+            <button onclick="app.setAnalyticsRange(30)" class="analytics-toggle px-4 py-1.5 rounded-lg text-xs font-bold transition-all text-gray-500 hover:text-primary" id="btnRange30">30 Days</button>
+        </div>
+    </div>
+
+    <div id="analyticsInsightBanner" class="hidden bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl p-5 text-white shadow-lg shadow-indigo-500/20 animate-fade-in">
+        <div class="flex items-start gap-4">
+            <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center shrink-0 backdrop-blur-sm">
+                <i class="fas fa-lightbulb text-amber-300 text-lg"></i>
+            </div>
+            <div>
+                <h4 class="font-bold text-sm uppercase tracking-wider opacity-90 mb-1">Weekly Insight</h4>
+                <p class="font-medium text-lg leading-snug" id="insightText">Analyzing your recent performance...</p>
+            </div>
+        </div>
+    </div>
+    <div id="analyticsConsistency" class="hidden mb-6 bg-white dark:bg-gray-800 p-4 rounded-xl border border-gray-100 dark:border-gray-700 shadow-sm flex items-center justify-between animate-fade-in">
+    <div class="flex items-center gap-4">
+        <div class="w-10 h-10 rounded-full bg-indigo-50 dark:bg-indigo-900/30 flex items-center justify-center text-primary">
+            <i class="fas fa-heartbeat"></i>
+        </div>
+        <div>
+            <h4 class="text-xs font-bold uppercase text-gray-400 tracking-wider">Study Rhythm</h4>
+            <p class="text-sm font-bold text-gray-800 dark:text-gray-200" id="consistencyText">Calculating...</p>
+        </div>
+    </div>
+    <div class="flex gap-1" id="consistencyVisuals"></div>
+</div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-soft border border-gray-200 dark:border-gray-700 relative overflow-hidden group">
+            <div class="absolute top-0 right-0 p-4 text-primary opacity-5 group-hover:opacity-10 transition-opacity"><i class="fas fa-clock text-6xl"></i></div>
+            <h3 class="text-gray-400 text-xxs uppercase font-bold tracking-widest z-10 mb-1">Study Time</h3>
+            <div class="flex items-baseline gap-2">
+                <div class="text-4xl font-extrabold text-gray-800 dark:text-white z-10" id="analyticsTotalHours">0h</div>
+                <span class="text-xs font-bold text-gray-400" id="analyticsTimeLabel">total</span>
+            </div>
+        </div>
+        
+        <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-soft border border-gray-200 dark:border-gray-700 relative overflow-hidden group">
+            <div class="absolute top-0 right-0 p-4 text-accent opacity-5 group-hover:opacity-10 transition-opacity"><i class="fas fa-brain text-6xl"></i></div>
+            <h3 class="text-gray-400 text-xxs uppercase font-bold tracking-widest z-10 mb-1">Focus Quality</h3>
+            <div class="flex items-baseline gap-2">
+                <div class="text-4xl font-extrabold text-accent z-10" id="analyticsAvgFocus">0.0</div>
+                <span class="text-xs font-bold text-gray-400">/ 5.0</span>
+            </div>
+        </div>
+        
+        <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-soft border border-gray-200 dark:border-gray-700 relative overflow-hidden group">
+            <div class="absolute top-0 right-0 p-4 text-secondary opacity-5 group-hover:opacity-10 transition-opacity"><i class="fas fa-check-circle text-6xl"></i></div>
+            <h3 class="text-gray-400 text-xxs uppercase font-bold tracking-widest z-10 mb-1">Completion Rate</h3>
+            <div class="flex items-baseline gap-2">
+                <div class="text-4xl font-extrabold text-secondary z-10" id="analyticsCompletion">0%</div>
+                <span class="text-xs font-bold text-gray-400">success</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="lg:col-span-2 bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-soft border border-gray-200 dark:border-gray-700">
+            <h3 class="text-sm font-bold mb-6 text-gray-800 dark:text-gray-100 uppercase tracking-wider flex items-center gap-2">
+                <i class="fas fa-chart-bar text-primary"></i> Subject Distribution
+            </h3>
+            <div id="analyticsSubjectBars" class="space-y-5">
                 </div>
-                
-                <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-soft border border-gray-200 dark:border-gray-700 flex flex-col items-center justify-center relative overflow-hidden">
-                    <div class="absolute top-0 right-0 p-4 text-accent opacity-10"><i class="fas fa-brain text-6xl"></i></div>
-                    <h3 class="text-gray-400 text-xxs uppercase font-bold tracking-widest z-10">Avg Focus Score</h3>
-                    <div class="text-5xl font-extrabold text-accent mt-2 z-10" id="analyticsAvgFocus">0.0</div>
+                <div id="analyticsDrillPanel" class="hidden fixed inset-0 z-20 bg-gray-50 dark:bg-dark-bg sm:static sm:bg-transparent sm:dark:bg-transparent sm:z-auto flex flex-col h-full sm:h-auto animate-fade-in">
+        <div class="flex items-center gap-4 mb-6 pt-4 sm:pt-0">
+        <button onclick="app.closeAnalyticsDrill()" class="w-10 h-10 flex items-center justify-center rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-gray-500 shadow-sm">
+            <i class="fas fa-arrow-left"></i>
+        </button>
+        <div>
+            <h3 class="text-xl font-extrabold text-gray-900 dark:text-white" id="drillSubjectTitle">Subject Analysis</h3>
+            <p class="text-xs font-medium text-gray-500 dark:text-gray-400">Topic-wise performance & retention.</p>
+        </div>
+    </div>
+    <div id="analyticsReflection" class="hidden mt-8 max-w-4xl mx-auto">
+    <h3 class="text-center text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Weekly Reflection</h3>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="bg-gray-50 dark:bg-gray-700/30 p-4 rounded-xl border border-gray-100 dark:border-gray-700 text-center">
+            <i class="fas fa-calendar-check text-emerald-500 mb-2"></i>
+            <p class="text-xs font-medium text-gray-600 dark:text-gray-300" id="refConsistency">...</p>
+        </div>
+        <div class="bg-gray-50 dark:bg-gray-700/30 p-4 rounded-xl border border-gray-100 dark:border-gray-700 text-center">
+            <i class="fas fa-balance-scale text-blue-500 mb-2"></i>
+            <p class="text-xs font-medium text-gray-600 dark:text-gray-300" id="refBalance">...</p>
+        </div>
+        <div class="bg-gray-50 dark:bg-gray-700/30 p-4 rounded-xl border border-gray-100 dark:border-gray-700 text-center">
+            <i class="fas fa-clock text-purple-500 mb-2"></i>
+            <p class="text-xs font-medium text-gray-600 dark:text-gray-300" id="refTiming">...</p>
+        </div>
+    </div>
+       </div>
+
+    <div id="drillInsightBanner" class="mb-6 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-2xl p-4 text-white shadow-lg shadow-blue-500/20 hidden">
+        <div class="flex items-start gap-3">
+            <i class="fas fa-brain mt-1 opacity-80"></i>
+            <div>
+                <span class="text-[10px] uppercase font-bold tracking-wider opacity-90 block mb-0.5">Focus Insight</span>
+                <p class="text-sm font-bold" id="drillInsightText">Analyzing focus patterns...</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-soft overflow-hidden flex-1">
+        <div class="overflow-y-auto max-h-[60vh] custom-scrollbar p-1">
+             <table class="w-full text-left border-collapse">
+                <thead class="bg-gray-50/50 dark:bg-gray-700/30 sticky top-0 z-10 backdrop-blur-sm">
+                    <tr>
+                        <th class="p-4 text-[10px] font-bold uppercase text-gray-400 tracking-wider">Topic / Chapter</th>
+                        <th class="p-4 text-[10px] font-bold uppercase text-gray-400 tracking-wider text-right">Stats</th>
+                        <th class="p-4 text-[10px] font-bold uppercase text-gray-400 tracking-wider text-right hidden sm:table-cell">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="drillTopicList" class="divide-y divide-gray-100 dark:divide-gray-700">
+                    </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+        </div>
+
+        <div class="space-y-4">
+            <div id="cardStrongSubject" class="hidden bg-emerald-50 dark:bg-emerald-900/10 p-5 rounded-2xl border border-emerald-100 dark:border-emerald-900/30">
+                <div class="flex items-center gap-3 mb-2">
+                    <div class="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-sm"><i class="fas fa-fire"></i></div>
+                    <div class="text-xs font-bold uppercase text-emerald-700 dark:text-emerald-500 tracking-wider">Power Subject</div>
                 </div>
-                
-                <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-soft border border-gray-200 dark:border-gray-700 flex flex-col items-center justify-center relative overflow-hidden">
-                    <div class="absolute top-0 right-0 p-4 text-secondary opacity-10"><i class="fas fa-check-circle text-6xl"></i></div>
-                    <h3 class="text-gray-400 text-xxs uppercase font-bold tracking-widest z-10">Completion Rate</h3>
-                    <div class="text-5xl font-extrabold text-secondary mt-2 z-10" id="analyticsCompletion">0%</div>
-                </div>
+                <h4 class="text-xl font-extrabold text-gray-800 dark:text-gray-100 mb-1" id="lblStrongSub">History</h4>
+                <p class="text-xs text-gray-500 dark:text-gray-400">Most consistent focus & time.</p>
             </div>
 
-            <div class="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-soft border border-gray-200 dark:border-gray-700">
-                <h3 class="text-lg font-bold mb-6 text-gray-800 dark:text-gray-100">Subject Distribution</h3>
-                <div id="analyticsSubjectBars" class="space-y-6">
+            <div id="cardWeakSubject" class="hidden bg-red-50 dark:bg-red-900/10 p-5 rounded-2xl border border-red-100 dark:border-red-900/30">
+                <div class="flex items-center gap-3 mb-2">
+                    <div class="w-8 h-8 rounded-lg bg-red-100 dark:bg-red-900/50 text-red-500 flex items-center justify-center text-sm"><i class="fas fa-exclamation-triangle"></i></div>
+                    <div class="text-xs font-bold uppercase text-red-700 dark:text-red-400 tracking-wider">Needs Attention</div>
+                </div>
+                <h4 class="text-xl font-extrabold text-gray-800 dark:text-gray-100 mb-1" id="lblWeakSub">Polity</h4>
+                <p class="text-xs text-gray-500 dark:text-gray-400">Low completion or focus.</p>
+            </div>
+
+            <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-soft border border-gray-200 dark:border-gray-700 h-auto">
+                <h3 class="text-xs font-bold mb-4 text-gray-400 uppercase tracking-widest">Coach's Corner</h3>
+                <div id="analyticsSuggestions" class="space-y-3">
                     </div>
             </div>
         </div>
+    </div>
+</div>
 
     </main>
 </div>
@@ -964,10 +1092,6 @@
         },
 
        // --- UPDATED & NEW METHODS FOR APP OBJECT ---
-
-        // 1. UPDATED: Start Timer with Auto-Zen & Silent Switch
-        
-// 1. UPDATED (FINAL): Start Timer with Interruption Guard
         async startTimer(id) {
             // Check if a timer is already running
             if (this.data.activeTimer) {
@@ -1225,56 +1349,65 @@
         },
 
 
+// UPDATED: confirmCompletion (Adds optional timestamp for future insights)
         async confirmCompletion(type) {
-            const id = this.data.completingTaskId;
-            const task = this.data.tasks.find(t => t.id === id);
-            
-            if (task) {
-                task.actualTime = parseInt(document.getElementById('actualTimeInput').value) || 0;
-                task.focusScore = document.getElementById('focusScore').value;
-                task.status = type; 
+    const id = this.data.completingTaskId;
+    const task = this.data.tasks.find(t => t.id === id);
+    
+    if (task) {
+        task.actualTime = parseInt(document.getElementById('actualTimeInput').value) || 0;
+        task.focusScore = document.getElementById('focusScore').value;
+        task.status = type; 
+        
+        // NEW: Optional field for Time-of-Day analysis (Safe add-on)
+        task.completedAt = new Date().toISOString(); 
 
-                if (type === 'done') {
-                    if (task.isRevision) {
-                        const quality = await this.getRecallQuality();
-                        const intervals = { 'again': 1, 'hard': 3, 'good': 7, 'easy': 25 };
-                        const daysToAdd = intervals[quality] || 7;
-                        
-                        task.lastRecallQuality = quality;
-                        task.lastReviewedAt = this.formatDate(new Date());
-                        
-                        const nextDate = new Date();
-                        nextDate.setDate(nextDate.getDate() + daysToAdd);
-                        task.nextReviewDate = this.formatDate(nextDate);
-                        
-                        if (quality === 'again') {
-                            task.reviewStage = 1;
-                        } else {
-                            const currentStage = task.reviewStage || 0;
-                            task.reviewStage = currentStage < 3 ? currentStage + 1 : 3;
-                        }
-
-                    } else {
-                        const currentStage = task.reviewStage || 0;
-                        const nextStage = currentStage < 3 ? currentStage + 1 : 3;
-                        const intervals = { 1: 1, 2: 7, 3: 30 };
-                        
-                        const nextDate = new Date();
-                        nextDate.setDate(nextDate.getDate() + intervals[nextStage]);
-                        
-                        task.nextReviewDate = this.formatDate(nextDate);
-                        task.reviewStage = nextStage;
-                    }
-                }
+        if (type === 'done') {
+            // ... [Keep existing Spaced Repetition Logic] ...
+             if (task.isRevision) {
+                const quality = await this.getRecallQuality();
+                const intervals = { 'again': 1, 'hard': 3, 'good': 7, 'easy': 25 };
+                const daysToAdd = intervals[quality] || 7;
                 
-                this.saveData();
-            }
-            this.closeModal('completeModal');
-            this.data.completingTaskId = null;
-        },
+                task.lastRecallQuality = quality;
+                task.lastReviewedAt = this.formatDate(new Date());
+                
+                const nextDate = new Date();
+                nextDate.setDate(nextDate.getDate() + daysToAdd);
+                task.nextReviewDate = this.formatDate(nextDate);
+                
+                if (quality === 'again') {
+                    task.reviewStage = 1;
+                } else {
+                    const currentStage = task.reviewStage || 0;
+                    task.reviewStage = currentStage < 3 ? currentStage + 1 : 3;
+                }
 
+            } else {
+                const currentStage = task.reviewStage || 0;
+                const nextStage = currentStage < 3 ? currentStage + 1 : 3;
+                const intervals = { 1: 1, 2: 7, 3: 30 };
+                
+                const nextDate = new Date();
+                nextDate.setDate(nextDate.getDate() + intervals[nextStage]);
+                
+                task.nextReviewDate = this.formatDate(nextDate);
+                task.reviewStage = nextStage;
+            }
+        }
+        
+        this.saveData();
+    }
+    this.closeModal('completeModal');
+    this.data.completingTaskId = null;
+},
+       
+       
         navigate(view) {
             this.data.currentView = view;
+            if(this.data.activeDrillSubject) {
+        this.closeAnalyticsDrill();
+    }
             document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
             document.getElementById(`view-${view}`).classList.remove('hidden');
             
@@ -1858,64 +1991,504 @@
             });
         }, 
        
-        renderAnalytics() {
-            if(this.data.currentView !== 'analytics') return;
+// --- NEW ANALYTICS LOGIC START ---
 
-            // ANALYTICS SAFETY FIX: Defensive DOM checks
-            // We verify all required elements exist before attempting updates
-            const els = {
-                total: document.getElementById('analyticsTotalHours'),
-                avg: document.getElementById('analyticsAvgFocus'),
-                comp: document.getElementById('analyticsCompletion'),
-                bars: document.getElementById('analyticsSubjectBars')
-            };
+// 1. New Helper: Set Range
+       setAnalyticsRange(days) {
+    this.data.analyticsRange = days;
+    
+    // Update UI Buttons
+    document.querySelectorAll('.analytics-toggle').forEach(btn => {
+        btn.classList.remove('bg-indigo-50', 'text-primary', 'dark:bg-gray-700', 'dark:text-white', 'shadow-sm');
+        btn.classList.add('text-gray-500', 'hover:text-primary');
+    });
+    
+    const activeBtn = document.getElementById(`btnRange${days}`);
+    if(activeBtn) {
+        activeBtn.classList.remove('text-gray-500', 'hover:text-primary');
+        activeBtn.classList.add('bg-indigo-50', 'text-primary', 'dark:bg-gray-700', 'dark:text-white', 'shadow-sm');
+    }
 
-            // If any critical element is missing (e.g., partial DOM load), abort safely
-            if (!els.total || !els.avg || !els.comp || !els.bars) return;
+    this.renderAnalytics();
+},
 
-            // --- Safe Logic Execution ---
-            const completedOrPartial = this.data.tasks.filter(t => t.actualTime > 0);
-            const totalMins = completedOrPartial.reduce((acc, t) => acc + (t.actualTime || 0), 0);
-            els.total.innerText = `${(totalMins/60).toFixed(1)}h`;
+// NEW: Quick Action Handlers (Feature 1)
+quickSchedule(type, payload) {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const dateStr = this.formatDate(tomorrow);
 
-            const ratedTasks = this.data.tasks.filter(t => t.focusScore);
-            const avgFocus = ratedTasks.length ? (ratedTasks.reduce((acc, t) => acc + parseInt(t.focusScore), 0) / ratedTasks.length).toFixed(1) : "0.0";
-            els.avg.innerText = avgFocus;
+    if (type === 'revision') {
+        // Schedule a generic revision task
+        this.data.tasks.push({
+            id: this.generateUUID(),
+            subject: payload || 'General',
+            subSubject: 'Quick Revision (Analytics)',
+            duration: 20,
+            desc: "Scheduled from Analytics insight",
+            date: dateStr,
+            status: 'pending',
+            actualTime: 0
+        });
+    } else if (type === 'break') {
+        // Schedule a break/buffer
+        this.data.tasks.push({
+            id: this.generateUUID(),
+            subject: 'Break',
+            subSubject: 'Mental Reset',
+            duration: 30,
+            desc: "Buffer time to recover focus",
+            date: dateStr,
+            status: 'pending',
+            actualTime: 0
+        });
+    }
 
-            const completed = this.data.tasks.filter(t => t.status === 'done');
-            const denominator = this.data.tasks.length;
-            const rate = denominator ? Math.round((completed.length / denominator) * 100) : 0;
-            els.comp.innerText = `${rate}%`;
+    this.saveData();
+    this.uiAlert(`✅ Added to tomorrow's schedule.`);
+},
 
-            els.bars.innerHTML = '';
-            
-            const sortedSubjects = [...this.data.subjects].map(sub => {
-                const subMins = completedOrPartial.filter(t => t.subject === sub.name).reduce((acc, t) => acc + (t.actualTime || 0), 0);
-                return { ...sub, mins: subMins };
-            }).sort((a,b) => b.mins - a.mins);
+// NEW: Time of Day Analysis (Feature 3)
+  getBestTimeBlock(tasks) {
+    // Only analyze tasks that have the new 'completedAt' field
+    const validTasks = tasks.filter(t => t.completedAt && t.focusScore);
+    if (validTasks.length < 5) return null; // Not enough data yet
 
-            const maxMins = sortedSubjects.length > 0 ? sortedSubjects[0].mins : 1;
+    const buckets = {}; // Hour -> [scores]
+    validTasks.forEach(t => {
+        const hour = new Date(t.completedAt).getHours();
+        if (!buckets[hour]) buckets[hour] = [];
+        buckets[hour].push(parseInt(t.focusScore));
+    });
 
-            sortedSubjects.forEach(sub => {
-                if(sub.mins > 0) {
-                    const width = (sub.mins / maxMins) * 100;
-                    const hours = (sub.mins/60).toFixed(1);
-                    els.bars.insertAdjacentHTML('beforeend', `
-                        <div class="group">
-                            <div class="flex justify-between text-xs font-bold mb-2 text-gray-600 dark:text-gray-300">
-                                <span>${sub.name}</span>
-                                <span class="font-mono text-gray-400 group-hover:text-primary transition-colors">${hours}h</span>
-                            </div>
-                            <div class="w-full bg-gray-100 dark:bg-gray-700 rounded-full h-2.5 overflow-hidden">
-                                <div class="bg-primary h-2.5 rounded-full transition-all duration-1000 ease-out relative overflow-hidden group-hover:bg-primary-500" style="width: ${width || 0}%">
-                                    <div class="absolute inset-0 bg-white/20 w-full h-full animate-[shimmer_2s_infinite]"></div>
-                                </div>
-                            </div>
+    let bestHour = -1;
+    let maxAvg = 0;
+
+    Object.keys(buckets).forEach(h => {
+        const avg = buckets[h].reduce((a,b)=>a+b,0) / buckets[h].length;
+        if (avg > maxAvg) {
+            maxAvg = avg;
+            bestHour = parseInt(h);
+        }
+    });
+
+    if (bestHour === -1) return null;
+    
+    // Convert 24h to AM/PM
+    const ampm = bestHour >= 12 ? 'PM' : 'AM';
+    const hour12 = bestHour % 12 || 12;
+    return `${hour12}-${hour12+1} ${ampm}`;
+},
+
+
+// 2. Updated Render Function (Replaces existing renderAnalytics)
+    // UPDATED: renderAnalytics (Adds Data Guard, Consistency, and Reflection)
+   renderAnalytics() {
+    if(this.data.currentView !== 'analytics') return;
+    
+    const range = this.data.analyticsRange || 7;
+    const now = new Date();
+    const cutoffDate = new Date();
+    cutoffDate.setDate(now.getDate() - (range - 1));
+    cutoffDate.setHours(0,0,0,0);
+
+    const relevantTasks = this.data.tasks.filter(t => {
+        const tDate = new Date(t.date);
+        return tDate >= cutoffDate && tDate <= now;
+    });
+
+    const completedOrPartial = relevantTasks.filter(t => t.actualTime > 0);
+    const totalMins = completedOrPartial.reduce((acc, t) => acc + (t.actualTime || 0), 0);
+
+    // FEATURE 6: NOT ENOUGH DATA GUARD
+    if (totalMins === 0) {
+        document.getElementById('analyticsSubjectBars').innerHTML = 
+            `<div class="text-center py-12 text-gray-400">
+                <i class="fas fa-chart-area text-4xl mb-3 opacity-20"></i>
+                <p class="font-medium">Not enough data yet.</p>
+                <p class="text-xs mt-1">Complete a few tasks to unlock insights.</p>
+             </div>`;
+        document.getElementById('analyticsTotalHours').innerText = "0h";
+        document.getElementById('analyticsAvgFocus').innerText = "-";
+        document.getElementById('analyticsCompletion').innerText = "-";
+        document.getElementById('analyticsConsistency').classList.add('hidden');
+        document.getElementById('analyticsReflection').classList.add('hidden');
+        // Hide specific cards if empty
+        document.getElementById('cardStrongSubject').classList.add('hidden');
+        document.getElementById('cardWeakSubject').classList.add('hidden');
+        this.generateInsights(0, 0, 0, range);
+        return;
+    }
+
+    // --- EXISTING STATS ---
+    const totalEl = document.getElementById('analyticsTotalHours');
+    if(totalEl) totalEl.innerText = `${(totalMins/60).toFixed(1)}h`;
+    
+    const ratedTasks = relevantTasks.filter(t => t.focusScore);
+    const avgFocus = ratedTasks.length ? (ratedTasks.reduce((acc, t) => acc + parseInt(t.focusScore), 0) / ratedTasks.length).toFixed(1) : "0.0";
+    document.getElementById('analyticsAvgFocus').innerText = avgFocus;
+
+    const completed = relevantTasks.filter(t => t.status === 'done');
+    const denominator = relevantTasks.length;
+    const rate = denominator ? Math.round((completed.length / denominator) * 100) : 0;
+    document.getElementById('analyticsCompletion').innerText = `${rate}%`;
+
+
+    // FEATURE 2: CONSISTENCY PULSE
+    const consistencyEl = document.getElementById('analyticsConsistency');
+    consistencyEl.classList.remove('hidden');
+    
+    // Count unique days with activity
+    const activeDays = new Set(completedOrPartial.map(t => t.date)).size;
+    document.getElementById('consistencyText').innerText = `${activeDays} active days this week`;
+    
+    // Visual Dots
+    const visuals = document.getElementById('consistencyVisuals');
+    visuals.innerHTML = '';
+    for(let i=0; i<7; i++) {
+        const isFilled = i < activeDays;
+        visuals.insertAdjacentHTML('beforeend', 
+            `<div class="w-2 h-2 rounded-full ${isFilled ? 'bg-secondary' : 'bg-gray-200 dark:bg-gray-700'}"></div>`
+        );
+    }
+
+
+    // --- EXISTING BAR CHART LOGIC (Preserved) ---
+    const barContainer = document.getElementById('analyticsSubjectBars');
+    barContainer.innerHTML = '';
+    const subjectStats = {};
+    relevantTasks.forEach(t => {
+        if(!subjectStats[t.subject]) subjectStats[t.subject] = { mins: 0, focusSum: 0, count: 0 };
+        if(t.actualTime > 0) subjectStats[t.subject].mins += t.actualTime;
+        if(t.focusScore) {
+            subjectStats[t.subject].focusSum += parseInt(t.focusScore);
+            subjectStats[t.subject].count++;
+        }
+    });
+
+    const sortedSubs = Object.entries(subjectStats)
+        .map(([name, stat]) => ({ name, ...stat, avgFocus: stat.count ? stat.focusSum/stat.count : 0 }))
+        .sort((a,b) => b.mins - a.mins);
+
+    if (sortedSubs.length > 0) {
+        const maxMins = sortedSubs[0].mins || 1;
+        sortedSubs.forEach(sub => {
+            const width = (sub.mins / maxMins) * 100;
+            const hours = (sub.mins/60).toFixed(1);
+            const safeName = sub.name.replace(/'/g, "\\'"); 
+            const barHtml = `
+                <div class="group cursor-pointer" onclick="app.openAnalyticsDrill('${safeName}')">
+                    <div class="flex justify-between text-xs font-bold mb-2 text-gray-600 dark:text-gray-300">
+                        <span class="group-hover:text-primary transition-colors flex items-center gap-2">
+                            ${sub.name} <i class="fas fa-chevron-right text-[9px] opacity-0 group-hover:opacity-100 transform -translate-x-2 group-hover:translate-x-0 transition-all"></i>
+                        </span>
+                        <div class="flex gap-3">
+                            <span class="text-gray-400 font-medium">${sub.avgFocus > 0 ? sub.avgFocus.toFixed(1) + ' <i class="fas fa-star text-[9px]"></i>' : ''}</span>
+                            <span class="font-mono text-primary">${hours}h</span>
                         </div>
-                    `);
-                }
-            });
-        },
+                    </div>
+                    <div class="w-full bg-gray-100 dark:bg-gray-700 rounded-full h-2.5 overflow-hidden">
+                        <div class="bg-primary h-2.5 rounded-full relative group-hover:bg-primary-700 transition-colors" style="width: ${width}%"></div>
+                    </div>
+                </div>`;
+            barContainer.insertAdjacentHTML('beforeend', barHtml);
+        });
+
+        // Feature 7: Safer Language for Weak Subjects
+        const weak = [...sortedSubs].reverse().find(s => s.mins > 30 && s.avgFocus < 3.0);
+        const weakCard = document.getElementById('cardWeakSubject');
+        if(weak) {
+            weakCard.classList.remove('hidden');
+            // Change "Needs Attention" title dynamically if needed, or rely on HTML update
+            document.getElementById('lblWeakSub').innerText = weak.name;
+        } else {
+            weakCard.classList.add('hidden');
+        }
+        
+        const strong = sortedSubs.find(s => s.mins > 60 && s.avgFocus >= 3.5);
+        if(strong) {
+            document.getElementById('cardStrongSubject').classList.remove('hidden');
+            document.getElementById('lblStrongSub').innerText = strong.name;
+        } else {
+             document.getElementById('cardStrongSubject').classList.add('hidden');
+        }
+    }
+
+
+    // FEATURE 5: WEEKLY REFLECTION (System Generated)
+    const refPanel = document.getElementById('analyticsReflection');
+    if (range === 7 && activeDays >= 2) {
+        refPanel.classList.remove('hidden');
+        
+        // Line 1: Consistency
+        document.getElementById('refConsistency').innerText = 
+            activeDays >= 5 ? "Consistent effort this week." : "Building momentum.";
+            
+        // Line 2: Balance (Hardest Subject)
+        const hardest = sortedSubs.sort((a,b) => a.avgFocus - b.avgFocus)[0];
+        document.getElementById('refBalance').innerText = hardest 
+            ? `Hardest topic: ${hardest.name}` 
+            : "Balanced workload.";
+
+        // Line 3: Timing (Feature 3 Insight)
+        const bestTime = this.getBestTimeBlock(relevantTasks);
+        document.getElementById('refTiming').innerText = bestTime 
+            ? `Peak focus around ${bestTime}.` 
+            : "Timing data gathering...";
+
+    } else {
+        refPanel.classList.add('hidden');
+    }
+
+    this.generateInsights(totalMins, parseFloat(avgFocus), rate, range, sortedSubs);
+},
+
+
+// UPDATED: Add to app object
+    openAnalyticsDrill(subjectName) {
+    this.data.activeDrillSubject = subjectName;
+    
+    // FIX: Don't hide the parent! Hide only the bars and the header.
+    const bars = document.getElementById('analyticsSubjectBars');
+    const header = bars.previousElementSibling; // The <h3>Subject Distribution</h3>
+    
+    bars.classList.add('hidden');
+    if (header) header.classList.add('hidden');
+    
+    // Show the panel
+    document.getElementById('analyticsDrillPanel').classList.remove('hidden'); 
+    
+    this.renderDrillDown();
+},
+
+   closeAnalyticsDrill() {
+    this.data.activeDrillSubject = null;
+    
+    const bars = document.getElementById('analyticsSubjectBars');
+    const header = bars.previousElementSibling;
+    
+    bars.classList.remove('hidden');
+    if (header) header.classList.remove('hidden');
+
+    document.getElementById('analyticsDrillPanel').classList.add('hidden');
+},
+
+// NEW: Core Logic for Feature 1, 2, & 3
+    renderDrillDown() {
+    const subName = this.data.activeDrillSubject;
+    if (!subName) return;
+
+    document.getElementById('drillSubjectTitle').innerText = subName;
+    const list = document.getElementById('drillTopicList');
+    list.innerHTML = '';
+
+    // 1. DATA AGGREGATION (Runtime Only)
+    const topicMap = new Map();
+    const subObj = this.data.subjects.find(s => s.name === subName);
+    const definedTopics = subObj ? subObj.sub : [];
+
+    // Initialize with defined topics (so unstudied topics show up)
+    definedTopics.forEach(t => topicMap.set(t, { 
+        name: t, time: 0, count: 0, lastDate: null, status: 'new' 
+    }));
+
+    // Process logs
+    this.data.tasks.forEach(t => {
+        if (t.subject === subName && t.actualTime > 0) {
+            const entry = topicMap.get(t.subSubject) || { name: t.subSubject, time: 0, count: 0, lastDate: null, status: 'active' };
+            
+            entry.time += t.actualTime;
+            entry.count++;
+            
+            // Track Last Date
+            if (!entry.lastDate || t.date > entry.lastDate) {
+                entry.lastDate = t.date;
+            }
+            topicMap.set(t.subSubject, entry);
+        }
+    });
+
+    // 2. FEATURE 3: PRODUCTIVITY INSIGHT (Safe Fallback to Day-of-Week)
+    // Note: Since legacy data stores dates as YYYY-MM-DD, we use Day of Week for accuracy.
+    const dayStats = [0,0,0,0,0,0,0]; // Sun-Sat
+    this.data.tasks.forEach(t => {
+        if(t.subject === subName && t.status === 'done' && t.focusScore) {
+            const d = new Date(t.date).getDay();
+            dayStats[d] += parseInt(t.focusScore);
+        }
+    });
+    
+    const bestDayIdx = dayStats.indexOf(Math.max(...dayStats));
+    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const banner = document.getElementById('drillInsightBanner');
+    
+    if (Math.max(...dayStats) > 0) {
+        banner.classList.remove('hidden');
+        document.getElementById('drillInsightText').innerText = `You have the highest focus intensity on ${days[bestDayIdx]}s for this subject.`;
+    } else {
+        banner.classList.add('hidden');
+    }
+
+    // 3. RENDER LIST
+    Array.from(topicMap.values()).sort((a,b) => (b.lastDate || '').localeCompare(a.lastDate || '')).forEach(topic => {
+        
+        // FEATURE 2: RETENTION INDICATOR
+        let retentionDot = 'bg-gray-300';
+        let retentionText = 'Not Started';
+        let daysAgo = 999;
+
+        if (topic.lastDate) {
+
+           // 1. Parse topic date to local midnight
+    const parts = topic.lastDate.split('-');
+    const lastDateLocal = new Date(parts[0], parts[1] - 1, parts[2]);
+    
+    // 2. Get today at local midnight
+    const today = new Date();
+    today.setHours(0,0,0,0);
+    
+    // 3. Calculate difference in days (integers)
+    const diffTime = today - lastDateLocal;
+    daysAgo = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            
+            if (daysAgo <= 3) { 
+                retentionDot = 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]'; 
+                retentionText = 'Fresh'; 
+            } else if (daysAgo <= 10) { 
+                retentionDot = 'bg-amber-400'; 
+                retentionText = 'Needs Review'; 
+            } else { 
+                retentionDot = 'bg-red-500'; 
+                retentionText = 'Overdue'; 
+            }
+        }
+
+        list.insertAdjacentHTML('beforeend', `
+            <tr class="group hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors border-b border-gray-50 dark:border-gray-700/50 last:border-0">
+                <td class="p-4 align-top">
+                    <div class="flex items-start gap-3">
+                        <div class="mt-1.5 w-2 h-2 rounded-full ${retentionDot} shrink-0" title="${retentionText}"></div>
+                        <div>
+                            <div class="font-bold text-sm text-gray-800 dark:text-gray-200 group-hover:text-primary transition-colors">${topic.name}</div>
+                            <div class="text-[10px] text-gray-400 font-mono mt-0.5">${topic.lastDate ? 'Last: ' + topic.lastDate : 'No logs yet'}</div>
+                        </div>
+                    </div>
+                </td>
+                <td class="p-4 text-right align-top">
+                    <div class="font-mono font-bold text-gray-700 dark:text-gray-300 text-sm">${(topic.time/60).toFixed(1)}h</div>
+                    <div class="text-[10px] text-gray-400">${topic.count} sessions</div>
+                </td>
+                <td class="p-4 text-right align-top hidden sm:table-cell">
+                    <div class="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button onclick="app.prepSafeAction('revision', '${subName}', '${topic.name}')" class="px-3 py-1.5 rounded-lg bg-indigo-50 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400 text-xs font-bold hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors">
+                            Revise
+                        </button>
+                        <button onclick="app.prepSafeAction('split', '${subName}', '${topic.name}')" class="px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-600 text-gray-500 dark:text-gray-400 text-xs font-bold hover:text-primary hover:border-primary transition-colors">
+                            Split
+                        </button>
+                    </div>
+                    <button onclick="app.prepSafeAction('revision', '${subName}', '${topic.name}')" class="sm:hidden w-8 h-8 flex items-center justify-center rounded-full bg-indigo-50 text-indigo-600">
+                        <i class="fas fa-plus text-xs"></i>
+                    </button>
+                </td>
+            </tr>
+        `);
+    });
+},
+// NEW: Action Handlers (Safe Interactions)
+    prepSafeAction(type, subject, topic) {
+    // Open the existing modal
+    this.openTaskModal();
+    
+    // Defer execution slightly to allow modal DOM to render
+    setTimeout(() => {
+        const subSelect = document.getElementById('taskSubject');
+        const topicInput = document.getElementById('taskSubSubject');
+        const descInput = document.getElementById('taskDesc');
+        
+        // Find subject ID
+        const subObj = this.data.subjects.find(s => s.name === subject);
+        if (subObj) {
+            subSelect.value = subObj.id;
+            // Trigger change to load datalist options
+            subSelect.dispatchEvent(new Event('change'));
+        }
+
+        if (type === 'revision') {
+            topicInput.value = topic;
+            descInput.value = "Scheduled Revision";
+        } else if (type === 'split') {
+            topicInput.value = `${topic} (Part 2)`;
+            descInput.value = "Continued session";
+        }
+    }, 50);
+},
+
+    // UPDATED: generateInsights (Supportive + Actionable)
+     generateInsights(totalMins, avgFocus, completionRate, range, subjectStats = []) {
+    const suggestionsEl = document.getElementById('analyticsSuggestions');
+    if(!suggestionsEl) return;
+    suggestionsEl.innerHTML = '';
+
+    const tips = [];
+    
+    // FEATURE 4: NORMALIZE BAD DAYS (Psychological Safety)
+    if (totalMins > 0 && avgFocus < 2.5) {
+        tips.push({ 
+            icon: 'fa-battery-quarter', 
+            color: 'text-gray-400', 
+            text: "Low energy days happen. Tomorrow is a reset.",
+            action: null // No action, just validation
+        });
+    }
+
+    if (totalMins > 0 && completionRate < 50) {
+        tips.push({ 
+            icon: 'fa-align-left', 
+            color: 'text-orange-500', 
+            text: "High backlog? Reduce daily load slightly.",
+            action: { label: "Move 1 Task", type: 'break' } // Soft action
+        });
+    }
+
+    // FEATURE 1: INSIGHT -> ACTION
+    if (avgFocus > 4.2) {
+        tips.push({ 
+            icon: 'fa-fire', 
+            color: 'text-amber-500', 
+            text: "Great flow! Lock this in with a quick review.",
+            action: { label: "Schedule Review", type: 'revision' }
+        });
+    }
+
+    // General Tips
+    if (tips.length === 0 && totalMins > 0) {
+        tips.push({ icon: 'fa-check', color: 'text-emerald-500', text: "Your rhythm is steady. Keep going.", action: null });
+    }
+
+    // Render Tips with Optional Buttons
+    tips.slice(0, 3).forEach(tip => {
+        let btnHtml = '';
+        if (tip.action) {
+            btnHtml = `
+            <button onclick="app.quickSchedule('${tip.action.type}')" class="ml-auto text-[10px] font-bold bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 px-2 py-1 rounded shadow-sm hover:text-primary transition-colors whitespace-nowrap">
+                ${tip.action.label}
+            </button>`;
+        }
+
+        suggestionsEl.insertAdjacentHTML('beforeend', `
+            <div class="flex gap-3 items-center p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                <i class="fas ${tip.icon} ${tip.color} text-xs w-4 text-center shrink-0"></i>
+                <span class="text-xs font-medium text-gray-600 dark:text-gray-300 leading-snug flex-1">${tip.text}</span>
+                ${btnHtml}
+            </div>
+        `);
+    });
+},
+
+
+// --- NEW ANALYTICS LOGIC END ---
+        
         // --- USER ACTIONS ---
         
         editTask(id) {
