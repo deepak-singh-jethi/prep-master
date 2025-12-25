@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PrepMaster v6.0.0</title>
+    <title>PrepMaster v5.6.0</title>
     <meta name="description" content="PrepMaster - Study Planner & Task Manager for Competitive Exams">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -25,28 +25,28 @@
                 },
                 colors: {
                     primary: {
-                        DEFAULT: '#4F46E5', // Indigo 600
+                        DEFAULT: '#4F46E5',
                         50: '#EEF2FF',
                         100: '#E0E7FF',
                         600: '#4F46E5',
                         700: '#4338CA',
                     },
                     secondary: {
-                        DEFAULT: '#10B981', // Emerald 500
+                        DEFAULT: '#10B981',
                         50: '#ECFDF5',
                         600: '#059669',
                     },
                     gray: {
-                        50: '#F8FAFC',  // Bg: Soft Slate
-                        100: '#F1F5F9', // Hover: Crisp Slate
-                        200: '#CBD5E1', // BORDER: Hard Slate (Defined edges)
-                        300: '#94A3B8', 
-                        400: '#64748B', // TEXT: Visible Labels
-                        500: '#475569', // TEXT: Visible Body
-                        600: '#334155', 
-                        700: '#374151', // Dark Mode Surface
-                        800: '#1F2937', // Dark Mode Cards
-                        900: '#111827', // Dark Mode Base
+                        50: '#F8FAFC',
+                        100: '#F1F5F9',
+                        200: '#CBD5E1',
+                        300: '#94A3B8',
+                        400: '#64748B',
+                        500: '#475569',
+                        600: '#334155',
+                        700: '#374151',
+                        800: '#1F2937',
+                        900: '#111827',
                     },
                     accent: '#F59E0B',
                     danger: '#EF4444',
@@ -70,31 +70,26 @@
     }
 </script>
 <style>
-    /* Modern Scrollbar - Slate Theme */
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: transparent; }
     
-    /* Light Mode: Slate Thumb */
     ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 99px; }
     ::-webkit-scrollbar-thumb:hover { background: #94A3B8; }
     
-    /* Dark Mode: Preserved Standard Gray */
     .dark ::-webkit-scrollbar-thumb { background: #374151; }
     .dark ::-webkit-scrollbar-thumb:hover { background: #4B5563; }
     
-    /* Glassmorphism & Utilities */
     .glass { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
     .dark .glass { background: rgba(17, 24, 39, 0.95); }
     .modal { background-color: rgba(0, 0, 0, 0.6); backdrop-filter: blur(4px); }
     
-    /* Smooth inputs */
     input:focus, select:focus, textarea:focus { 
         outline: none; 
         box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1); 
         border-color: #4F46E5; 
     }
 
-    /* Calendar Grid */
+    .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.75rem; }
     .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.75rem; }
     @media (max-width: 640px) {
         .calendar-grid { gap: 0.25rem; }
@@ -105,7 +100,6 @@
         border-color: #CBD5E1 !important;
     }
 
-    /* Utilities */
     .text-xxs { font-size: 0.65rem; line-height: 1rem; }
     .bg-pattern { background-image: radial-gradient(#4F46E5 0.5px, transparent 0.5px); background-size: 10px 10px; opacity: 0.05; }
 </style>
@@ -121,7 +115,7 @@
                 </div>
                 <div>
                     <h1 class="text-lg md:text-xl font-bold tracking-tight leading-none">Prep<span class="text-primary">Master</span></h1>
-                    <span class="text-[10px] font-mono font-medium text-gray-400 dark:text-gray-500 uppercase tracking-widest">v6.0.0</span>
+                    <span class="text-[10px] font-mono font-medium text-gray-400 dark:text-gray-500 uppercase tracking-widest">v5.6.0</span>
                 </div>
             </div>
             
@@ -782,16 +776,13 @@
             tasks: [],
             subjects: [],
             targetDate: '2026-02-01',
-            // TIMER STATE
             activeTimer: null, 
             timerInterval: null,
-            // UI STATE
             currentView: 'dashboard',
             currentDate: new Date(),
             calendarMonth: new Date(),
             completingTaskId: null,
             lastBackup: null,
-            // UI DIALOG STATE
             dialogQueue: [],
             isDialogOpen: false,
             focusSubjectId: null 
@@ -810,7 +801,6 @@
             }
         },
         
-        // --- CUSTOM UI DIALOGS ---
         processDialogQueue() {
             if (this.isDialogOpen || this.data.dialogQueue.length === 0) return;
             
@@ -896,7 +886,7 @@
                 this.processDialogQueue();
             });
         },
-        
+
         uiPrompt(msg, defaultVal = '') {
             return new Promise(resolve => {
                 this.data.dialogQueue.push({ type: 'prompt', msg, defaultVal, resolve });
@@ -904,7 +894,6 @@
             });
         },
 
-        // --- HELPERS ---
         generateUUID() {
             if (typeof crypto !== 'undefined' && crypto.randomUUID) {
                 return crypto.randomUUID();
@@ -943,8 +932,6 @@
             });
         },
 
-        // --- DATA LAYER ---
-
         saveData(options = { render: true }) {
             localStorage.setItem('prepMasterData_v3', JSON.stringify({
                 schema: 3.2,
@@ -954,18 +941,16 @@
                 lastBackup: this.data.lastBackup 
             }));
             
-            // FIX: Use debounced render instead of synchronous this.render()
             if (options.render) {
                 this.scheduleRender();
             }
         },
-        // NEW: Debounced render to prevent UI jank
         scheduleRender() {
             if (this._renderTimer) clearTimeout(this._renderTimer);
             this._renderTimer = setTimeout(() => {
                 this.render();
                 this._renderTimer = null;
-            }, 120); // 120ms debounce
+            }, 120);
         },
 
         loadData() {
@@ -997,11 +982,10 @@
         },
         
         checkBackupStatus() {
-    // 1. Existing Warning Dot Logic (Preserved)
+
     const dot = document.getElementById('backupWarningDot');
     const last = this.data.lastBackup ? new Date(this.data.lastBackup) : null;
     const now = new Date();
-    // If no backup, treat as infinite days
     const diffDays = last ? (now - last) / (1000 * 60 * 60 * 24) : 999;
     
     if (dot) {
@@ -1009,21 +993,17 @@
         else dot.classList.add('hidden');
     }
 
-    // 2. NEW: Update Health Panel UI
     const panel = document.getElementById('backupHealthPanel');
     const title = document.getElementById('backupStatusTitle');
     const text = document.getElementById('backupStatusText');
     const icon = document.getElementById('backupStatusIcon');
 
-    // Safety check in case modal DOM isn't loaded
     if (!panel || !title) return;
 
-    // Reset Base Classes
     panel.className = "p-4 rounded-xl border transition-all duration-300 mb-4 shadow-sm";
     icon.className = "fas text-xl";
 
     if (!last) {
-        // STATE: No Backup Found
         panel.classList.add('bg-gray-50', 'border-gray-200', 'dark:bg-gray-700/30', 'dark:border-gray-600');
         title.innerText = "No Backup Found";
         title.className = "font-bold text-sm text-gray-600 dark:text-gray-300";
@@ -1031,7 +1011,6 @@
         icon.classList.add('fa-exclamation-circle', 'text-gray-400');
         
     } else if (diffDays > 7) {
-        // STATE: Overdue (Yellow/Amber)
         panel.classList.add('bg-amber-50', 'border-amber-200', 'dark:bg-amber-900/20', 'dark:border-amber-800');
         title.innerText = "Backup Overdue";
         title.className = "font-bold text-sm text-amber-700 dark:text-amber-500";
@@ -1039,12 +1018,10 @@
         icon.classList.add('fa-exclamation-triangle', 'text-amber-500');
         
     } else {
-        // STATE: Healthy (Green/Emerald)
         panel.classList.add('bg-emerald-50', 'border-emerald-200', 'dark:bg-emerald-900/20', 'dark:border-emerald-800');
         title.innerText = "System Healthy";
         title.className = "font-bold text-sm text-emerald-700 dark:text-emerald-500";
         
-        // Human readable date format
         const dateStr = last.toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute:'2-digit' });
         text.innerText = `Last saved: ${dateStr}`;
         icon.classList.add('fa-check-circle', 'text-emerald-500');
@@ -1091,32 +1068,26 @@
             }
         },
 
-       // --- UPDATED & NEW METHODS FOR APP OBJECT ---
+
         async startTimer(id) {
-            // Check if a timer is already running
             if (this.data.activeTimer) {
-                // Scenario A: User clicks "Start" on the ALREADY running task
                 if (this.data.activeTimer.id === id) {
                     this.toggleZenMode(true);
                     return;
                 }
                 
-                // Scenario B: User clicks "Start" on a DIFFERENT task (Hot Swap)
                 const currentTask = this.data.tasks.find(t => t.id === this.data.activeTimer.id);
                 const currentName = currentTask ? currentTask.subSubject : "Current Task";
                 
-                // UX SAFETY: Ask first!
                 const confirmed = await this.uiConfirm(
                     `⏱️ Switch Task?\n\n"${currentName}" is currently running.\n\nStop it and switch to this new task?`
                 );
 
-                if (!confirmed) return; // User cancelled. Abort switch.
+                if (!confirmed) return;
 
-                // DATA INTEGRITY: Silently save Task A before starting Task B
                 this.stopTimer(true); 
             }
 
-            // Initialize new timer state
             this.data.activeTimer = {
                 id: id,
                 startTime: Date.now(),
@@ -1125,18 +1096,15 @@
 
             this.persistTimerState();
             
-            // UX: Enter Zen Mode
             this.toggleZenMode(true);
             
             this.render();
             this.startTicker();
         },
 
-        // 2. UPDATED (FINAL): Stop Timer with Data Safety Fix
         stopTimer(silent = false) {
             if (!this.data.activeTimer) return;
 
-            // UX: Always exit Zen Mode
             this.data.isZenMode = false;
             document.getElementById('zenModeOverlay').classList.add('hidden');
 
@@ -1145,8 +1113,6 @@
             const taskId = this.data.activeTimer.id;
 
             // --- DATA INTEGRITY FIX ---
-            // If stopping silently (Hot Swap), we MUST save the data automatically
-            // because the completion modal won't appear to do it for us.
             if (silent) {
                 const task = this.data.tasks.find(t => t.id === taskId);
                 if (task) {
@@ -1155,7 +1121,6 @@
                     this.saveData(); 
                 }
             }
-            // --------------------------
 
             if (this.data.timerInterval) {
                 clearInterval(this.data.timerInterval);
@@ -1167,18 +1132,15 @@
             this.updateGlobalTimerUI();
             this.render(); 
             
-            // Only trigger completion modal if NOT silent (Manual Stop)
             if (!silent) {
                 this.manualComplete(taskId, finalMinutes);
             }
         },
         
-        // 3. UPDATED: Toggle Timer (Syncs Buttons)
         toggleTimer() {
             if (!this.data.activeTimer) return;
 
             if (this.data.activeTimer.startTime !== null) {
-                // PAUSE LOGIC
                 const now = Date.now();
                 const delta = Math.max(0, now - this.data.activeTimer.startTime);
                 this.data.activeTimer.accumulated += delta;
@@ -1191,7 +1153,6 @@
                 
                 this.updateTickerDisplay();
                 
-                // SYNC: Update both UI locations
                 document.getElementById('globalTimerPauseBtn').innerText = "Resume";
                 const zenBtn = document.getElementById('zenPauseBtn');
                 if(zenBtn) {
@@ -1200,11 +1161,9 @@
                 }
 
             } else {
-                // RESUME LOGIC
                 this.data.activeTimer.startTime = Date.now();
                 this.startTicker();
                 
-                // SYNC: Update both UI locations
                 document.getElementById('globalTimerPauseBtn').innerText = "Pause";
                  const zenBtn = document.getElementById('zenPauseBtn');
                 if(zenBtn) {
@@ -1218,13 +1177,12 @@
 
         startTicker() {
             if (this.data.timerInterval) clearInterval(this.data.timerInterval);
-            this.updateTickerDisplay(); // Update immediately
+            this.updateTickerDisplay();
             this.data.timerInterval = setInterval(() => {
                 this.updateTickerDisplay();
             }, 1000);
         }, 
 
-        // 4. UPDATED: Update Ticker (Syncs Two Timers)
         updateTickerDisplay() {
             if (!this.data.activeTimer) return;
             
@@ -1240,16 +1198,13 @@
             
             const timeString = `${h}:${m}:${s}`;
 
-            // Update Bottom Bar
             const display = document.getElementById('globalTimerDisplay');
             if (display) display.innerText = timeString;
 
-            // Update Zen Mode Overlay
             const zenDisplay = document.getElementById('zenTimerDisplay');
             if (zenDisplay) zenDisplay.innerText = timeString;
         },
 
-        // 5. NEW: Toggle Zen Mode State
         toggleZenMode(forceState = null) {
             if (forceState !== null) {
                 this.data.isZenMode = forceState;
@@ -1276,7 +1231,6 @@
                 if (task) {
                     document.getElementById('globalTimerTaskName').innerText = `${task.subject}: ${task.subSubject}`;
                 } else {
-                    // Cleanup if task missing
                     this.data.activeTimer = null;
                     this.persistTimerState();
                     bar.classList.add('translate-y-full');
@@ -1292,7 +1246,6 @@
             }
         },
 
-        // --- COMPLETION LOGIC ---
         manualComplete(id, defaultTime = null) {
             this.data.completingTaskId = id;
             const task = this.data.tasks.find(t => t.id === id);
@@ -1348,8 +1301,6 @@
             });
         },
 
-
-// UPDATED: confirmCompletion (Adds optional timestamp for future insights)
         async confirmCompletion(type) {
     const id = this.data.completingTaskId;
     const task = this.data.tasks.find(t => t.id === id);
@@ -1359,11 +1310,9 @@
         task.focusScore = document.getElementById('focusScore').value;
         task.status = type; 
         
-        // NEW: Optional field for Time-of-Day analysis (Safe add-on)
         task.completedAt = new Date().toISOString(); 
 
         if (type === 'done') {
-            // ... [Keep existing Spaced Repetition Logic] ...
              if (task.isRevision) {
                 const quality = await this.getRecallQuality();
                 const intervals = { 'again': 1, 'hard': 3, 'good': 7, 'easy': 25 };
@@ -1431,13 +1380,11 @@
 
         openSettings() { document.getElementById('settingsModal').classList.remove('hidden'); },
 
-        // --- IMPORT/EXPORT ---
         exportData() {
             this.data.lastBackup = new Date().toISOString();
             this.saveData();
             this.checkBackupStatus();
 
-            // FIX: Explicitly add schema: 3.2 here
             const exportObj = {
                 schema: 3.2,
                 ...this.data,
@@ -1454,22 +1401,19 @@
         },
 
         validateImportData(data) {
-            // 1. Schema & Structure
             if (!data || typeof data !== 'object') return { ok: false, error: "Invalid JSON structure." };
             if (data.schema !== 3.2) return { ok: false, error: `Version mismatch. Expected 3.2, got ${data.schema}.` };
             if (!Array.isArray(data.tasks)) return { ok: false, error: "Missing tasks array." };
             if (!Array.isArray(data.subjects)) return { ok: false, error: "Missing subjects array." };
 
-            // 2. Subject Validation (Check Duplicates)
             const validSubjectNames = new Set();
-            const subjectIds = new Set(); // NEW: Track Subject IDs
+            const subjectIds = new Set();
 
             for (let i = 0; i < data.subjects.length; i++) {
                 const s = data.subjects[i];
                 if (!s.id || typeof s.name !== 'string' || !s.name.trim()) 
                     return { ok: false, error: `Subject[${i}] is invalid (missing ID or Name).` };
                 
-                // FIX #1: Duplicate Subject ID Check
                 if (subjectIds.has(s.id)) return { ok: false, error: `Duplicate Subject ID detected: ${s.id}` };
                 subjectIds.add(s.id);
 
@@ -1477,22 +1421,18 @@
                 validSubjectNames.add(s.name);
             }
 
-            // 3. Task Validation (Check Duplicates)
-            const taskIds = new Set(); // NEW: Track Task IDs
+            const taskIds = new Set();
 
             for (let i = 0; i < data.tasks.length; i++) {
                 const t = data.tasks[i];
-                // Mandatory Fields
                 if (!t.id || typeof t.id !== 'string') return { ok: false, error: `Task[${i}] missing valid ID.` };
                 
-                // FIX #1: Duplicate Task ID Check
                 if (taskIds.has(t.id)) return { ok: false, error: `Duplicate Task ID detected: ${t.id}` };
                 taskIds.add(t.id);
 
                 if (typeof t.duration !== 'number' || t.duration < 0) return { ok: false, error: `Task[${i}] has invalid duration.` };
                 if (!t.date || isNaN(new Date(t.date).getTime())) return { ok: false, error: `Task[${i}] has invalid date.` };
                 
-                // Referential Integrity
                 if (!validSubjectNames.has(t.subject)) return { ok: false, error: `Task[${i}] refers to missing subject: "${t.subject}".` };
             }
 
@@ -1501,14 +1441,11 @@
         
         showImportPreview(data) {
             return new Promise(resolve => {
-                // 1. Extract Stats
                 const taskCount = data.tasks ? data.tasks.length : 0;
                 const subCount = data.subjects ? data.subjects.length : 0;
                 
-                // 2. Calculate Date Range
                 let dateRange = "No tasks";
                 if (taskCount > 0) {
-                    // Extract timestamps, filter invalids, and sort
                     const timestamps = data.tasks
                         .map(t => new Date(t.date).getTime())
                         .filter(ts => !isNaN(ts));
@@ -1525,18 +1462,15 @@
                     }
                 }
 
-                // 3. Populate Modal
                 document.getElementById('previewTaskCount').innerText = taskCount;
                 document.getElementById('previewSubCount').innerText = subCount;
                 document.getElementById('previewDateRange').innerText = dateRange;
 
-                // 4. Show Modal & Attach Listeners
                 const modal = document.getElementById('importPreviewModal');
                 modal.classList.remove('hidden');
 
                 const cleanup = () => {
                     modal.classList.add('hidden');
-                    // Remove listeners to prevent memory leaks/duplicate firings
                     cancelBtn.onclick = null;
                     confirmBtn.onclick = null;
                 };
@@ -1558,22 +1492,19 @@
                 try {
                     const parsed = JSON.parse(e.target.result);
                     
-                    // 1. STRICT VALIDATION
                     const validation = this.validateImportData(parsed);
                     if (!validation.ok) {
                         await this.uiAlert(`⛔ Import Blocked\n\n${validation.error}\n\nNo changes were made.`);
-                        input.value = ''; 
+                        input.value = '';
                         return;
                     }
 
-                    // 2. SHOW PREVIEW (Replaces simple uiConfirm)
                     const userConfirmed = await this.showImportPreview(parsed);
                     if (!userConfirmed) {
-                        input.value = ''; // Reset input so same file can be selected again
+                        input.value = '';
                         return;
                     }
 
-                    // 3. SAFETY RESTORE POINT
                     try {
                         const safetyBackup = JSON.stringify(this.data);
                         localStorage.setItem('prepMaster_safety_restore', safetyBackup);
@@ -1582,14 +1513,11 @@
                         return;
                     }
 
-                    // 4. ATOMIC UPDATE & CLEANUP
-                    // Clear active timer to prevent ghost state
                     if (this.data.timerInterval) clearInterval(this.data.timerInterval);
                     this.data.activeTimer = null;
                     this.data.timerInterval = null;
                     localStorage.removeItem('prepMasterTimer');
 
-                    // Apply Data
                     this.data.tasks = parsed.tasks;
                     this.data.subjects = parsed.subjects;
                     this.data.targetDate = parsed.targetDate || this.data.targetDate;
@@ -1609,7 +1537,6 @@
             reader.readAsText(file);
             input.value = '';
         },
-        // --- RENDERING ---
 
         async restoreSafetyBackup() {
             const raw = localStorage.getItem('prepMaster_safety_restore');
@@ -1620,7 +1547,6 @@
 
             try {
                 const parsed = JSON.parse(raw);
-                // Validate before restoring to ensure backup isn't corrupt
                 const validation = this.validateImportData(parsed);
                 if (!validation.ok) {
                     await this.uiAlert(`Cannot restore: Backup is corrupt.\n${validation.error}`);
@@ -1628,13 +1554,11 @@
                 }
 
                 if (await this.uiConfirm("⚠️ RESTORE BACKUP\n\nThis will overwrite your current data with the last safety backup created during import.\n\nContinue?")) {
-                    // Clear timer state (Safety)
                     if (this.data.timerInterval) clearInterval(this.data.timerInterval);
                     this.data.activeTimer = null;
                     this.data.timerInterval = null;
                     localStorage.removeItem('prepMasterTimer');
 
-                    // Apply Data
                     this.data.tasks = parsed.tasks;
                     this.data.subjects = parsed.subjects;
                     this.data.targetDate = parsed.targetDate;
@@ -1658,7 +1582,6 @@
             this.renderCalendar();
             this.renderSubjects();
             
-            // Safely render analytics
             try {
                 if (typeof this.renderAnalytics === 'function') {
                     this.renderAnalytics();
@@ -1668,19 +1591,16 @@
             this.renderBacklog();
             this.updateGlobalTimerUI();
 
-            // --- ZEN MODE RENDERING ---
             const zenOverlay = document.getElementById('zenModeOverlay');
             if (this.data.isZenMode && this.data.activeTimer) {
                 zenOverlay.classList.remove('hidden');
                 
-                // Populate Zen Details
                 const task = this.data.tasks.find(t => t.id === this.data.activeTimer.id);
                 if (task) {
                     document.getElementById('zenSubject').innerText = task.subject;
                     document.getElementById('zenTaskName').innerText = task.subSubject;
                 }
                 
-                // Sync Pause Button State visually
                 const isRunning = this.data.activeTimer.startTime !== null;
                 const zenBtn = document.getElementById('zenPauseBtn');
                 if(zenBtn) {
@@ -1991,13 +1911,9 @@
             });
         }, 
        
-// --- NEW ANALYTICS LOGIC START ---
-
-// 1. New Helper: Set Range
        setAnalyticsRange(days) {
     this.data.analyticsRange = days;
     
-    // Update UI Buttons
     document.querySelectorAll('.analytics-toggle').forEach(btn => {
         btn.classList.remove('bg-indigo-50', 'text-primary', 'dark:bg-gray-700', 'dark:text-white', 'shadow-sm');
         btn.classList.add('text-gray-500', 'hover:text-primary');
@@ -2012,14 +1928,12 @@
     this.renderAnalytics();
 },
 
-// NEW: Quick Action Handlers (Feature 1)
 quickSchedule(type, payload) {
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
     const dateStr = this.formatDate(tomorrow);
 
     if (type === 'revision') {
-        // Schedule a generic revision task
         this.data.tasks.push({
             id: this.generateUUID(),
             subject: payload || 'General',
@@ -2031,7 +1945,6 @@ quickSchedule(type, payload) {
             actualTime: 0
         });
     } else if (type === 'break') {
-        // Schedule a break/buffer
         this.data.tasks.push({
             id: this.generateUUID(),
             subject: 'Break',
@@ -2048,13 +1961,11 @@ quickSchedule(type, payload) {
     this.uiAlert(`✅ Added to tomorrow's schedule.`);
 },
 
-// NEW: Time of Day Analysis (Feature 3)
   getBestTimeBlock(tasks) {
-    // Only analyze tasks that have the new 'completedAt' field
     const validTasks = tasks.filter(t => t.completedAt && t.focusScore);
-    if (validTasks.length < 5) return null; // Not enough data yet
+    if (validTasks.length < 5) return null;
 
-    const buckets = {}; // Hour -> [scores]
+    const buckets = {};
     validTasks.forEach(t => {
         const hour = new Date(t.completedAt).getHours();
         if (!buckets[hour]) buckets[hour] = [];
@@ -2074,15 +1985,12 @@ quickSchedule(type, payload) {
 
     if (bestHour === -1) return null;
     
-    // Convert 24h to AM/PM
     const ampm = bestHour >= 12 ? 'PM' : 'AM';
     const hour12 = bestHour % 12 || 12;
     return `${hour12}-${hour12+1} ${ampm}`;
 },
 
 
-// 2. Updated Render Function (Replaces existing renderAnalytics)
-    // UPDATED: renderAnalytics (Adds Data Guard, Consistency, and Reflection)
    renderAnalytics() {
     if(this.data.currentView !== 'analytics') return;
     
@@ -2100,7 +2008,6 @@ quickSchedule(type, payload) {
     const completedOrPartial = relevantTasks.filter(t => t.actualTime > 0);
     const totalMins = completedOrPartial.reduce((acc, t) => acc + (t.actualTime || 0), 0);
 
-    // FEATURE 6: NOT ENOUGH DATA GUARD
     if (totalMins === 0) {
         document.getElementById('analyticsSubjectBars').innerHTML = 
             `<div class="text-center py-12 text-gray-400">
@@ -2113,14 +2020,12 @@ quickSchedule(type, payload) {
         document.getElementById('analyticsCompletion').innerText = "-";
         document.getElementById('analyticsConsistency').classList.add('hidden');
         document.getElementById('analyticsReflection').classList.add('hidden');
-        // Hide specific cards if empty
         document.getElementById('cardStrongSubject').classList.add('hidden');
         document.getElementById('cardWeakSubject').classList.add('hidden');
         this.generateInsights(0, 0, 0, range);
         return;
     }
 
-    // --- EXISTING STATS ---
     const totalEl = document.getElementById('analyticsTotalHours');
     if(totalEl) totalEl.innerText = `${(totalMins/60).toFixed(1)}h`;
     
@@ -2134,15 +2039,12 @@ quickSchedule(type, payload) {
     document.getElementById('analyticsCompletion').innerText = `${rate}%`;
 
 
-    // FEATURE 2: CONSISTENCY PULSE
     const consistencyEl = document.getElementById('analyticsConsistency');
     consistencyEl.classList.remove('hidden');
     
-    // Count unique days with activity
     const activeDays = new Set(completedOrPartial.map(t => t.date)).size;
     document.getElementById('consistencyText').innerText = `${activeDays} active days this week`;
     
-    // Visual Dots
     const visuals = document.getElementById('consistencyVisuals');
     visuals.innerHTML = '';
     for(let i=0; i<7; i++) {
@@ -2153,7 +2055,6 @@ quickSchedule(type, payload) {
     }
 
 
-    // --- EXISTING BAR CHART LOGIC (Preserved) ---
     const barContainer = document.getElementById('analyticsSubjectBars');
     barContainer.innerHTML = '';
     const subjectStats = {};
@@ -2170,36 +2071,58 @@ quickSchedule(type, payload) {
         .map(([name, stat]) => ({ name, ...stat, avgFocus: stat.count ? stat.focusSum/stat.count : 0 }))
         .sort((a,b) => b.mins - a.mins);
 
-    if (sortedSubs.length > 0) {
+   if (sortedSubs.length > 0) {
         const maxMins = sortedSubs[0].mins || 1;
-        sortedSubs.forEach(sub => {
+        const grandTotalMins = totalMins || 1; // Prevent division by zero
+
+        sortedSubs.forEach((sub, index) => {
             const width = (sub.mins / maxMins) * 100;
-            const hours = (sub.mins/60).toFixed(1);
+            const shareOfTotal = Math.round((sub.mins / grandTotalMins) * 100);
+            let focusColor = "bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400";
+            if (sub.avgFocus >= 4) focusColor = "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400";
+            else if (sub.avgFocus >= 2.5) focusColor = "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400";
+            else if (sub.avgFocus > 0) focusColor = "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400";
+
+            const hours = (sub.mins / 60).toFixed(1);
             const safeName = sub.name.replace(/'/g, "\\'"); 
+
             const barHtml = `
-                <div class="group cursor-pointer" onclick="app.openAnalyticsDrill('${safeName}')">
-                    <div class="flex justify-between text-xs font-bold mb-2 text-gray-600 dark:text-gray-300">
-                        <span class="group-hover:text-primary transition-colors flex items-center gap-2">
-                            ${sub.name} <i class="fas fa-chevron-right text-[9px] opacity-0 group-hover:opacity-100 transform -translate-x-2 group-hover:translate-x-0 transition-all"></i>
-                        </span>
-                        <div class="flex gap-3">
-                            <span class="text-gray-400 font-medium">${sub.avgFocus > 0 ? sub.avgFocus.toFixed(1) + ' <i class="fas fa-star text-[9px]"></i>' : ''}</span>
-                            <span class="font-mono text-primary">${hours}h</span>
+                <div class="group relative bg-gray-50 dark:bg-gray-700/20 hover:bg-white dark:hover:bg-gray-700 border border-transparent hover:border-gray-200 dark:hover:border-gray-600 rounded-xl p-3 transition-all duration-200 cursor-pointer shadow-sm hover:shadow-md" onclick="app.openAnalyticsDrill('${safeName}')">
+                    
+                    <div class="flex justify-between items-center mb-2">
+                        <div class="flex items-center gap-2">
+                            <span class="text-[10px] font-bold text-gray-400 w-4">#${index + 1}</span>
+                            <span class="text-sm font-bold text-gray-800 dark:text-gray-100 group-hover:text-primary transition-colors">${sub.name}</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                             ${sub.avgFocus > 0 ? `
+                             <div class="${focusColor} px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider flex items-center gap-1">
+                                <i class="fas fa-brain"></i> ${sub.avgFocus.toFixed(1)}
+                             </div>` : ''}
                         </div>
                     </div>
-                    <div class="w-full bg-gray-100 dark:bg-gray-700 rounded-full h-2.5 overflow-hidden">
-                        <div class="bg-primary h-2.5 rounded-full relative group-hover:bg-primary-700 transition-colors" style="width: ${width}%"></div>
+
+                    <div class="relative w-full h-2.5 bg-gray-200 dark:bg-gray-600 rounded-full overflow-hidden mb-1.5">
+                        <div class="absolute top-0 left-0 h-full bg-primary group-hover:bg-primary-600 transition-all duration-500 rounded-full" style="width: ${width}%"></div>
+                    </div>
+
+                    <div class="flex justify-between items-center text-[10px] font-medium text-gray-400">
+                        <span>${hours} hours logged</span>
+                        <span class="font-mono text-gray-500 dark:text-gray-300">${shareOfTotal}% of total study</span>
+                    </div>
+                    
+                    <div class="absolute right-3 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-all transform translate-x-2 group-hover:translate-x-0">
+                        <i class="fas fa-chevron-right text-gray-300 dark:text-gray-500"></i>
                     </div>
                 </div>`;
+                
             barContainer.insertAdjacentHTML('beforeend', barHtml);
         });
 
-        // Feature 7: Safer Language for Weak Subjects
         const weak = [...sortedSubs].reverse().find(s => s.mins > 30 && s.avgFocus < 3.0);
         const weakCard = document.getElementById('cardWeakSubject');
         if(weak) {
             weakCard.classList.remove('hidden');
-            // Change "Needs Attention" title dynamically if needed, or rely on HTML update
             document.getElementById('lblWeakSub').innerText = weak.name;
         } else {
             weakCard.classList.add('hidden');
@@ -2215,22 +2138,18 @@ quickSchedule(type, payload) {
     }
 
 
-    // FEATURE 5: WEEKLY REFLECTION (System Generated)
     const refPanel = document.getElementById('analyticsReflection');
     if (range === 7 && activeDays >= 2) {
         refPanel.classList.remove('hidden');
         
-        // Line 1: Consistency
         document.getElementById('refConsistency').innerText = 
             activeDays >= 5 ? "Consistent effort this week." : "Building momentum.";
             
-        // Line 2: Balance (Hardest Subject)
         const hardest = sortedSubs.sort((a,b) => a.avgFocus - b.avgFocus)[0];
         document.getElementById('refBalance').innerText = hardest 
             ? `Hardest topic: ${hardest.name}` 
             : "Balanced workload.";
 
-        // Line 3: Timing (Feature 3 Insight)
         const bestTime = this.getBestTimeBlock(relevantTasks);
         document.getElementById('refTiming').innerText = bestTime 
             ? `Peak focus around ${bestTime}.` 
@@ -2244,20 +2163,20 @@ quickSchedule(type, payload) {
 },
 
 
-// UPDATED: Add to app object
-    openAnalyticsDrill(subjectName) {
+openAnalyticsDrill(subjectName) {
     this.data.activeDrillSubject = subjectName;
     
-    // FIX: Don't hide the parent! Hide only the bars and the header.
     const bars = document.getElementById('analyticsSubjectBars');
-    const header = bars.previousElementSibling; // The <h3>Subject Distribution</h3>
+    const header = bars.previousElementSibling; 
     
     bars.classList.add('hidden');
     if (header) header.classList.add('hidden');
     
-    // Show the panel
-    document.getElementById('analyticsDrillPanel').classList.remove('hidden'); 
+    const panel = document.getElementById('analyticsDrillPanel');
+    panel.classList.remove('hidden');
     
+    document.getElementById('view-analytics').scrollIntoView({ behavior: 'smooth' });
+
     this.renderDrillDown();
 },
 
@@ -2273,144 +2192,184 @@ quickSchedule(type, payload) {
     document.getElementById('analyticsDrillPanel').classList.add('hidden');
 },
 
-// NEW: Core Logic for Feature 1, 2, & 3
-    renderDrillDown() {
+renderDrillDown() {
     const subName = this.data.activeDrillSubject;
     if (!subName) return;
 
-    document.getElementById('drillSubjectTitle').innerText = subName;
-    const list = document.getElementById('drillTopicList');
-    list.innerHTML = '';
-
-    // 1. DATA AGGREGATION (Runtime Only)
-    const topicMap = new Map();
     const subObj = this.data.subjects.find(s => s.name === subName);
     const definedTopics = subObj ? subObj.sub : [];
+    const topicMap = new Map();
 
-    // Initialize with defined topics (so unstudied topics show up)
+    
     definedTopics.forEach(t => topicMap.set(t, { 
-        name: t, time: 0, count: 0, lastDate: null, status: 'new' 
+        name: t, time: 0, count: 0, lastDate: null 
     }));
 
-    // Process logs
+    let hasFocusData = false;
+    const dayStats = [0,0,0,0,0,0,0]; 
+    
     this.data.tasks.forEach(t => {
-        if (t.subject === subName && t.actualTime > 0) {
-            const entry = topicMap.get(t.subSubject) || { name: t.subSubject, time: 0, count: 0, lastDate: null, status: 'active' };
-            
-            entry.time += t.actualTime;
-            entry.count++;
-            
-            // Track Last Date
-            if (!entry.lastDate || t.date > entry.lastDate) {
-                entry.lastDate = t.date;
+        if (t.subject === subName) {
+            if (t.actualTime > 0) {
+                const entry = topicMap.get(t.subSubject) || { name: t.subSubject, time: 0, count: 0, lastDate: null };
+                entry.time += t.actualTime;
+                entry.count++;
+                if (!entry.lastDate || t.date > entry.lastDate) entry.lastDate = t.date;
+                topicMap.set(t.subSubject, entry);
             }
-            topicMap.set(t.subSubject, entry);
+            if(t.status === 'done' && t.focusScore) {
+                const parts = t.date.split('-');
+                const localDate = new Date(parts[0], parts[1] - 1, parts[2]); 
+                dayStats[localDate.getDay()] += parseInt(t.focusScore);
+                hasFocusData = true;
+            }
         }
     });
 
-    // 2. FEATURE 3: PRODUCTIVITY INSIGHT (Safe Fallback to Day-of-Week)
-    // Note: Since legacy data stores dates as YYYY-MM-DD, we use Day of Week for accuracy.
-    const dayStats = [0,0,0,0,0,0,0]; // Sun-Sat
-    this.data.tasks.forEach(t => {
-        if(t.subject === subName && t.status === 'done' && t.focusScore) {
-            const d = new Date(t.date).getDay();
-            dayStats[d] += parseInt(t.focusScore);
-        }
-    });
-    
-    const bestDayIdx = dayStats.indexOf(Math.max(...dayStats));
-    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-    const banner = document.getElementById('drillInsightBanner');
-    
-    if (Math.max(...dayStats) > 0) {
-        banner.classList.remove('hidden');
-        document.getElementById('drillInsightText').innerText = `You have the highest focus intensity on ${days[bestDayIdx]}s for this subject.`;
-    } else {
-        banner.classList.add('hidden');
+
+
+    const headerHtml = `
+        <div class="sticky top-0 z-20 bg-gray-50/90 dark:bg-gray-900/90 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 py-3 mb-6 transition-all">
+            <div class="flex items-center justify-between px-2 sm:px-4">
+                <div class="flex items-center gap-3">
+                    <button onclick="app.closeAnalyticsDrill()" class="group w-9 h-9 flex items-center justify-center rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-primary hover:text-primary transition-all shadow-sm">
+                        <i class="fas fa-arrow-left text-sm text-gray-400 group-hover:text-primary transition-colors"></i>
+                    </button>
+                    <div>
+                        <h3 class="text-lg font-extrabold text-gray-900 dark:text-white tracking-tight leading-none">${subName}</h3>
+                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-0.5">Topic Performance</p>
+                    </div>
+                </div>
+                <button onclick="app.closeAnalyticsDrill()" class="hidden sm:block text-xs font-bold text-gray-400 hover:text-primary px-2 py-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                    CLOSE
+                </button>
+            </div>
+        </div>
+    `;
+
+    let insightHtml = '';
+    if (hasFocusData && Math.max(...dayStats) > 0) {
+        const bestDayIdx = dayStats.indexOf(Math.max(...dayStats));
+        const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        
+        insightHtml = `
+            <div class="mb-8 relative overflow-hidden rounded-2xl bg-gradient-to-br from-indigo-600 to-blue-700 text-white shadow-lg shadow-indigo-500/20 group">
+                <div class="absolute -right-6 -top-6 text-white/5 text-9xl group-hover:scale-110 transition-transform duration-700"><i class="fas fa-brain"></i></div>
+                <div class="relative z-10 p-4 flex items-start gap-5">
+                    <div class="w-12 h-12 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center shrink-0 border border-white/10">
+                        <i class="fas fa-lightbulb text-amber-300 text-xl"></i>
+                    </div>
+                    <div>
+                        <div class="text-[10px] font-bold uppercase tracking-widest text-indigo-200 mb-1">Focus Insight</div>
+                        <p class="text-sm font-medium leading-relaxed">
+                            You have the highest focus intensity on <span class="font-bold text-amber-300 border-b-2 border-amber-300/30">${days[bestDayIdx]}s</span> for this subject.
+                        </p>
+                    </div>
+                </div>
+            </div>`;
     }
 
-    // 3. RENDER LIST
-    Array.from(topicMap.values()).sort((a,b) => (b.lastDate || '').localeCompare(a.lastDate || '')).forEach(topic => {
-        
-        // FEATURE 2: RETENTION INDICATOR
-        let retentionDot = 'bg-gray-300';
-        let retentionText = 'Not Started';
-        let daysAgo = 999;
+    let listRows = '';
+    const sortedTopics = Array.from(topicMap.values()).sort((a,b) => (b.lastDate || '').localeCompare(a.lastDate || ''));
 
-        if (topic.lastDate) {
-
-           // 1. Parse topic date to local midnight
-    const parts = topic.lastDate.split('-');
-    const lastDateLocal = new Date(parts[0], parts[1] - 1, parts[2]);
-    
-    // 2. Get today at local midnight
-    const today = new Date();
-    today.setHours(0,0,0,0);
-    
-    // 3. Calculate difference in days (integers)
-    const diffTime = today - lastDateLocal;
-    daysAgo = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    if (sortedTopics.length === 0) {
+        listRows = `
+            <div class="flex flex-col items-center justify-center py-16 border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-2xl text-gray-400 bg-gray-50/50 dark:bg-gray-800/50">
+                <i class="fas fa-layer-group text-3xl mb-3 opacity-50"></i>
+                <p class="font-medium">No topics started yet.</p>
+                <button onclick="app.closeAnalyticsDrill(); app.openTaskModal()" class="mt-4 text-xs font-bold text-primary hover:underline">Create a Task</button>
+            </div>`;
+    } else {
+        sortedTopics.forEach(topic => {
+            let status = { color: 'bg-gray-100 text-gray-500 border-gray-200', label: 'New', icon: 'fa-circle' };
             
-            if (daysAgo <= 3) { 
-                retentionDot = 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]'; 
-                retentionText = 'Fresh'; 
-            } else if (daysAgo <= 10) { 
-                retentionDot = 'bg-amber-400'; 
-                retentionText = 'Needs Review'; 
-            } else { 
-                retentionDot = 'bg-red-500'; 
-                retentionText = 'Overdue'; 
+            if (topic.lastDate) {
+                const parts = topic.lastDate.split('-');
+                const diffTime = new Date().setHours(0,0,0,0) - new Date(parts[0], parts[1]-1, parts[2]);
+                const daysAgo = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+                
+                if (daysAgo <= 3) status = { color: 'bg-emerald-100 text-emerald-700 border-emerald-200', label: 'Fresh', icon: 'fa-check-circle' };
+                else if (daysAgo <= 10) status = { color: 'bg-amber-100 text-amber-700 border-amber-200', label: 'Review', icon: 'fa-exclamation-circle' };
+                else status = { color: 'bg-red-50 text-red-600 border-red-100', label: 'Overdue', icon: 'fa-history' };
             }
-        }
 
-        list.insertAdjacentHTML('beforeend', `
-            <tr class="group hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors border-b border-gray-50 dark:border-gray-700/50 last:border-0">
-                <td class="p-4 align-top">
-                    <div class="flex items-start gap-3">
-                        <div class="mt-1.5 w-2 h-2 rounded-full ${retentionDot} shrink-0" title="${retentionText}"></div>
-                        <div>
-                            <div class="font-bold text-sm text-gray-800 dark:text-gray-200 group-hover:text-primary transition-colors">${topic.name}</div>
-                            <div class="text-[10px] text-gray-400 font-mono mt-0.5">${topic.lastDate ? 'Last: ' + topic.lastDate : 'No logs yet'}</div>
+            const safeName = topic.name.replace(/'/g, "\\'");
+            const safeSub = subName.replace(/'/g, "\\'");
+
+listRows += `
+                <div class="group relative bg-white dark:bg-gray-800 p-4 rounded-xl border border-gray-100 dark:border-gray-700 hover:border-indigo-300 dark:hover:border-indigo-500 hover:shadow-md transition-all duration-200">
+                    
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-2 mb-1">
+                                <h4 class="text-sm font-extrabold text-gray-800 dark:text-gray-100 truncate" title="${topic.name}">
+                                    ${topic.name}
+                                </h4>
+                                <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wide border ${status.color}">
+                                    ${status.label}
+                                </span>
+                            </div>
+                            <div class="text-[10px] text-gray-400 font-medium flex items-center gap-1.5">
+                                <span class="w-1.5 h-1.5 rounded-full ${topic.lastDate ? 'bg-indigo-400' : 'bg-gray-300'}"></span>
+                                ${topic.lastDate ? 'Last studied: ' + topic.lastDate : 'No activity yet'}
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-between sm:justify-end gap-3 w-full sm:w-auto">
+                            
+                            <div class="flex items-center gap-3 bg-gray-50 dark:bg-gray-700/40 px-3 py-1.5 rounded-lg border border-gray-100 dark:border-gray-700/50">
+                                <div class="flex flex-col items-center leading-none">
+                                    <span class="text-[9px] font-bold text-gray-400 uppercase tracking-wider mb-0.5">Time</span>
+                                    <span class="text-xs font-mono font-bold text-gray-700 dark:text-gray-200">${(topic.time/60).toFixed(1)}h</span>
+                                </div>
+                                <div class="w-px h-5 bg-gray-200 dark:bg-gray-600"></div> <div class="flex flex-col items-center leading-none">
+                                    <span class="text-[9px] font-bold text-gray-400 uppercase tracking-wider mb-0.5">Sess.</span>
+                                    <span class="text-xs font-mono font-bold text-gray-700 dark:text-gray-200">${topic.count}</span>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center gap-1 pl-1">
+                                <button onclick="app.prepSafeAction('revision', '${safeSub}', '${safeName}')" class="px-3 py-1.5 bg-indigo-50 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-300 hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-500 dark:hover:text-white rounded-lg text-xs font-bold transition-all shadow-sm">
+                                    Revise
+                                </button>
+                                <button onclick="app.prepSafeAction('split', '${safeSub}', '${safeName}')" class="px-3 py-1.5 text-gray-400 hover:text-indigo-600 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg text-xs font-bold transition-colors">
+                                    Split
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </td>
-                <td class="p-4 text-right align-top">
-                    <div class="font-mono font-bold text-gray-700 dark:text-gray-300 text-sm">${(topic.time/60).toFixed(1)}h</div>
-                    <div class="text-[10px] text-gray-400">${topic.count} sessions</div>
-                </td>
-                <td class="p-4 text-right align-top hidden sm:table-cell">
-                    <div class="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button onclick="app.prepSafeAction('revision', '${subName}', '${topic.name}')" class="px-3 py-1.5 rounded-lg bg-indigo-50 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400 text-xs font-bold hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors">
-                            Revise
-                        </button>
-                        <button onclick="app.prepSafeAction('split', '${subName}', '${topic.name}')" class="px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-600 text-gray-500 dark:text-gray-400 text-xs font-bold hover:text-primary hover:border-primary transition-colors">
-                            Split
-                        </button>
-                    </div>
-                    <button onclick="app.prepSafeAction('revision', '${subName}', '${topic.name}')" class="sm:hidden w-8 h-8 flex items-center justify-center rounded-full bg-indigo-50 text-indigo-600">
-                        <i class="fas fa-plus text-xs"></i>
-                    </button>
-                </td>
-            </tr>
-        `);
-    });
+                </div>
+            `;
+        });
+    }
+
+    const panel = document.getElementById('analyticsDrillPanel');
+    panel.innerHTML = `
+        <div class="flex flex-col w-full min-h-[80vh] sm:min-h-0 pb-20">
+            ${headerHtml}
+            <div class="animate-fade-in px-1">
+                ${insightHtml}
+                <div class="space-y-3">
+                    ${listRows}
+                </div>
+            </div>
+        </div>
+    `;
 },
-// NEW: Action Handlers (Safe Interactions)
+
+
     prepSafeAction(type, subject, topic) {
-    // Open the existing modal
     this.openTaskModal();
     
-    // Defer execution slightly to allow modal DOM to render
     setTimeout(() => {
         const subSelect = document.getElementById('taskSubject');
         const topicInput = document.getElementById('taskSubSubject');
         const descInput = document.getElementById('taskDesc');
         
-        // Find subject ID
         const subObj = this.data.subjects.find(s => s.name === subject);
         if (subObj) {
             subSelect.value = subObj.id;
-            // Trigger change to load datalist options
             subSelect.dispatchEvent(new Event('change'));
         }
 
@@ -2424,21 +2383,19 @@ quickSchedule(type, payload) {
     }, 50);
 },
 
-    // UPDATED: generateInsights (Supportive + Actionable)
-     generateInsights(totalMins, avgFocus, completionRate, range, subjectStats = []) {
+    generateInsights(totalMins, avgFocus, completionRate, range, subjectStats = []) {
     const suggestionsEl = document.getElementById('analyticsSuggestions');
     if(!suggestionsEl) return;
     suggestionsEl.innerHTML = '';
 
     const tips = [];
     
-    // FEATURE 4: NORMALIZE BAD DAYS (Psychological Safety)
     if (totalMins > 0 && avgFocus < 2.5) {
         tips.push({ 
             icon: 'fa-battery-quarter', 
             color: 'text-gray-400', 
             text: "Low energy days happen. Tomorrow is a reset.",
-            action: null // No action, just validation
+            action: null
         });
     }
 
@@ -2447,11 +2404,10 @@ quickSchedule(type, payload) {
             icon: 'fa-align-left', 
             color: 'text-orange-500', 
             text: "High backlog? Reduce daily load slightly.",
-            action: { label: "Move 1 Task", type: 'break' } // Soft action
+            action: { label: "Move 1 Task", type: 'break' }
         });
     }
 
-    // FEATURE 1: INSIGHT -> ACTION
     if (avgFocus > 4.2) {
         tips.push({ 
             icon: 'fa-fire', 
@@ -2461,12 +2417,10 @@ quickSchedule(type, payload) {
         });
     }
 
-    // General Tips
     if (tips.length === 0 && totalMins > 0) {
         tips.push({ icon: 'fa-check', color: 'text-emerald-500', text: "Your rhythm is steady. Keep going.", action: null });
     }
 
-    // Render Tips with Optional Buttons
     tips.slice(0, 3).forEach(tip => {
         let btnHtml = '';
         if (tip.action) {
@@ -2487,9 +2441,9 @@ quickSchedule(type, payload) {
 },
 
 
-// --- NEW ANALYTICS LOGIC END ---
+
         
-        // --- USER ACTIONS ---
+        
         
         editTask(id) {
             const task = this.data.tasks.find(t => t.id === id);
@@ -2682,7 +2636,7 @@ quickSchedule(type, payload) {
         },
 
         async deleteTask(id) {
-            // 1. Check if the task being deleted has the Active Timer
+
             if (this.data.activeTimer && this.data.activeTimer.id === id) {
                 const task = this.data.tasks.find(t => t.id === id);
                 const msg = `⚠️ SESSION IN PROGRESS\n\nYou are currently studying "${task.subSubject}".\n\nStop the timer and delete this task?`;
@@ -2694,15 +2648,15 @@ quickSchedule(type, payload) {
                     return; // User cancelled
                 }
             } else {
-                // Standard confirmation for non-active tasks
+
                 if (!(await this.uiConfirm('Delete this task?'))) return;
             }
 
-            // 2. Proceed with deletion
+
             this.data.tasks = this.data.tasks.filter(t => t.id !== id);
             this.saveData();
             
-            // 3. Update UI if Modal is open
+
             const modalDate = document.getElementById('taskDate').value;
             if(!document.getElementById('taskModal').classList.contains('hidden')) {
                  this.renderDayManagerList(modalDate);
@@ -2818,18 +2772,18 @@ quickSchedule(type, payload) {
             e.target.reset();
         },
         
-        // [FIX] Converted legacy hard-delete to safe archive flow
+
         async removeSubSubject(subId, topicName) {
             if (window.subjActions && typeof window.subjActions.archiveTopic === 'function') {
                 const subject = this.data.subjects.find(s => s.id === subId);
                 if (!subject) return;
 
-                // 1. SAFETY: Check Active Timer
+
                 if (await window.subjActions.checkActiveTimerConflict(subject.name, topicName)) return;
 
-                // 2. CONFIRMATION (Archive vs Delete)
+
                 if (await this.uiConfirm(`Archive "${topicName}"?\n\nIt will be hidden from new tasks, but history is preserved.`)) {
-                     // Move to archive
+
                      subject.sub = subject.sub.filter(s => s !== topicName);
                      if (!subject.archivedSub) subject.archivedSub = [];
                      if (!subject.archivedSub.includes(topicName)) subject.archivedSub.push(topicName);
@@ -2855,27 +2809,16 @@ quickSchedule(type, payload) {
         }
     };
 
-// --- SUBJECT & TOPIC CONTROLLER (FINAL SIGN-OFF v5.4.3) ---
-// 1. Deduplicated controller.
-// 2. Added checkActiveTimerConflict() middleware.
-// 3. Added cascade updates for renames (Subject & Topic).
-// 4. Implemented Pagination (Limit 20) with Show More.
-// 5. Converted Delete to Archive-first flow.
+
 
 window.subjActions = {
-    // --- MIDDLEWARE: ACTIVE TIMER SAFETY ---
     checkActiveTimerConflict: async (subjectName, topicName = null) => {
-        // 1. Check if timer exists and is running (startTime != null)
         if (!app.data.activeTimer || app.data.activeTimer.startTime === null) return false;
 
-        // 2. Resolve the active task
         const currentTask = app.data.tasks.find(t => t.id === app.data.activeTimer.id);
         if (!currentTask) return false;
 
-        // 3. Check for Collision
         const subMatch = currentTask.subject === subjectName;
-        // If topicName is null, we are modifying the whole subject -> Match!
-        // If topicName is present, we match only if subSubject also matches.
         const topicMatch = topicName ? (currentTask.subSubject === topicName) : true;
 
         if (subMatch && topicMatch) {
@@ -2886,7 +2829,6 @@ window.subjActions = {
         return false; // No conflict
     },
 
-    // --- NAVIGATION ---
     openFocus: (id) => {
         app.data.focusSubjectId = id;
         app.render(); 
@@ -2897,7 +2839,6 @@ window.subjActions = {
         app.render(); 
     },
 
-    // --- RENDERING ---
     renderFocusList: () => {
         const subId = app.data.focusSubjectId;
         if (!subId) return;
@@ -2905,7 +2846,6 @@ window.subjActions = {
         const sub = app.data.subjects.find(s => s.id === subId);
         if (!sub) return window.subjActions.closeFocus();
 
-        // 1. Setup Data
         const activeTopics = sub.sub || [];
         if (!sub.archivedSub) sub.archivedSub = [];
         const totalHistory = app.data.tasks.filter(t => t.subject === sub.name).length;
