@@ -1,343 +1,110 @@
-# PrepMaster (v5.4.2)
+# 📚 PrepMaster (v6.0.1)
 
-PrepMaster is a production-ready Single Page Application built for long-term exam preparation. It combines structured planning, time tracking, calendar scheduling, and spaced repetition into a single offline-first frontend.
+**The Ultimate Local-First Study Planner for Competitive Exams.**
 
-This README is written as technical documentation. It is intended for engineers, especially backend developers, who want to integrate their own storage or APIs with this frontend while preserving all existing behavior.
+![Version](https://img.shields.io/badge/version-6.0.1-blue)
+![Tech](https://img.shields.io/badge/built%20with-Vanilla%20JS%20%2B%20Tailwind-teal)
+![License](https://img.shields.io/badge/license-MIT-green)
 
----
+PrepMaster is a lightweight, single-file Single Page Application (SPA) designed to help students manage syllabus coverage, track study hours, and analyze performance for competitive exams (like UPSC, SSC, JEE, etc.). 
 
-## 1. What this application does
+It operates entirely in the browser using `localStorage`, meaning **no internet connection, backend, or login is required.**
 
-PrepMaster helps a user plan, execute, and revise their study in a controlled and measurable way. It is not just a task list. It enforces a workflow:
+## ✨ Key Features
 
-1. Plan study tasks by date and subject
-2. Track real time spent using a persistent timer
-3. Review completed topics using spaced repetition
-4. Measure progress using derived analytics
+### 🗓️ Planning & Organization
+- **Dashboard:** At-a-glance view of "Today's Focus," backlog items, and daily progress bars.
+- **Sprint Calendar:** Visual calendar with heat-map style indicators for study density, mock tests, and revision days.
+- **Curriculum Manager:** specialized subject and topic management. organize your syllabus hierarchically (Subject -> Topics).
+- **Backlog Bucket:** Automatically catches missed tasks from previous days so nothing slips through the cracks.
 
-All logic lives in the frontend. The backend, if added, is responsible only for persistence and synchronization.
+### ⏱️ Execution & Focus
+- **Global Timer:** Persistent timer bar that tracks study sessions in real-time.
+- **Zen Mode:** A distraction-free, full-screen overlay with a massive timer and control buttons to help you enter a flow state.
+- **Focus Scoring:** Rate your focus level (1-5) after every session to track quality, not just quantity.
 
----
+### 📊 Analytics & Insights
+- **Performance Metrics:** Track total study hours, average focus quality, and completion rates.
+- **Subject Distribution:** Visual bar charts showing time allocation across different subjects.
+- **Drill-Down Analysis:** Click into any subject to see topic-wise statistics (Time spent, session count, last studied date).
+- **Smart Insights:** Automated detection of "Power Subjects" (high focus/time) and "Weak Areas" (low focus/completion).
+- **Review System:** Built-in Spaced Repetition logic (Again/Hard/Good/Easy) to schedule smart reviews.
 
-## 2. Architectural overview
-
-PrepMaster is a plain Single Page Application.
-
-* Technology: HTML and vanilla JavaScript
-* Styling: Tailwind via CDN
-* Build step: none
-* Frameworks: none
-
-The application uses a single in-memory state object (`app.data`). All UI rendering is derived from this state. Persistence is handled explicitly through browser localStorage.
-
-This design makes the app predictable, debuggable, and safe to integrate with any backend.
-
----
-
-## 3. Core design rules
-
-These rules are important for anyone integrating a backend.
-
-* The frontend owns all business logic
-* The backend must not recalculate revision schedules
-* The backend must not mutate timer state
-* All dates are stored as simple strings (YYYY-MM-DD)
-* All IDs are stable and immutable
-
-Violating these rules will cause subtle bugs.
+### 🛡️ Data & Customization
+- **Local-First:** All data is stored securely in your browser's `localStorage`.
+- **Import/Export:** distinct JSON export feature for backups and data portability.
+- **Dark Mode:** Fully responsive UI with a built-in light/dark theme toggle.
+- **Glassmorphism UI:** Modern, aesthetic interface using Tailwind CSS.
 
 ---
 
-## 4. Feature breakdown (in depth)
+## 🚀 Getting Started
 
-### 4.1 Task system
+Since PrepMaster is a **zero-dependency** single file application, installation is instant.
 
-A task represents a single unit of planned study.
+### Installation
+1. Download the `index.html` file from this repository.
+2. Open the file in any modern web browser (Chrome, Edge, Firefox, Safari).
+3. Start planning!
 
-A task always has:
+### Usage Guide
 
-* A unique ID
-* A subject and optional sub-topic
-* A planned date (or backlog state)
-* A planned duration
-
-Additional properties are added as the task is worked on or reviewed.
-
-Supported operations:
-
-* Create a task
-* Edit task metadata
-* Start, pause, and stop a timer on the task
-* Mark task as partially complete or done
-* Delete task safely
-
-Important behaviors:
-
-* Deleting a task that has an active timer will first stop the timer
-* Editing a task never changes its ID
-* A task can exist without a date (backlog)
+1. **Create Subjects:** Go to the **Subjects** tab and add your core subjects (e.g., History, Polity, Physics).
+2. **Add Topics:** Click on a subject to add specific chapters or topics.
+3. **Plan Your Day:** Go to the **Dashboard**, click "New Task," and select a subject/topic. Set a duration.
+4. **Start Studying:** Click the "Play" button on a task to start the timer.
+5. **Zen Mode:** For deep work, click the bottom timer bar to enter full-screen Zen Mode.
+6. **Log & Review:** When finished, stop the timer. Log your **Actual Time** and **Focus Score**.
 
 ---
 
-### 4.2 Subject system
+## 🛠️ Tech Stack
 
-Subjects define the syllabus structure.
+PrepMaster is built with simplicity and longevity in mind. It uses no build tools, no npm, and no frameworks.
 
-A subject is not just a label. It is used to group tasks, analytics, and revision history.
-
-Supported operations:
-
-* Add a subject
-* Rename a subject
-* Delete a subject
-
-Rules:
-
-* Renaming a subject updates all tasks that reference it
-* Deleting a subject deletes all associated tasks
-* If any deleted task has an active timer, the timer is stopped first
-
-This guarantees consistency and prevents crashes.
+* **Core:** HTML5, Vanilla JavaScript (ES6+)
+* **Styling:** [Tailwind CSS](https://tailwindcss.com/) (via CDN)
+* **Icons:** [FontAwesome](https://fontawesome.com/) (via CDN)
+* **Fonts:** Inter & JetBrains Mono (via Google Fonts)
+* **Storage:** Browser LocalStorage API
+* **Architecture:** Monolithic SPA (Single `index.html` file)
 
 ---
 
-### 4.3 Timer system
+## 💾 Data Management
 
-The timer is implemented as a state machine.
+**Where is my data?**
+Your data lives in your browser cache. If you clear your browser history/cache, you might lose your data.
 
-It tracks real elapsed time spent on a task and survives page reloads and browser restarts.
+**How to backup?**
+1. Click the **Settings** (⚙️) icon in the top right.
+2. Click **Export Now**.
+3. Save the `.json` file to a safe location (Google Drive, Cloud, etc.).
+4. To restore, use the **Import File** button in the settings menu.
 
-Key properties:
-
-* Only one timer can be active at a time
-* Timer state is persisted separately from tasks
-* Timer restoration validates task existence
-
-Timer lifecycle:
-
-1. Start timer on a task
-2. Pause or resume as needed
-3. Stop timer and record elapsed time
-
-Internally, elapsed time is calculated using:
-
-* `startTime`: when the timer last started
-* `accumulated`: previously recorded elapsed time
-
-Display guards prevent unrealistic values, but stored data is never altered.
+> **Note:** The app includes an automatic "Safety Backup" feature that attempts to save a snapshot before you import new data.
 
 ---
 
-### 4.4 Calendar planning
+## 🤝 Contributing
 
-The calendar is the primary planning interface.
+Contributions are welcome! Since this is a single-file project, please ensure:
 
-Features:
+1.  **Tailwind Classes:** Use standard Tailwind utility classes.
+2.  **No External Scripts:** Do not add local JS files; keep logic embedded in the `<script>` tag at the bottom of `index.html`.
+3.  **responsive:** Ensure UI changes work on mobile (`md:` and `lg:` breakpoints).
 
-* Month navigation
-* Day selection
-* Viewing and managing tasks for a specific date
-
-Dates are stored as plain strings in YYYY-MM-DD format. This avoids timezone bugs and makes backend integration simpler.
-
----
-
-### 4.5 Smart Revision (spaced repetition)
-
-PrepMaster includes an overdue-based spaced repetition system.
-
-How it works:
-
-* When a task is completed, future review dates are calculated
-* Review tasks are generated dynamically
-* Missing a review day does not discard the review
-
-A review is due if:
-
-nextReviewDate is less than or equal to the selected date
-
-Review tasks:
-
-* Are stored as normal tasks
-* Are marked with `isRevision: true`
-* Reference the original task using `reviewOf`
-
-This allows revision tasks to be tracked, timed, and analyzed like any other task.
+**To modify the code:**
+1.  Fork the repo.
+2.  Edit `index.html`.
+3.  Submit a Pull Request.
 
 ---
 
-### 4.6 Adaptive recall
+## 📄 License
 
-When completing a revision task, the user selects how well they remembered the topic.
-
-Recall options:
-
-* Again
-* Hard
-* Good
-* Easy
-
-Each option maps to a fixed next-review interval. The mapping is deterministic and must not be changed by the backend.
-
-The recall result updates:
-
-* Next review date
-* Review stage
-* Last reviewed timestamp
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
 
-### 4.7 Analytics
-
-Analytics are derived from existing task data.
-
-They are computed on demand and never stored separately.
-
-Examples include:
-
-* Total study time
-* Completion percentage
-* Subject-wise time distribution
-
-Because analytics are derived, backend systems may recompute them if needed.
-
----
-
-### 4.8 Backup and restore
-
-The application supports JSON export and import.
-
-Export:
-
-* Exports the full application state
-* Excludes active timer state
-
-Import:
-
-* Validates schema
-* Confirms overwrite
-* Rejects incompatible data
-
-If stored data becomes corrupted, the app preserves a backup copy before resetting to a safe default state.
-
----
-
-## 5. Data schema (authoritative)
-
-This section defines the exact data contract used by the frontend.
-
-### 5.1 Root state object
-
-Stored under the key `prepMasterData_v3`.
-
-{
-"schema": 3.2,
-"tasks": ["Task"],
-"subjects": ["Subject"],
-"targetDate": "YYYY-MM-DD",
-"lastBackup": "ISO_TIMESTAMP"
-}
-
-The backend should store this object exactly or normalize it carefully.
-
----
-
-### 5.2 Task object
-
-{
-"id": "string (uuid)",
-"subject": "string",
-"subSubject": "string",
-"desc": "string",
-"date": "YYYY-MM-DD | null",
-"duration": "number (minutes)",
-"actualTime": "number (minutes)",
-"focusScore": "number (1-5)",
-"status": "pending | partial | done | backlog",
-
-"isRevision": "boolean",
-"reviewOf": "task id | null",
-"reviewStage": "number",
-"nextReviewDate": "YYYY-MM-DD | null",
-"lastReviewedAt": "YYYY-MM-DD | null",
-"lastRecallQuality": "again | hard | good | easy"
-}
-
-Important notes:
-
-* All task IDs are immutable
-* `isRevision` distinguishes generated review tasks
-* `reviewOf` links revisions to the original task
-* `nextReviewDate` controls smart revision selection
-
----
-
-### 5.3 Subject object
-
-{
-"id": "string (uuid)",
-"name": "string",
-"sub": ["string"]
-}
-
-Subjects are referenced by name in tasks. Renaming a subject updates all tasks.
-
----
-
-### 5.4 Active timer object
-
-Stored separately under `prepMasterTimer`.
-
-{
-"id": "task id",
-"startTime": "number (epoch ms)",
-"accumulated": "number (ms)"
-}
-
-Timer data is ephemeral and should not be treated as historical study data by a backend.
-
----
-
-## 6. Backend integration strategies
-
-Several integration approaches are possible.
-
-1. Full-state synchronization
-
-   * Store and restore the root state object
-
-2. Normalized persistence
-
-   * Store tasks and subjects in separate tables
-   * Reconstruct the root object on load
-
-3. Event-based persistence
-
-   * Store task events
-   * Replay events to rebuild state
-
-Regardless of approach, the frontend must remain the authority for business logic.
-
----
-
-## 7. Stability and guarantees
-
-The application guarantees:
-
-* No uncaught runtime crashes
-* Defensive handling of corrupted storage
-* Safe deletion of tasks and subjects
-* Timer isolation and validation
-* Full regression QA coverage
-
----
-
-## 8. Versioning and release status
-
-Version 5.4.2 is a production stability release. It has passed full end-to-end QA and is suitable for public use.
-
----
-
-## 9. Final notes for backend engineers
-
-This frontend is intentionally explicit and conservative. If you integrate a backend and respect the data contract defined above, you can safely extend the system without breaking existing users.
+*Made for students, by students.*
