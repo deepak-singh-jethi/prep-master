@@ -1105,7 +1105,7 @@
         },
         
         createCardHTML(t, isDone) {
-
+        // 1. Calculate Progress
         let duration = t.duration || 1; 
         let actual = t.actualTime || 0;
         
@@ -1117,7 +1117,9 @@
         let isOvertime = pct > 100;
         let displayWidth = Math.min(pct, 100); 
         
-
+        // 2. Dynamic Styles
+        // Normal: Clean Green Bar (No border animation)
+        // Overtime: Full Width Bar (Amber tint) + Breathing Animation Class
         
         let barColor = isOvertime ? 'bg-amber-500/10' : 'bg-emerald-500/10'; 
         let cardClass = isOvertime ? 'overtime-warning' : 'bg-white dark:bg-gray-800 border-gray-100 dark:border-gray-700';
@@ -1270,7 +1272,7 @@
                 this.stopTimer(true); 
             }
 
-
+            // FIX: Load existing time into accumulated state to resume correctly
             const task = this.data.tasks.find(t => t.id === id);
             const initialAccumulated = task && task.actualTime ? task.actualTime * 60000 : 0;
 
@@ -1300,7 +1302,7 @@
             if (silent) {
                 const task = this.data.tasks.find(t => t.id === taskId);
                 if (task) {
-
+                    // FIX: Set total time directly (do NOT add) because getElapsedMS now includes the history
                     task.actualTime = finalMinutes;
                     if (task.status !== 'done') task.status = 'partial';
                     this.saveData(); 
@@ -1374,7 +1376,7 @@
         const totalMS = this.getElapsedMS();
         const totalSecs = Math.floor(totalMS / 1000);
         
-
+        // 1. Update Global Timer
         const h = Math.floor(totalSecs / 3600).toString().padStart(2, '0');
         const m = Math.floor((totalSecs % 3600) / 60).toString().padStart(2, '0');
         const s = (totalSecs % 60).toString().padStart(2, '0');
@@ -1385,16 +1387,16 @@
         const zenDisplay = document.getElementById('zenTimerDisplay');
         if (zenDisplay) zenDisplay.innerText = timeString;
 
-
+        // 2. Update Progress Bars & Animations
         const task = this.data.tasks.find(t => t.id === this.data.activeTimer.id);
         
         if (task && task.duration) {
             const durationMS = task.duration * 60000;
             const pct = (totalMS / durationMS) * 100;
             const isOvertime = pct > 100;
-            const displayWidth = Math.min(pct, 100); /
+            const displayWidth = Math.min(pct, 100); // Cap green bar at 100%
 
-
+            // --- A. Update List Items (Small Cards) ---
             const bar = document.getElementById(`progress-bar-${task.id}`);
             const timeText = document.getElementById(`time-display-${task.id}`);
             const card = document.getElementById(`task-card-${task.id}`);
@@ -1404,26 +1406,26 @@
                 if(timeText) timeText.innerText = Math.floor(totalMS / 60000);
 
                 if (isOvertime) {
-
+                    // Activate Breathing Animation
                     if (card && !card.classList.contains('overtime-warning')) {
                         card.classList.add('overtime-warning');
-    
+                        // Remove default borders to let animation take over
                         card.classList.remove('border-gray-100', 'dark:border-gray-700', 'bg-white', 'dark:bg-gray-800');
                         
- 
+                        // Change text color
                         if(timeText && timeText.parentElement) {
                             timeText.parentElement.classList.remove('text-gray-400');
                             timeText.parentElement.classList.add('text-amber-600', 'dark:text-amber-500', 'font-bold');
                         }
                         
-        
+                        // Shift bar color to amber tint
                         bar.classList.remove('bg-emerald-500/10');
                         bar.classList.add('bg-amber-500/10');
                     }
                 }
             }
 
-
+            // --- B. Update HERO CARD (Big Card) ---
             const heroCard = document.getElementById('active-hero-card');
             const heroBar = document.getElementById('active-hero-progress');
             const heroStatus = document.getElementById('active-hero-status');
@@ -1435,12 +1437,12 @@
 
                 if (isOvertime) {
                     if (heroCard && !heroCard.classList.contains('overtime-warning')) {
-         
+                        // Switch Hero to Warning Mode
                         heroCard.classList.add('overtime-warning');
-    
+                        // Remove default green styling
                         heroCard.classList.remove('border-emerald-500/50', 'shadow-emerald-500/10');
                         
-        
+                        // Update inner elements to Amber
                         heroBar.classList.remove('bg-emerald-500/10');
                         heroBar.classList.add('bg-amber-500/10');
 
@@ -1891,6 +1893,7 @@
             }
         },
 
+// --- PHASE 2 HELPER: RISK ENGINE ---
         computeRiskMessage(recentTasks, coverage, gain, weakList) {
         const totalMins = recentTasks.reduce((acc, t) => acc + (t.actualTime || 0), 0);
         const totalHours = totalMins / 60;
@@ -1902,10 +1905,11 @@
     },
 
 
+// --- Phase-3 Logic: Strategy Engine ---
         computePhase3Signal(allTasks, targetDateStr, subjects) {
         const now = new Date();
         
-
+        // 1. Low Data Guard (Silence if < 6h or < 3 sessions in 14d)
         const day14 = new Date(); day14.setDate(now.getDate() - 14);
         const day30 = new Date(); day30.setDate(now.getDate() - 30);
         
@@ -1914,12 +1918,14 @@
         
         if ((totalMins / 60) < 6 || recentTasks.length < 3) return null;
 
+        // 2. Snooze & Cadence Guards
         const snoozeUntil = localStorage.getItem('strategySnoozeUntil');
         if (snoozeUntil && parseInt(snoozeUntil) > now.getTime()) return null;
 
         const lastShown = localStorage.getItem('lastStrategyShownAt');
         if (lastShown && (now.getTime() - parseInt(lastShown)) < (7 * 24 * 60 * 60 * 1000)) return null;
 
+        // 3. Signal: Mock Gap (Target < 12 weeks & < 2 mocks in 30d)
         const target = new Date(targetDateStr);
         const weeksLeft = (target - now) / (1000 * 60 * 60 * 24 * 7);
         
@@ -1940,6 +1946,7 @@
             }
         }
 
+        // 4. Signal: Revision Decay (Topics not seen in 21d)
         const topicLastSeen = {};
         allTasks.forEach(t => {
             if (t.status === 'done') {
@@ -1987,6 +1994,7 @@
         const allTasks = this.data.tasks;
         const todayTasks = allTasks.filter(t => t.date === todayStr && t.status !== 'backlog');
         
+        // --- 1. DATA PREP ---
         let focusTask = this.data.activeTimer ? allTasks.find(t => t.id === this.data.activeTimer.id) : null;
 
         const targetDate = new Date(this.data.targetDate);
@@ -2003,6 +2011,7 @@
         const totalHours = Math.round(recentTasks.reduce((acc, t) => acc + (t.actualTime || 0), 0) / 60);
         const isLowData = totalHours < 6;
 
+        // --- 2. RENDER LAYOUT ---
         const dashboardContainer = document.getElementById('view-dashboard');
         
         dashboardContainer.innerHTML = `
@@ -2082,10 +2091,13 @@
             </div>
         `;
 
+        // Active Card Logic
         const focusEl = document.getElementById('dashFocusCard');
         if (focusTask) {
             const isRunning = this.data.activeTimer && this.data.activeTimer.id === focusTask.id;
             
+            // --- UPDATED HERO CARD ---
+            // Added ID "active-hero-card" and "active-hero-progress" for live JS updates
             focusEl.innerHTML = `
                 <div id="active-hero-card" class="rounded-2xl p-6 md:p-8 border border-emerald-500/50 bg-white dark:bg-gray-800 relative group shadow-lg shadow-emerald-500/10 transition-all duration-500 overflow-hidden">
                     
@@ -2123,6 +2135,7 @@
                     </div>
                 </div>`;
         } else {
+            // Empty State
             focusEl.innerHTML = `
                 <div class="flex flex-col items-center justify-center py-12 bg-white dark:bg-dark-surface rounded-2xl border-2 border-dashed border-gray-200 dark:border-dark-border group hover:border-primary/30 transition-colors">
                     <div class="w-16 h-16 bg-gray-50 dark:bg-gray-800 rounded-full flex items-center justify-center mb-4 text-2xl text-gray-300 group-hover:text-primary group-hover:scale-110 transition-all duration-300">
@@ -2135,6 +2148,7 @@
                 </div>`;
         }
 
+        // List Rendering (with createCardHTML)
         const remainingEl = document.getElementById('dashRemainingList');
         const remainingTasks = todayTasks.filter(t => t.id !== (focusTask?.id) && t.status !== 'done');
         remainingEl.innerHTML = remainingTasks.length === 0 
@@ -2190,6 +2204,7 @@
             countEl.classList.toggle('hidden', count === 0);
         }
 
+        // 2. [FIX] Dashboard Header Badge (Phase 3)
         const miniBadge = document.getElementById('dashMiniBacklogCount');
         if (miniBadge) {
             miniBadge.textContent = count > 0 ? count : '';
@@ -2210,7 +2225,8 @@
             `);
         });
         
-       
+        // Note: dashBacklogMini (Phase 3) is static/informational now, so no list rendering needed there.
+    },
       
     renderCalendar() {
             if(this.data.currentView !== 'calendar') return;
@@ -2511,7 +2527,7 @@ quickSchedule(type, payload) {
 
    if (sortedSubs.length > 0) {
         const maxMins = sortedSubs[0].mins || 1;
-        const grandTotalMins = totalMins || 1; 
+        const grandTotalMins = totalMins || 1; // Prevent division by zero
 
         sortedSubs.forEach((sub, index) => {
             const width = (sub.mins / maxMins) * 100;
@@ -3115,7 +3131,7 @@ openBacklogModal() {
                 const msg = `⚠️ SESSION IN PROGRESS\n\nYou are currently studying "${task.subSubject}".\n\nStop the timer and delete this task?`;
 
                 if (await this.uiConfirm(msg)) {
-                   
+                    // ✅ CRITICAL FIX: Stop timer silently (true = suppress modal)
                     this.stopTimer(true); 
                 } else {
                     return; // User cancelled
