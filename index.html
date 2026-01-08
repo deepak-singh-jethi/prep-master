@@ -909,12 +909,19 @@
             focusSubjectId: null 
         },
 
-        init() {
+       init() {
+            // 1. Load basic data
             this.loadData();
-            this.render();
+            
+            // 2. Update logic (Backlog & Timer) BEFORE rendering UI
             this.checkBacklog();
-            this.checkBackupStatus(); 
             this.restoreTimerState(); 
+            
+            // 3. Render the UI (Now it sees the active timer correctly)
+            this.render();
+            
+            // 4. Secondary checks & listeners
+            this.checkBackupStatus(); 
             this.setupKeyboardShortcuts();
 
             if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
