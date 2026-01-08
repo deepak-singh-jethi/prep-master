@@ -114,6 +114,53 @@
     @media (max-width: 640px) {
       #dashQuickActions .hidden.sm\:inline-flex { display:none !important; }
     }
+    /* Add this inside your <style> tag */
+    
+    @keyframes moveStripes {
+        0% { background-position: 0 0; }
+        100% { background-position: 30px 30px; }
+    }
+
+    .animate-stripes {
+        background-image: linear-gradient(
+            45deg, 
+            rgba(255, 255, 255, 0.03) 25%, 
+            transparent 25%, 
+            transparent 50%, 
+            rgba(255, 255, 255, 0.03) 50%, 
+            rgba(255, 255, 255, 0.03) 75%, 
+            transparent 75%, 
+            transparent
+        );
+        background-size: 30px 30px;
+        animation: moveStripes 1s linear infinite;
+    }
+
+    .glass-panel {
+        background: rgba(255, 255, 255, 0.03);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    /* Overtime "Breathing" Animation */
+    @keyframes breatheAmber {
+        0%, 100% { 
+            border-color: rgba(245, 158, 11, 0.3); /* Amber-500 low opacity */
+            box-shadow: 0 0 0 rgba(245, 158, 11, 0);
+        }
+        50% { 
+            border-color: rgba(245, 158, 11, 1);   /* Amber-500 full opacity */
+            box-shadow: 0 0 15px rgba(245, 158, 11, 0.4); /* Soft Halo */
+        }
+    }
+
+    .overtime-warning {
+        animation: breatheAmber 3s infinite ease-in-out;
+        background-color: rgba(255, 251, 235, 0.5); /* Very light amber bg tint */
+    }
+    .dark .overtime-warning {
+        background-color: rgba(69, 26, 3, 0.2); /* Dark amber bg tint */
+    }
 
 </style>
 </head>
@@ -968,6 +1015,7 @@
             });
         },
 
+
         generateUUID() {
             if (typeof crypto !== 'undefined' && crypto.randomUUID) {
                 return crypto.randomUUID();
@@ -1056,6 +1104,65 @@
             }
         },
         
+        createCardHTML(t, isDone) {
+
+        let duration = t.duration || 1; 
+        let actual = t.actualTime || 0;
+        
+        if (this.data.activeTimer && this.data.activeTimer.id === t.id) {
+            actual = Math.floor(this.getElapsedMS() / 60000);
+        }
+
+        let pct = (actual / duration) * 100;
+        let isOvertime = pct > 100;
+        let displayWidth = Math.min(pct, 100); 
+        
+
+        
+        let barColor = isOvertime ? 'bg-amber-500/10' : 'bg-emerald-500/10'; 
+        let cardClass = isOvertime ? 'overtime-warning' : 'bg-white dark:bg-gray-800 border-gray-100 dark:border-gray-700';
+        let timeColor = isOvertime ? 'text-amber-600 dark:text-amber-500 font-bold' : 'text-gray-400';
+
+        // 3. HTML Structure
+        return `
+        <div id="task-card-${t.id}" class="group relative overflow-hidden flex justify-between items-center p-5 border rounded-2xl transition-all duration-300 mb-3 shadow-sm hover:shadow-md ${cardClass}">
+            
+            <div id="progress-bar-${t.id}" 
+                 class="absolute top-0 bottom-0 left-0 transition-all duration-700 ease-linear pointer-events-none ${barColor}" 
+                 style="width: ${displayWidth}%">
+            </div>
+
+            <div class="relative z-10 flex items-start gap-4 overflow-hidden flex-1 min-w-0">
+                <div class="mt-1.5 w-2.5 h-2.5 rounded-full shadow-sm shrink-0 transition-colors duration-300 ${isDone ? 'bg-emerald-500' : 'bg-gray-300 dark:bg-gray-600 group-hover:bg-primary'}"></div>
+                
+                <div class="flex flex-col min-w-0 w-full pr-4">
+                    <span class="text-base font-bold text-gray-800 dark:text-gray-100 truncate ${isDone ? 'line-through opacity-50' : ''}">${t.subSubject}</span>
+                    
+                    ${t.desc ? `<p class="text-xs text-gray-500 dark:text-gray-400 truncate w-full opacity-80 mb-1.5 font-medium"><i class="far fa-sticky-note text-[10px] mr-1.5 opacity-60"></i>${t.desc}</p>` : ''}
+                    
+                    <div class="flex items-center gap-3 mt-0.5">
+                        <span class="text-[9px] font-extrabold uppercase tracking-wider text-gray-500 border border-gray-200 dark:border-gray-600 px-2 py-0.5 rounded-md bg-white/50 dark:bg-black/20 backdrop-blur-md">${t.subject}</span>
+                        
+                        <span class="text-xs font-mono flex items-center gap-1.5 ${timeColor} transition-colors">
+                            <i class="far fa-clock text-[10px] opacity-70"></i>
+                            <span id="time-display-${t.id}">${Math.round(actual)}</span><span class="opacity-50">/</span><span>${t.duration}m</span>
+                            ${isOvertime ? '<i class="fas fa-exclamation-circle text-[10px] animate-pulse"></i>' : ''}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="relative z-10 flex items-center gap-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all duration-200 shrink-0 transform sm:translate-x-2 sm:group-hover:translate-x-0">
+                ${!isDone ? `
+                <button onclick="app.startTimer('${t.id}')" class="w-9 h-9 flex items-center justify-center rounded-xl text-gray-400 hover:text-white hover:bg-primary transition-all bg-white/80 dark:bg-gray-800/80 border border-gray-200 dark:border-gray-700 shadow-sm backdrop-blur-sm" title="Start"><i class="fas fa-play text-xs pl-0.5"></i></button>
+                <button onclick="app.manualComplete('${t.id}')" class="w-9 h-9 flex items-center justify-center rounded-xl text-gray-400 hover:text-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-all bg-white/80 dark:bg-gray-800/80 border border-gray-200 dark:border-gray-700 shadow-sm backdrop-blur-sm" title="Done"><i class="fas fa-check text-xs"></i></button>
+                <button onclick="app.editTask('${t.id}')" class="w-9 h-9 flex items-center justify-center rounded-xl text-gray-400 hover:text-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-all bg-white/80 dark:bg-gray-800/80 border border-gray-200 dark:border-gray-700 backdrop-blur-sm" title="Edit"><i class="fas fa-pencil-alt text-xs"></i></button>
+                ` : ''}
+                <button onclick="app.deleteTask('${t.id}')" class="w-9 h-9 flex items-center justify-center rounded-xl text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all bg-white/80 dark:bg-gray-800/80 border border-gray-200 dark:border-gray-700 backdrop-blur-sm" title="Delete"><i class="fas fa-trash-alt text-xs"></i></button>
+            </div>
+        </div>`;
+    },
+    
         checkBackupStatus() {
 
     const dot = document.getElementById('backupWarningDot');
@@ -1163,20 +1270,23 @@
                 this.stopTimer(true); 
             }
 
+
+            const task = this.data.tasks.find(t => t.id === id);
+            const initialAccumulated = task && task.actualTime ? task.actualTime * 60000 : 0;
+
             this.data.activeTimer = {
                 id: id,
                 startTime: Date.now(),
-                accumulated: 0
+                accumulated: initialAccumulated
             };
 
             this.persistTimerState();
-            
             this.toggleZenMode(true);
-            
             this.render();
             this.startTicker();
         },
-
+       
+       
         stopTimer(silent = false) {
             if (!this.data.activeTimer) return;
 
@@ -1187,11 +1297,11 @@
             const finalMinutes = Math.ceil(finalElapsedMS / 1000 / 60);
             const taskId = this.data.activeTimer.id;
 
-            // --- DATA INTEGRITY FIX ---
             if (silent) {
                 const task = this.data.tasks.find(t => t.id === taskId);
                 if (task) {
-                    task.actualTime = (task.actualTime || 0) + finalMinutes;
+
+                    task.actualTime = finalMinutes;
                     if (task.status !== 'done') task.status = 'partial';
                     this.saveData(); 
                 }
@@ -1211,7 +1321,7 @@
                 this.manualComplete(taskId, finalMinutes);
             }
         },
-        
+
         toggleTimer() {
             if (!this.data.activeTimer) return;
 
@@ -1259,27 +1369,95 @@
         }, 
 
         updateTickerDisplay() {
-            if (!this.data.activeTimer) return;
-            
-            const totalMS = this.getElapsedMS();
-            const MAX_DISPLAY_MS = 24 * 60 * 60 * 1000; 
-            const safeMS = (totalMS > MAX_DISPLAY_MS) ? MAX_DISPLAY_MS : totalMS;
+        if (!this.data.activeTimer) return;
+        
+        const totalMS = this.getElapsedMS();
+        const totalSecs = Math.floor(totalMS / 1000);
+        
 
-            const totalSecs = Math.floor(safeMS / 1000);
-            
-            const h = Math.floor(totalSecs / 3600).toString().padStart(2, '0');
-            const m = Math.floor((totalSecs % 3600) / 60).toString().padStart(2, '0');
-            const s = (totalSecs % 60).toString().padStart(2, '0');
-            
-            const timeString = `${h}:${m}:${s}`;
+        const h = Math.floor(totalSecs / 3600).toString().padStart(2, '0');
+        const m = Math.floor((totalSecs % 3600) / 60).toString().padStart(2, '0');
+        const s = (totalSecs % 60).toString().padStart(2, '0');
+        const timeString = `${h}:${m}:${s}`;
 
-            const display = document.getElementById('globalTimerDisplay');
-            if (display) display.innerText = timeString;
+        const display = document.getElementById('globalTimerDisplay');
+        if (display) display.innerText = timeString;
+        const zenDisplay = document.getElementById('zenTimerDisplay');
+        if (zenDisplay) zenDisplay.innerText = timeString;
 
-            const zenDisplay = document.getElementById('zenTimerDisplay');
-            if (zenDisplay) zenDisplay.innerText = timeString;
-        },
 
+        const task = this.data.tasks.find(t => t.id === this.data.activeTimer.id);
+        
+        if (task && task.duration) {
+            const durationMS = task.duration * 60000;
+            const pct = (totalMS / durationMS) * 100;
+            const isOvertime = pct > 100;
+            const displayWidth = Math.min(pct, 100); /
+
+
+            const bar = document.getElementById(`progress-bar-${task.id}`);
+            const timeText = document.getElementById(`time-display-${task.id}`);
+            const card = document.getElementById(`task-card-${task.id}`);
+
+            if (bar) {
+                bar.style.width = `${displayWidth}%`;
+                if(timeText) timeText.innerText = Math.floor(totalMS / 60000);
+
+                if (isOvertime) {
+
+                    if (card && !card.classList.contains('overtime-warning')) {
+                        card.classList.add('overtime-warning');
+    
+                        card.classList.remove('border-gray-100', 'dark:border-gray-700', 'bg-white', 'dark:bg-gray-800');
+                        
+ 
+                        if(timeText && timeText.parentElement) {
+                            timeText.parentElement.classList.remove('text-gray-400');
+                            timeText.parentElement.classList.add('text-amber-600', 'dark:text-amber-500', 'font-bold');
+                        }
+                        
+        
+                        bar.classList.remove('bg-emerald-500/10');
+                        bar.classList.add('bg-amber-500/10');
+                    }
+                }
+            }
+
+
+            const heroCard = document.getElementById('active-hero-card');
+            const heroBar = document.getElementById('active-hero-progress');
+            const heroStatus = document.getElementById('active-hero-status');
+            const heroPing = document.getElementById('active-hero-ping');
+            const heroDot = document.getElementById('active-hero-dot');
+
+            if (heroBar) {
+                heroBar.style.width = `${displayWidth}%`;
+
+                if (isOvertime) {
+                    if (heroCard && !heroCard.classList.contains('overtime-warning')) {
+         
+                        heroCard.classList.add('overtime-warning');
+    
+                        heroCard.classList.remove('border-emerald-500/50', 'shadow-emerald-500/10');
+                        
+        
+                        heroBar.classList.remove('bg-emerald-500/10');
+                        heroBar.classList.add('bg-amber-500/10');
+
+                        if (heroStatus) {
+                            heroStatus.innerText = "Time Exceeded";
+                            heroStatus.classList.remove('text-emerald-500');
+                            heroStatus.classList.add('text-amber-500', 'animate-pulse');
+                        }
+                        
+                        if (heroPing) heroPing.classList.replace('bg-emerald-400', 'bg-amber-400');
+                        if (heroDot) heroDot.classList.replace('bg-emerald-500', 'bg-amber-500');
+                    }
+                }
+            }
+        }
+    },
+       
         toggleZenMode(forceState = null) {
             if (forceState !== null) {
                 this.data.isZenMode = forceState;
@@ -1713,7 +1891,6 @@
             }
         },
 
-// --- PHASE 2 HELPER: RISK ENGINE ---
         computeRiskMessage(recentTasks, coverage, gain, weakList) {
         const totalMins = recentTasks.reduce((acc, t) => acc + (t.actualTime || 0), 0);
         const totalHours = totalMins / 60;
@@ -1725,11 +1902,10 @@
     },
 
 
-// --- Phase-3 Logic: Strategy Engine ---
         computePhase3Signal(allTasks, targetDateStr, subjects) {
         const now = new Date();
         
-        // 1. Low Data Guard (Silence if < 6h or < 3 sessions in 14d)
+
         const day14 = new Date(); day14.setDate(now.getDate() - 14);
         const day30 = new Date(); day30.setDate(now.getDate() - 30);
         
@@ -1738,14 +1914,12 @@
         
         if ((totalMins / 60) < 6 || recentTasks.length < 3) return null;
 
-        // 2. Snooze & Cadence Guards
         const snoozeUntil = localStorage.getItem('strategySnoozeUntil');
         if (snoozeUntil && parseInt(snoozeUntil) > now.getTime()) return null;
 
         const lastShown = localStorage.getItem('lastStrategyShownAt');
         if (lastShown && (now.getTime() - parseInt(lastShown)) < (7 * 24 * 60 * 60 * 1000)) return null;
 
-        // 3. Signal: Mock Gap (Target < 12 weeks & < 2 mocks in 30d)
         const target = new Date(targetDateStr);
         const weeksLeft = (target - now) / (1000 * 60 * 60 * 24 * 7);
         
@@ -1766,7 +1940,6 @@
             }
         }
 
-        // 4. Signal: Revision Decay (Topics not seen in 21d)
         const topicLastSeen = {};
         allTasks.forEach(t => {
             if (t.status === 'done') {
@@ -1806,7 +1979,7 @@
         this.renderDashboard();
     },
     
-renderDashboard() {
+     renderDashboard() {
         if (this.data.currentView !== 'dashboard') return;
 
         const todayStr = this.formatDate(new Date());
@@ -1814,310 +1987,194 @@ renderDashboard() {
         const allTasks = this.data.tasks;
         const todayTasks = allTasks.filter(t => t.date === todayStr && t.status !== 'backlog');
         
-        // 1. METRICS & SNAPSHOT
+        let focusTask = this.data.activeTimer ? allTasks.find(t => t.id === this.data.activeTimer.id) : null;
+
         const targetDate = new Date(this.data.targetDate);
         const daysLeft = Math.ceil((targetDate - new Date()) / (1000 * 60 * 60 * 24));
         const doneAll = allTasks.filter(t => t.status === 'done').length;
         const coverage = Math.round((doneAll / (allTasks.length || 1)) * 100);
         
-        // Weakness Heuristic
-        const subStats = {};
-        this.data.subjects.forEach(s => subStats[s.name] = { total: 0, done: 0 });
-        allTasks.forEach(t => {
-            if(subStats[t.subject]) {
-                subStats[t.subject].total++;
-                if(t.status === 'done') subStats[t.subject].done++;
-            }
-        });
-        const weakList = Object.entries(subStats)
-            .filter(([,v]) => v.total > 0)
-            .sort((a,b) => (a[1].done/a[1].total) - (b[1].done/b[1].total))
-            .map(s => s[0]).slice(0, 2);
-        const weakText = weakList.length ? `Gaps: ${weakList.join(', ')}` : "No data yet";
-
-        document.getElementById('dashRealitySnapshot').innerHTML = `
-            <div class="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-3 border border-gray-200 dark:border-gray-700 flex justify-between items-center text-xs font-medium text-gray-600 dark:text-gray-300">
-                <span><strong class="text-gray-900 dark:text-white">${daysLeft}</strong> days left</span>
-                <span>~${coverage}% covered</span>
-                <span class="text-red-500 dark:text-red-400 truncate max-w-[120px]">${weakText}</span>
-            </div>
-        `;
-
-        // 2. PRIMARY FOCUS / RUNNING TASK SECTION
-        let focusTask = this.data.activeTimer ? allTasks.find(t => t.id === this.data.activeTimer.id) : null;
-        
-        // If no timer is running, pick the next priority
-        if (!focusTask) {
-            const overdue = allTasks.find(t => new Date(t.date) < todayDate && t.status !== 'done' && t.status !== 'backlog');
-            const partial = todayTasks.find(t => t.status === 'partial');
-            const pending = todayTasks.find(t => t.status === 'pending');
-            focusTask = overdue || partial || pending;
-        }
-
-        const focusEl = document.getElementById('dashFocusCard');
-        
-        if (focusTask) {
-            const isRunning = this.data.activeTimer && this.data.activeTimer.id === focusTask.id;
-            const isOverdue = new Date(focusTask.date) < todayDate;
-            
-            // UX: Dynamic Labeling
-            let statusLabel = "NON-NEGOTIABLE";
-            let statusColor = "text-primary";
-            let borderClass = "border-primary";
-            let shadowClass = "";
-            let btnText = "START FOCUS SESSION";
-            let btnClass = "bg-primary hover:bg-primary-700 text-white";
-
-            if (isRunning) {
-                statusLabel = "● SESSION ACTIVE";
-                statusColor = "text-emerald-500 animate-pulse";
-                borderClass = "border-emerald-500 ring-1 ring-emerald-500/20";
-                shadowClass = "shadow-lg shadow-emerald-500/10";
-                btnText = "RESUME SESSION";
-                btnClass = "bg-emerald-500 hover:bg-emerald-600 text-white";
-            } else if (isOverdue) {
-                statusLabel = "OVERDUE";
-                statusColor = "text-red-500";
-                borderClass = "border-red-500";
-            }
-
-            const btnAction = isRunning ? "app.openZenMode()" : `app.startTimer('${focusTask.id}')`;
-            
-            // Logic for "Why this task"
-            let reason = "Core syllabus progression";
-            if (focusTask.isRevision) reason = "Spaced repetition due today";
-            else if (isOverdue) reason = "Topic is overdue – clear backlog";
-            else if ((focusTask.duration || 0) > 50) reason = "High-weight deep work session";
-
-            focusEl.innerHTML = `
-                <div class="bg-white dark:bg-gray-800 rounded-xl p-6 border-l-4 ${borderClass} ${shadowClass} relative group transition-all duration-300">
-                    
-                    <div class="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button onclick="app.editTask('${focusTask.id}')" class="p-2 text-gray-400 hover:text-primary transition-colors bg-white dark:bg-gray-700 rounded-lg shadow-sm" title="Edit Task"><i class="fas fa-pencil-alt text-xs"></i></button>
-                    </div>
-
-                    <div class="flex justify-between items-start mb-2">
-                        <span class="text-[10px] font-bold uppercase tracking-widest ${statusColor}">${statusLabel}</span>
-                        <span class="text-xs font-mono text-gray-400">${focusTask.duration || 0}m</span>
-                    </div>
-                    
-                    <h2 class="text-2xl font-extrabold text-gray-900 dark:text-white leading-tight mb-0.5">${focusTask.subSubject}</h2>
-                    <p class="text-xs text-gray-400 font-medium mb-1">Chosen because: ${reason}</p>
-                    <p class="text-sm text-gray-500 dark:text-gray-400 font-medium mb-6">${focusTask.subject} • Priority Task</p>
-                    
-                    <button onclick="${btnAction}" class="w-full py-3.5 rounded-lg font-bold text-xs uppercase tracking-widest shadow-md transition-all active:scale-[0.98] ${btnClass}">
-                        ${btnText}
-                    </button>
-                </div>`;
-        } else {
-            // Empty State
-            focusEl.innerHTML = `
-                <div class="flex flex-col items-center justify-center py-12 bg-white dark:bg-gray-800 rounded-xl border-2 border-dashed border-gray-200 dark:border-gray-700">
-                    <p class="text-gray-500 dark:text-gray-400 font-medium text-sm mb-2">Your schedule is clear.</p>
-                    <button onclick="app.openTaskModal()" class="bg-primary text-white hover:bg-primary-700 font-extrabold text-sm px-6 py-3 rounded-xl flex items-center gap-2 shadow-lg shadow-primary/20 transition-all">
-                        <i class="fas fa-plus-circle"></i> Add Anchor Task
-                    </button>
-                </div>`;
-        }
-
-        // 3. EFFORT IMPACT (Bounded Logic)
-        const sevenDaysAgo = new Date(); sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-        const recentTasks = allTasks.filter(t => new Date(t.date) >= sevenDaysAgo);
-        const totalHours = Math.round(recentTasks.reduce((acc, t) => acc + (t.actualTime || 0), 0) / 60);
-        
-        const uniqueDone = new Set(recentTasks.filter(t => t.status === 'done').map(t => t.subSubject)).size;
-        const gainVal = Math.round((uniqueDone / (this.data.subjects.reduce((a, s) => a + s.sub.length, 0) || 1)) * 100);
-        
-        let label = "LOW";
-        if (gainVal >= 15) label = "HIGH"; else if (gainVal >= 5) label = "MODERATE";
-        
-        const isLowData = totalHours < 6;
-        const displayLeft = `Last 7 days: ${totalHours}h studied` + (isLowData ? '' : ` → Conversion: ${label}`);
-        const displayRight = isLowData ? "LIMITED DATA" : this.computeRiskMessage(recentTasks, coverage, gainVal, weakList) || "Stable pace";
-
-        document.getElementById('dashEffortImpact').innerHTML = `
-            <div class="bg-amber-50 dark:bg-amber-900/10 px-4 py-3 rounded-lg border border-amber-100 dark:border-amber-900/30 flex justify-between items-center gap-4">
-                 <span class="text-xs font-bold text-amber-800 dark:text-amber-500 truncate">${displayLeft}</span>
-                 <span class="text-[10px] font-bold uppercase tracking-wider text-amber-600/70 dark:text-amber-500/70 shrink-0">${displayRight}</span>
-            </div>
-        `;
-
-        // 4. STRATEGY CARD (Phase 3)
-        let strategyEl = document.getElementById('dashStrategyCard');
-        if (!strategyEl) {
-            strategyEl = document.createElement('div');
-            strategyEl.id = 'dashStrategyCard';
-            document.getElementById('dashEffortImpact').insertAdjacentElement('afterend', strategyEl);
-        }
-        
-        const signal = this.computePhase3Signal(allTasks, this.data.targetDate, this.data.subjects);
-        if (signal) {
-            strategyEl.innerHTML = `
-                <div role="region" class="mb-6 bg-white dark:bg-gray-800 rounded-xl p-5 border-l-4 border-amber-400 shadow-sm flex flex-col md:flex-row gap-5 items-start md:items-center justify-between">
-                    <div class="flex-1 min-w-0">
-                        <h4 class="text-[10px] font-bold uppercase tracking-widest text-amber-600 dark:text-amber-500 mb-1.5 flex items-center gap-2"><i class="fas fa-lightbulb"></i> Strategy</h4>
-                        <p class="text-sm font-bold text-gray-900 dark:text-gray-100 leading-snug">${signal.text}</p>
-                    </div>
-                    <div class="flex items-center gap-4">
-                        <button onclick="app.snoozeStrategy()" class="text-xs font-medium text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 underline decoration-dotted">Snooze 3d</button>
-                        <button onclick="app.executeStrategyAction('${signal.ctaAction.replace(/'/g, "\\'")}')" class="bg-primary hover:bg-primary-700 text-white px-5 py-3 rounded-lg font-bold text-xs uppercase tracking-wider shadow-md transition-all">${signal.ctaLabel}</button>
-                    </div>
-                </div>`;
-            strategyEl.classList.remove('hidden');
-        } else {
-            strategyEl.classList.add('hidden');
-        }
-
-        // 5. PROGRESS & QUALITY
-        const rated = recentTasks.filter(t => t.focusScore);
-        const deepCount = rated.filter(t => parseInt(t.focusScore) >= 4).length;
-        const ratio = rated.length ? Math.round((deepCount / rated.length) * 100) : 0;
-        
         const completedToday = todayTasks.filter(t => t.status === 'done').length;
         const totalToday = todayTasks.length;
         const progressPct = totalToday > 0 ? Math.round((completedToday / totalToday) * 100) : 0;
+
+        const sevenDaysAgo = new Date(); sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+        const recentTasks = allTasks.filter(t => new Date(t.date) >= sevenDaysAgo);
+        const totalHours = Math.round(recentTasks.reduce((acc, t) => acc + (t.actualTime || 0), 0) / 60);
+        const isLowData = totalHours < 6;
+
+        const dashboardContainer = document.getElementById('view-dashboard');
         
-        document.getElementById('dashProgressText').innerText = `DAILY: ${completedToday} of ${totalToday} FOCUS ITEMS`;
-        document.getElementById('dashProgressPct').innerText = `${progressPct}%`;
-        setTimeout(() => document.getElementById('dashProgressBar').style.width = `${progressPct}%`, 50);
+        dashboardContainer.innerHTML = `
+            <div id="dashQuickActions" class="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-gray-200 dark:border-gray-700 pb-4 shrink-0">
+                <div>
+                    <h2 class="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">Dashboard</h2>
+                    <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mt-1">Your command center for today.</p>
+                </div>
+                <div class="flex items-center gap-3">
+                    <button onclick="app.openBacklogModal()" class="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-xs font-bold text-gray-600 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all shadow-sm">
+                        <i class="fas fa-archive text-gray-400"></i>
+                        <span>Backlog</span>
+                        <span id="dashMiniBacklogCount" class="hidden ml-2 bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded-md font-bold shadow-sm">0</span>
+                    </button>
+                    <button onclick="app.openTaskModal()" class="px-5 py-2.5 rounded-xl bg-primary hover:bg-primary-700 text-white font-bold shadow-lg shadow-primary/25 hover:shadow-primary/40 active:scale-95 transition-all text-sm flex items-center gap-2">
+                        <i class="fas fa-plus"></i> New Task
+                    </button>
+                </div>
+            </div>
 
-        const qualityEl = document.getElementById('dashQualityText');
-        if (rated.length >= 3) {
-            qualityEl.innerText = `Deep focus ratio: ${ratio}% ${ratio > 50 ? '(Good)' : '(Low)'}`;
-            qualityEl.classList.remove('hidden');
-        } else {
-            qualityEl.classList.add('hidden');
-        }
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start lg:h-[calc(100vh-13rem)]">
+                
+                <div class="lg:col-span-5 space-y-6 lg:h-full lg:overflow-hidden lg:flex lg:flex-col">
+                    <div id="dashFocusCard" class="shrink-0"></div>
 
-        // 6. SPLIT LISTS: OPTIONAL vs COMPLETED
-        const optListEl = document.getElementById('dashOptionalList');
-        const otherTasks = todayTasks.filter(t => t.id !== (focusTask?.id));
-        
-        // Filter groups
-        const pendingTasks = otherTasks.filter(t => t.status !== 'done');
-        const completedTasks = otherTasks.filter(t => t.status === 'done');
-
-        let listHtml = '';
-
-        // A. Remaining / Up Next
-        if (pendingTasks.length > 0) {
-            listHtml += `<div class="mb-6">
-                <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3 px-1 flex items-center gap-2">
-                    <span class="w-1.5 h-1.5 rounded-full bg-blue-400"></span> Remaining (${pendingTasks.length})
-                </h3>
-                <div class="space-y-2">`;
-            
-            pendingTasks.forEach(t => {
-                listHtml += `
-                <div class="group flex justify-between items-center p-3 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-lg hover:border-gray-300 dark:hover:border-gray-600 transition-all shadow-sm">
-                    <div class="flex items-center gap-3 overflow-hidden flex-1 min-w-0">
-                        <span class="text-xs font-bold text-gray-700 dark:text-gray-200 truncate">${t.subSubject}</span>
-                        <span class="text-[10px] text-gray-400 bg-gray-50 dark:bg-gray-700 px-1.5 py-0.5 rounded">${t.duration}m</span>
-                    </div>
-                    
-                    <div class="flex items-center gap-1">
-                        <button onclick="app.startTimer('${t.id}')" class="w-7 h-7 flex items-center justify-center rounded text-gray-400 hover:text-green-500 hover:bg-green-50 dark:hover:bg-green-900/20 transition-colors" title="Start"><i class="fas fa-play text-[10px]"></i></button>
-                        <button onclick="app.editTask('${t.id}')" class="w-7 h-7 flex items-center justify-center rounded text-gray-400 hover:text-primary hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors" title="Edit"><i class="fas fa-pencil-alt text-[10px]"></i></button>
-                        <button onclick="app.manualComplete('${t.id}')" class="w-7 h-7 flex items-center justify-center rounded text-gray-400 hover:text-secondary hover:bg-secondary/10 dark:hover:bg-gray-700 transition-colors" title="Done"><i class="fas fa-check text-xs"></i></button>
-                        <button onclick="app.deleteTask('${t.id}')" class="w-7 h-7 flex items-center justify-center rounded text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors" title="Delete"><i class="fas fa-trash-alt text-[10px]"></i></button>
-                    </div>
-                </div>`;
-            });
-            listHtml += `</div></div>`;
-        }
-
-        // B. Completed
-        if (completedTasks.length > 0) {
-            listHtml += `<div>
-                <h3 class="text-xs font-bold text-emerald-600/70 dark:text-emerald-500/70 uppercase tracking-widest mb-3 px-1 flex items-center gap-2">
-                    <i class="fas fa-check-circle text-xs"></i> Completed Today (${completedTasks.length})
-                </h3>
-                <div class="space-y-2 opacity-75 hover:opacity-100 transition-opacity">`;
-            
-            completedTasks.forEach(t => {
-                listHtml += `
-                <div class="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-800/50 border border-transparent dark:border-gray-700/50 rounded-lg">
-                    <div class="flex items-center gap-3 overflow-hidden flex-1 min-w-0">
-                        <span class="text-xs font-bold text-gray-500 dark:text-gray-400 line-through truncate">${t.subSubject}</span>
-                        <div class="flex items-center gap-1 text-[9px] text-gray-400">
-                            <span class="font-mono">${t.actualTime}m</span>
-                            ${t.focusScore ? `<span class="bg-gray-100 dark:bg-gray-700 px-1 rounded">Focus: ${t.focusScore}</span>` : ''}
+                    <div class="bg-white dark:bg-dark-surface rounded-2xl p-6 border border-gray-100 dark:border-dark-border shadow-soft space-y-6 shrink-0">
+                        <div class="flex justify-between items-center pb-4 border-b border-gray-100 dark:border-dark-border">
+                            <div class="flex flex-col">
+                                <span class="text-[10px] uppercase tracking-wider font-bold text-gray-400">Days Left</span>
+                                <strong class="text-2xl text-gray-900 dark:text-white tracking-tight">${daysLeft}</strong>
+                            </div>
+                            <div class="flex flex-col text-right">
+                                <span class="text-[10px] uppercase tracking-wider font-bold text-gray-400">Coverage</span>
+                                <strong class="text-2xl text-primary tracking-tight">${coverage}%</strong>
+                            </div>
+                        </div>
+                        <div>
+                            <h4 class="text-[10px] font-bold uppercase text-gray-400 tracking-widest mb-2">Performance (7 Days)</h4>
+                            <div class="flex justify-between items-center bg-gray-50 dark:bg-gray-700/30 p-3 rounded-xl">
+                                <span class="text-sm font-bold text-gray-700 dark:text-gray-300">${totalHours}h studied</span>
+                                <span class="text-[10px] font-bold uppercase tracking-wider ${isLowData ? 'text-gray-400' : 'text-emerald-500'}">
+                                    ${isLowData ? 'LIMITED DATA' : 'ON TRACK'}
+                                </span>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-[10px] font-bold uppercase text-gray-500 tracking-widest">Daily: ${completedToday}/${totalToday} Completed</span>
+                                <span class="text-sm font-mono font-bold text-gray-800 dark:text-white">${progressPct}%</span>
+                            </div>
+                            <div class="w-full bg-gray-100 dark:bg-gray-700 rounded-full h-2.5">
+                                <div id="dashProgressBar" class="bg-primary h-2.5 rounded-full transition-all duration-1000 shadow-glow" style="width: ${progressPct}%"></div>
+                            </div>
                         </div>
                     </div>
-                    <button onclick="app.deleteTask('${t.id}')" class="text-gray-300 hover:text-red-400 transition-colors px-2"><i class="fas fa-trash-alt text-[10px]"></i></button>
+                    <div id="dashStrategyCard" class="hidden shrink-0"></div>
+                </div>
+
+                <div class="lg:col-span-7 space-y-8 lg:h-full lg:overflow-y-auto lg:pr-2 custom-scrollbar pb-10">
+                    <div>
+                        <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4 flex items-center gap-2 sticky top-0 bg-gray-50 dark:bg-dark-bg z-10 py-2">
+                            <span class="w-2 h-2 rounded-full bg-blue-400 shadow-[0_0_8px_rgba(96,165,250,0.6)]"></span> Remaining
+                        </h3>
+                        <div id="dashRemainingList" class="space-y-3"></div>
+                    </div>
+                    <div>
+                        <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4 flex items-center gap-2 opacity-75 sticky top-0 bg-gray-50 dark:bg-dark-bg z-10 py-2">
+                            <span class="w-2 h-2 rounded-full bg-emerald-400"></span> Completed Today
+                        </h3>
+                        <div id="dashCompletedList" class="space-y-3 opacity-80"></div>
+                    </div>
+                    <div id="dashBacklogWhisper" class="hidden pt-6 border-t border-gray-100 dark:border-dark-border text-center">
+                        <p class="text-xs text-gray-500 dark:text-gray-400 font-medium mb-2" id="backlogText">Checking backlog...</p>
+                        <button onclick="app.openBacklogModal()" class="text-xs font-bold text-primary hover:text-primary-700 transition-colors">Review Bucket <i class="fas fa-arrow-right ml-1"></i></button>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        const focusEl = document.getElementById('dashFocusCard');
+        if (focusTask) {
+            const isRunning = this.data.activeTimer && this.data.activeTimer.id === focusTask.id;
+            
+            focusEl.innerHTML = `
+                <div id="active-hero-card" class="rounded-2xl p-6 md:p-8 border border-emerald-500/50 bg-white dark:bg-gray-800 relative group shadow-lg shadow-emerald-500/10 transition-all duration-500 overflow-hidden">
+                    
+                    <div id="active-hero-progress" class="absolute top-0 bottom-0 left-0 bg-emerald-500/10 transition-all duration-1000 ease-linear pointer-events-none" style="width: 0%"></div>
+
+                    <div class="relative z-10">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="flex items-center gap-2">
+                                <span class="relative flex h-2.5 w-2.5">
+                                  <span id="active-hero-ping" class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                                  <span id="active-hero-dot" class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                                </span>
+                                <span id="active-hero-status" class="text-[10px] font-bold uppercase tracking-widest text-emerald-500">Session Active</span>
+                            </div>
+                            <span class="text-xs font-mono font-bold text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-black/20 px-2 py-1 rounded-lg border border-gray-200 dark:border-white/10">
+                                ${focusTask.duration}m Target
+                            </span>
+                        </div>
+                        
+                        <h2 class="text-3xl font-extrabold text-gray-900 dark:text-white leading-tight mb-1 tracking-tight">${focusTask.subSubject}</h2>
+                        <p class="text-sm font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-5 flex items-center gap-2">
+                            <i class="fas fa-book text-xs opacity-50"></i> ${focusTask.subject}
+                        </p>
+                        
+                        ${focusTask.desc ? `
+                        <div class="text-sm text-gray-600 dark:text-gray-300 italic mb-6 bg-white/60 dark:bg-black/20 p-3 rounded-lg border border-gray-200 dark:border-white/5 flex gap-3 items-start backdrop-blur-sm">
+                            <i class="fas fa-quote-left text-gray-400 text-xs mt-1"></i> 
+                            <span class="leading-relaxed opacity-90">${focusTask.desc}</span>
+                        </div>` : ''}
+                        
+                        <button onclick="app.openZenMode()" class="w-full py-4 rounded-xl font-bold text-sm uppercase tracking-widest shadow-lg shadow-emerald-500/20 transition-transform active:scale-[0.98] bg-emerald-500 hover:bg-emerald-600 text-white flex items-center justify-center gap-2 group/btn">
+                            <span>Open Focus Mode</span>
+                            <i class="fas fa-expand text-xs group-hover/btn:scale-110 transition-transform"></i>
+                        </button>
+                    </div>
                 </div>`;
-            });
-            listHtml += `</div></div>`;
+        } else {
+            focusEl.innerHTML = `
+                <div class="flex flex-col items-center justify-center py-12 bg-white dark:bg-dark-surface rounded-2xl border-2 border-dashed border-gray-200 dark:border-dark-border group hover:border-primary/30 transition-colors">
+                    <div class="w-16 h-16 bg-gray-50 dark:bg-gray-800 rounded-full flex items-center justify-center mb-4 text-2xl text-gray-300 group-hover:text-primary group-hover:scale-110 transition-all duration-300">
+                        <i class="fas fa-coffee"></i>
+                    </div>
+                    <p class="text-gray-500 dark:text-gray-400 font-medium text-sm mb-4">Ready to start?</p>
+                    <button onclick="app.openTaskModal()" class="bg-primary text-white hover:bg-primary-700 font-bold text-sm px-6 py-3 rounded-xl shadow-lg shadow-primary/20 transition-transform active:scale-95 flex items-center gap-2">
+                        <i class="fas fa-plus"></i> Add Anchor Task
+                    </button>
+                </div>`;
         }
 
-        if (pendingTasks.length === 0 && completedTasks.length === 0) {
-            listHtml = `<div class="text-[10px] text-gray-400 italic px-1 text-center py-4">No other tasks scheduled.</div>`;
+        const remainingEl = document.getElementById('dashRemainingList');
+        const remainingTasks = todayTasks.filter(t => t.id !== (focusTask?.id) && t.status !== 'done');
+        remainingEl.innerHTML = remainingTasks.length === 0 
+            ? `<div class="text-xs text-gray-400 italic py-4 text-center border border-dashed border-gray-200 dark:border-gray-700 rounded-xl">No other tasks remaining.</div>` 
+            : remainingTasks.map(t => this.createCardHTML(t, false)).join('');
+
+        const completedEl = document.getElementById('dashCompletedList');
+        const doneTasks = todayTasks.filter(t => t.status === 'done');
+        completedEl.innerHTML = doneTasks.length === 0 
+            ? `<div class="text-xs text-gray-400 italic py-4 text-center">Nothing completed yet.</div>` 
+            : doneTasks.map(t => this.createCardHTML(t, true)).join('');
+
+        // Signals & Backlog
+        const signal = this.computePhase3Signal(allTasks, this.data.targetDate, this.data.subjects);
+        const stratEl = document.getElementById('dashStrategyCard');
+        if (signal) {
+            stratEl.innerHTML = `
+                <div class="bg-amber-50 dark:bg-amber-900/20 rounded-xl p-4 border border-amber-100 dark:border-amber-800/50 flex flex-col gap-3">
+                    <div>
+                        <h4 class="text-[10px] font-bold uppercase tracking-widest text-amber-600 dark:text-amber-500 mb-1 flex items-center gap-2"><i class="fas fa-lightbulb"></i> Strategy</h4>
+                        <p class="text-sm font-bold text-gray-900 dark:text-gray-100 leading-snug">${signal.text}</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <button onclick="app.executeStrategyAction('${signal.ctaAction.replace(/'/g, "\\'")}')" class="bg-amber-100 hover:bg-amber-200 dark:bg-amber-800 dark:hover:bg-amber-700 text-amber-900 dark:text-amber-100 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors">${signal.ctaLabel}</button>
+                        <button onclick="app.snoozeStrategy()" class="text-xs font-medium text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">Snooze</button>
+                    </div>
+                </div>`;
+            stratEl.classList.remove('hidden');
         }
 
-        optListEl.innerHTML = listHtml;
-
-        // 7. BACKLOG WHISPER
         const backlogCount = allTasks.filter(t => t.status === 'backlog').length;
         const blEl = document.getElementById('dashBacklogWhisper');
         if (backlogCount > 0) {
             blEl.classList.remove('hidden');
-            const itemText = backlogCount === 1 ? 'item' : 'items';
-            document.getElementById('backlogText').innerText = `You have ${backlogCount} postponed ${itemText} pending.`;
+            document.getElementById('backlogText').innerText = `You have ${backlogCount} postponed items pending.`;
         } else {
             blEl.classList.add('hidden');
         }
     },
 
-        createTaskHTML(task, isOverdue) {
-    const isDone = task.status === 'done';
-    const isPartial = task.status === 'partial';
-    const active = this.data.activeTimer && this.data.activeTimer.id === task.id;
-    
-    let actionHtml = '';
-    
-    if (!isDone) {
-        if (active) {
-            actionHtml = `<div class="text-primary font-bold text-xs tracking-wider animate-pulse">RUNNING</div>`;
-        } else {
-            actionHtml = `
-                <div class="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                     <button onclick="app.editTask('${task.id}')" class="p-2 text-gray-400 hover:text-primary transition-colors"><i class="fas fa-pencil-alt"></i></button>
-                     <button onclick="app.startTimer('${task.id}')" class="w-8 h-8 rounded-lg bg-primary text-white flex items-center justify-center shadow-md hover:scale-110 transition-transform"><i class="fas fa-play text-[10px]"></i></button>
-                     <button onclick="app.manualComplete('${task.id}')" class="p-2 text-gray-400 hover:text-secondary transition-colors"><i class="fas fa-check"></i></button>
-                </div>
-            `;
-        }
-    } else {
-         actionHtml = `<div class="text-secondary text-xs font-bold bg-secondary/10 px-2 py-1 rounded"><i class="fas fa-check"></i> Done</div>`;
-    }
-
-    const borderClass = isOverdue 
-        ? 'border-l-4 border-l-red-500 bg-red-50/50 dark:bg-red-900/10' 
-        : (active ? 'border-primary ring-1 ring-primary bg-primary/5' : 'border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800');
-
-    const overdueLabel = isOverdue ? `<span class="text-[9px] font-bold bg-red-100 text-red-600 px-1.5 py-0.5 rounded ml-2">OVERDUE</span>` : '';
-
-    return `
-        <div class="p-4 rounded-xl shadow-sm border ${borderClass} flex justify-between items-center group transition-all hover:shadow-md">
-            <div class="min-w-0 flex-1">
-                <div class="flex items-center gap-2 mb-1">
-                    <span class="text-[9px] font-bold uppercase text-gray-400 tracking-wider">${task.subject}</span>
-                    ${overdueLabel}
-                    ${isPartial ? `<span class="text-[9px] font-bold bg-blue-100 text-blue-600 px-1.5 py-0.5 rounded ml-2">PAUSED</span>` : ''}
-                </div>
-                <h4 class="font-bold text-gray-800 dark:text-gray-100 text-sm truncate ${isDone ? 'line-through opacity-50' : ''}">${task.subSubject}</h4>
-                <div class="flex items-center gap-3 mt-1">
-                    <div class="text-xs text-gray-400 flex items-center gap-1"><i class="far fa-clock text-[10px]"></i> ${task.duration}m</div>
-                </div>
-            </div>
-            <div class="flex items-center gap-2 pl-2">
-                ${actionHtml}
-            </div>
-        </div>
-    `;
-},
-
-// HELPER: Small update to support the "Focus" button in Resume CTA
        openZenMode() {
     document.getElementById('zenModeOverlay').classList.remove('hidden');
        },
@@ -2133,7 +2190,6 @@ renderDashboard() {
             countEl.classList.toggle('hidden', count === 0);
         }
 
-        // 2. [FIX] Dashboard Header Badge (Phase 3)
         const miniBadge = document.getElementById('dashMiniBacklogCount');
         if (miniBadge) {
             miniBadge.textContent = count > 0 ? count : '';
@@ -2154,8 +2210,7 @@ renderDashboard() {
             `);
         });
         
-        // Note: dashBacklogMini (Phase 3) is static/informational now, so no list rendering needed there.
-    },
+       
       
     renderCalendar() {
             if(this.data.currentView !== 'calendar') return;
@@ -2456,7 +2511,7 @@ quickSchedule(type, payload) {
 
    if (sortedSubs.length > 0) {
         const maxMins = sortedSubs[0].mins || 1;
-        const grandTotalMins = totalMins || 1; // Prevent division by zero
+        const grandTotalMins = totalMins || 1; 
 
         sortedSubs.forEach((sub, index) => {
             const width = (sub.mins / maxMins) * 100;
@@ -3060,7 +3115,7 @@ openBacklogModal() {
                 const msg = `⚠️ SESSION IN PROGRESS\n\nYou are currently studying "${task.subSubject}".\n\nStop the timer and delete this task?`;
 
                 if (await this.uiConfirm(msg)) {
-                    // ✅ CRITICAL FIX: Stop timer silently (true = suppress modal)
+                   
                     this.stopTimer(true); 
                 } else {
                     return; // User cancelled
