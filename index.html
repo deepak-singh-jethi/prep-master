@@ -70,6 +70,8 @@
     }
 </script>
 <style>
+    /* FIX: Prevents layout jump when scrollbar appears/disappears */
+    html { scrollbar-gutter: stable; }
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: transparent; }
     
@@ -102,6 +104,17 @@
 
     .text-xxs { font-size: 0.65rem; line-height: 1rem; }
     .bg-pattern { background-image: radial-gradient(#4F46E5 0.5px, transparent 0.5px); background-size: 10px 10px; opacity: 0.05; }
+  
+    /* ... existing styles ... */
+
+    /* PHASE3 MERGE: small dashboard micro-styling for merged UI-2 elements */
+    #dashQuickActions .shadow-glow { box-shadow: 0 8px 30px rgba(79,70,229,0.12); }
+    #dashMiniBacklogCount { min-width: 22px; text-align:center; display:inline-block; }
+    #dashBacklogMiniList .truncate { max-width: 26rem; }
+    @media (max-width: 640px) {
+      #dashQuickActions .hidden.sm\:inline-flex { display:none !important; }
+    }
+
 </style>
 </head>
 <body class="bg-gray-50 text-gray-800 dark:bg-dark-bg dark:text-gray-100 transition-colors duration-200 h-screen flex flex-col overflow-hidden font-sans antialiased selection:bg-primary-100 dark:selection:bg-primary-700/30">
@@ -189,34 +202,80 @@
 
     <main id="mainContent" class="flex-1 overflow-y-auto bg-gray-50 dark:bg-dark-bg p-4 md:p-8 lg:p-10 pb-32 scroll-smooth">
         
-        <div id="view-dashboard" class="view-section max-w-7xl mx-auto animate-fade-in">
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <div class="lg:col-span-2 flex flex-col gap-6">
-                    <div class="flex justify-between items-end">
-                        <div>
-                            <h2 class="text-2xl md:text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">Today's Focus</h2>
-                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mt-1">Execute your plan consistently.</p>
-                        </div>
-                        <button onclick="app.openTaskModal()" class="bg-primary hover:bg-primary-700 text-white pl-6 pr-7 py-3 rounded-xl shadow-lg shadow-primary/30 hover:shadow-primary/50 transition-all active:scale-95 flex items-center gap-2 font-extrabold text-sm">
-                            <i class="fas fa-plus"></i> <span class="hidden sm:inline">New Task</span>
-                        </button>
-                    </div>
+<div id="view-dashboard" class="view-section max-w-6xl mx-auto animate-fade-in px-2 sm:px-4">
+    
+    <div id="dashQuickActions" class="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-gray-200 dark:border-gray-700 pb-6">
+        <div>
+            <h2 class="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">Dashboard</h2>
+            <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mt-1">Your command center for today.</p>
+        </div>
 
-                    <div id="todayTaskList" class="flex flex-col gap-3 min-h-[200px]">
-                        </div>
+        <div class="flex items-center gap-3">
+            <button onclick="app.openBacklogModal()" class="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-xs font-bold text-gray-600 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all shadow-sm">
+                <i class="fas fa-archive text-gray-400"></i>
+                <span>Backlog</span>
+                <span id="dashMiniBacklogCount" class="hidden ml-2 bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded-md font-bold shadow-sm">0</span>
+            </button>
+
+            <button onclick="app.openTaskModal()" class="px-5 py-2.5 rounded-xl bg-primary hover:bg-primary-700 text-white font-bold shadow-lg shadow-primary/25 hover:shadow-primary/40 active:scale-95 transition-all text-sm flex items-center gap-2">
+                <i class="fas fa-plus"></i> New Task
+            </button>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        
+        <div class="lg:col-span-8 space-y-8">
+            
+            <div id="dashFocusCard"></div>
+
+            <div>
+                <div id="dashOptionalList" class="space-y-3"></div>
+            </div>
+        </div>
+
+        <div class="lg:col-span-4 space-y-6 lg:sticky lg:top-6">
+            
+            <div class="space-y-4">
+                <div id="dashRealitySnapshot"></div>
+                <div id="dashStrategyCard"></div> </div>
+
+            <div class="bg-white dark:bg-gray-800 rounded-2xl p-5 border border-gray-100 dark:border-gray-700 shadow-sm space-y-6">
+                
+                <div>
+                    <h4 class="text-[10px] font-bold uppercase text-gray-400 tracking-widest mb-3">Performance</h4>
+                    <div id="dashEffortImpact"></div>
                 </div>
 
-                <div class="space-y-6">
-                    <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-soft border border-gray-100 dark:border-gray-700 h-full max-h-[80vh] flex flex-col">
-                        <h3 class="text-sm font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-4 flex items-center gap-2">
-                            <i class="fas fa-inbox text-gray-400"></i> Backlog Bucket
-                        </h3>
-                        <div id="dashboardBacklogList" class="flex-1 overflow-y-auto pr-2 space-y-3 custom-scrollbar">
-                            </div>
+                <div id="dashProgressSection" class="opacity-90 hover:opacity-100 transition-opacity">
+                    <div class="flex justify-between items-center mb-2">
+                        <div class="flex flex-col">
+                             <span id="dashProgressText" class="text-[10px] font-bold uppercase text-gray-500 tracking-widest">Loading...</span>
+                             <span id="dashQualityText" class="text-[10px] font-medium text-indigo-500 hidden mt-0.5"></span>
+                        </div>
+                        <span id="dashProgressPct" class="text-xl font-mono font-bold text-gray-800 dark:text-white">0%</span>
+                    </div>
+                    <div class="w-full bg-gray-100 dark:bg-gray-700 rounded-full h-2">
+                        <div id="dashProgressBar" class="bg-primary h-2 rounded-full transition-all duration-1000" style="width: 0%"></div>
                     </div>
                 </div>
             </div>
+
+            <div id="dashBacklogWhisper" class="hidden bg-gray-50 dark:bg-gray-700/30 rounded-xl p-4 border border-dashed border-gray-200 dark:border-gray-600 text-center">
+                <p class="text-xs text-gray-500 dark:text-gray-400 font-medium mb-2" id="backlogText">Checking backlog...</p>
+                <button onclick="app.openBacklogModal()" class="text-xs font-bold text-primary hover:text-primary-700 dark:hover:text-primary-400 transition-colors">
+                    Review Bucket <i class="fas fa-arrow-right ml-1"></i>
+                </button>
+            </div>
+
+            <div id="dashCoachFeedback" class="hidden p-4 bg-indigo-50 dark:bg-indigo-900/20 rounded-xl border border-indigo-100 dark:border-indigo-800 text-center">
+                <p class="text-xs font-bold text-indigo-400 uppercase tracking-widest mb-1">Weekly Coach</p>
+                <p id="coachText" class="text-sm font-medium text-indigo-900 dark:text-indigo-200"></p>
+            </div>
+
         </div>
+    </div>
+</div>
 
         <div id="view-calendar" class="view-section hidden max-w-6xl mx-auto">
             <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
@@ -769,6 +828,21 @@
         </button>
     </div>
 </div>
+<div id="backlogModal" class="modal fixed inset-0 z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden border border-gray-200 dark:border-gray-700 flex flex-col max-h-[80vh]">
+        <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center bg-gray-50/50 dark:bg-gray-700/30 shrink-0">
+            <h3 class="text-lg font-bold text-gray-800 dark:text-white flex items-center gap-2">
+                <i class="fas fa-inbox text-gray-400"></i> Backlog Bucket
+            </h3>
+            <button onclick="app.closeModal('backlogModal')" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 w-8 h-8 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 flex items-center justify-center transition-colors"><i class="fas fa-times"></i></button>
+        </div>
+        <div id="backlogModalList" class="p-4 overflow-y-auto space-y-2 custom-scrollbar flex-1 bg-gray-50 dark:bg-dark-bg">
+            </div>
+        <div class="p-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shrink-0">
+            <button onclick="app.closeModal('backlogModal')" class="w-full py-3 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 font-bold rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors text-sm">Close</button>
+        </div>
+    </div>
+</div>
 
 <script>
     const app = {
@@ -945,6 +1019,7 @@
                 this.scheduleRender();
             }
         },
+       
         scheduleRender() {
             if (this._renderTimer) clearTimeout(this._renderTimer);
             this._renderTimer = setTimeout(() => {
@@ -1638,143 +1713,451 @@
             }
         },
 
-        renderDashboard() {
-            if(this.data.currentView !== 'dashboard') return;
+// --- PHASE 2 HELPER: RISK ENGINE ---
+        computeRiskMessage(recentTasks, coverage, gain, weakList) {
+        const totalMins = recentTasks.reduce((acc, t) => acc + (t.actualTime || 0), 0);
+        const totalHours = totalMins / 60;
 
-            const todayStr = this.formatDate(new Date());
-            const sortOrder = { 'partial': 0, 'pending': 1, 'done': 2, 'backlog': 3 };
-            const todaysTasks = this.data.tasks
-                .filter(t => t.date === todayStr && t.status !== 'backlog')
-                .sort((a,b) => sortOrder[a.status] - sortOrder[b.status]);
+        if (totalHours < 5) return "UNDER-UTILIZED STUDY TIME";
+        if (coverage < 30 && gain < 3) return "GAPS: HIGH";
+        if (weakList && weakList.length > 0) return `GAPS: ${weakList.join(', ').toUpperCase()}`;
+        return "";
+    },
 
-            const list = document.getElementById('todayTaskList');
-            list.innerHTML = '';
 
-            if (todaysTasks.length === 0) {
-                list.innerHTML = `<div class="flex flex-col items-center justify-center py-16 px-4 bg-white dark:bg-gray-800 rounded-2xl border-2 border-dashed border-gray-200 dark:border-gray-700">
-                    <div class="w-16 h-16 bg-gray-50 dark:bg-gray-700 rounded-full flex items-center justify-center mb-4">
-                        <i class="fas fa-clipboard-list text-2xl text-gray-300 dark:text-gray-500"></i>
-                    </div>
-                    <p class="text-gray-500 dark:text-gray-400 font-medium text-sm">Your schedule is clear today.</p>
-                    <button onclick="app.openTaskModal()" class="bg-primary text-white hover:bg-primary-700 font-extrabold text-sm mt-4 px-6 py-3 rounded-xl flex items-center gap-2 shadow-lg shadow-primary/30 transition-all">
-                        <i class="fas fa-plus-circle"></i> Plan your day
-                    </button>
-                </div>`;
+// --- Phase-3 Logic: Strategy Engine ---
+        computePhase3Signal(allTasks, targetDateStr, subjects) {
+        const now = new Date();
+        
+        // 1. Low Data Guard (Silence if < 6h or < 3 sessions in 14d)
+        const day14 = new Date(); day14.setDate(now.getDate() - 14);
+        const day30 = new Date(); day30.setDate(now.getDate() - 30);
+        
+        const recentTasks = allTasks.filter(t => new Date(t.date) >= day14 && t.status === 'done');
+        const totalMins = recentTasks.reduce((acc, t) => acc + (t.actualTime || 0), 0);
+        
+        if ((totalMins / 60) < 6 || recentTasks.length < 3) return null;
+
+        // 2. Snooze & Cadence Guards
+        const snoozeUntil = localStorage.getItem('strategySnoozeUntil');
+        if (snoozeUntil && parseInt(snoozeUntil) > now.getTime()) return null;
+
+        const lastShown = localStorage.getItem('lastStrategyShownAt');
+        if (lastShown && (now.getTime() - parseInt(lastShown)) < (7 * 24 * 60 * 60 * 1000)) return null;
+
+        // 3. Signal: Mock Gap (Target < 12 weeks & < 2 mocks in 30d)
+        const target = new Date(targetDateStr);
+        const weeksLeft = (target - now) / (1000 * 60 * 60 * 24 * 7);
+        
+        if (weeksLeft <= 12) {
+            const recentMocks = allTasks.filter(t => 
+                new Date(t.date) >= day30 && 
+                t.status === 'done' && 
+                (t.subSubject || '').toLowerCase().includes('mock')
+            );
+            if (recentMocks.length < 2) {
+                return {
+                    type: 'MOCK',
+                    text: "Mocks are underused — take one full-length mock this week.",
+                    reason: "Mocks surface blind spots",
+                    ctaLabel: "Schedule Mock",
+                    ctaAction: "app.navigate('calendar')"
+                };
+            }
+        }
+
+        // 4. Signal: Revision Decay (Topics not seen in 21d)
+        const topicLastSeen = {};
+        allTasks.forEach(t => {
+            if (t.status === 'done') {
+                const key = `${t.subject}::${t.subSubject}`;
+                if (!topicLastSeen[key] || t.date > topicLastSeen[key]) topicLastSeen[key] = t.date;
+            }
+        });
+
+        const limitDate = new Date(); limitDate.setDate(now.getDate() - 21);
+        const limitStr = this.formatDate(limitDate);
+        const decayed = Object.entries(topicLastSeen).filter(([_, dateStr]) => dateStr < limitStr);
+
+        if (decayed.length > 0) {
+            const [fullKey] = decayed.sort((a, b) => a[1].localeCompare(b[1]))[0];
+            const [sub, topic] = fullKey.split('::');
+            return {
+                type: 'REVISION',
+                text: `Revision overdue — revise ${topic} this week.`,
+                reason: "Retention decay detected",
+                ctaLabel: "Start Revision",
+                ctaAction: `app.prepSafeAction('revision', '${sub.replace(/'/g, "\\'")}', '${topic.replace(/'/g, "\\'")}')`
+            };
+        }
+
+        return null;
+    },
+
+        executeStrategyAction(script) {
+        localStorage.setItem('lastStrategyShownAt', Date.now().toString());
+        const func = new Function(script.replace('app.', 'this.'));
+        func.call(this);
+        this.renderDashboard();
+      },
+
+    snoozeStrategy() {
+        localStorage.setItem('strategySnoozeUntil', (Date.now() + (3 * 86400000)).toString());
+        this.renderDashboard();
+    },
+    
+renderDashboard() {
+        if (this.data.currentView !== 'dashboard') return;
+
+        const todayStr = this.formatDate(new Date());
+        const todayDate = new Date(`${todayStr}T00:00:00`); 
+        const allTasks = this.data.tasks;
+        const todayTasks = allTasks.filter(t => t.date === todayStr && t.status !== 'backlog');
+        
+        // 1. METRICS & SNAPSHOT
+        const targetDate = new Date(this.data.targetDate);
+        const daysLeft = Math.ceil((targetDate - new Date()) / (1000 * 60 * 60 * 24));
+        const doneAll = allTasks.filter(t => t.status === 'done').length;
+        const coverage = Math.round((doneAll / (allTasks.length || 1)) * 100);
+        
+        // Weakness Heuristic
+        const subStats = {};
+        this.data.subjects.forEach(s => subStats[s.name] = { total: 0, done: 0 });
+        allTasks.forEach(t => {
+            if(subStats[t.subject]) {
+                subStats[t.subject].total++;
+                if(t.status === 'done') subStats[t.subject].done++;
+            }
+        });
+        const weakList = Object.entries(subStats)
+            .filter(([,v]) => v.total > 0)
+            .sort((a,b) => (a[1].done/a[1].total) - (b[1].done/b[1].total))
+            .map(s => s[0]).slice(0, 2);
+        const weakText = weakList.length ? `Gaps: ${weakList.join(', ')}` : "No data yet";
+
+        document.getElementById('dashRealitySnapshot').innerHTML = `
+            <div class="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-3 border border-gray-200 dark:border-gray-700 flex justify-between items-center text-xs font-medium text-gray-600 dark:text-gray-300">
+                <span><strong class="text-gray-900 dark:text-white">${daysLeft}</strong> days left</span>
+                <span>~${coverage}% covered</span>
+                <span class="text-red-500 dark:text-red-400 truncate max-w-[120px]">${weakText}</span>
+            </div>
+        `;
+
+        // 2. PRIMARY FOCUS / RUNNING TASK SECTION
+        let focusTask = this.data.activeTimer ? allTasks.find(t => t.id === this.data.activeTimer.id) : null;
+        
+        // If no timer is running, pick the next priority
+        if (!focusTask) {
+            const overdue = allTasks.find(t => new Date(t.date) < todayDate && t.status !== 'done' && t.status !== 'backlog');
+            const partial = todayTasks.find(t => t.status === 'partial');
+            const pending = todayTasks.find(t => t.status === 'pending');
+            focusTask = overdue || partial || pending;
+        }
+
+        const focusEl = document.getElementById('dashFocusCard');
+        
+        if (focusTask) {
+            const isRunning = this.data.activeTimer && this.data.activeTimer.id === focusTask.id;
+            const isOverdue = new Date(focusTask.date) < todayDate;
+            
+            // UX: Dynamic Labeling
+            let statusLabel = "NON-NEGOTIABLE";
+            let statusColor = "text-primary";
+            let borderClass = "border-primary";
+            let shadowClass = "";
+            let btnText = "START FOCUS SESSION";
+            let btnClass = "bg-primary hover:bg-primary-700 text-white";
+
+            if (isRunning) {
+                statusLabel = "● SESSION ACTIVE";
+                statusColor = "text-emerald-500 animate-pulse";
+                borderClass = "border-emerald-500 ring-1 ring-emerald-500/20";
+                shadowClass = "shadow-lg shadow-emerald-500/10";
+                btnText = "RESUME SESSION";
+                btnClass = "bg-emerald-500 hover:bg-emerald-600 text-white";
+            } else if (isOverdue) {
+                statusLabel = "OVERDUE";
+                statusColor = "text-red-500";
+                borderClass = "border-red-500";
             }
 
-            todaysTasks.forEach(task => {
-                const isDone = task.status === 'done';
-                const isPartial = task.status === 'partial';
-                const active = this.data.activeTimer && this.data.activeTimer.id === task.id;
-                
-                let actionHtml = '';
-                if (!isDone) {
-                    if (active) {
-                        actionHtml = `
-                            <div class="flex items-center gap-3">
-                                <span class="inline-flex relative flex h-3 w-3">
-                                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary-600 opacity-75"></span>
-                                  <span class="relative inline-flex rounded-full h-3 w-3 bg-primary-600"></span>
-                                </span>
-                                <span class="text-primary font-bold text-xs tracking-wider">RUNNING</span>
-                            </div>`;
-                    } else {
-                        actionHtml = `
-                            <div class="flex items-center gap-2">
-                                <button onclick="app.editTask('${task.id}')" class="w-9 h-9 rounded-full text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 dark:hover:text-gray-200 transition-all flex items-center justify-center" aria-label="Edit" title="Edit"><i class="fas fa-pencil-alt text-sm"></i></button>
-                                
-                                <button onclick="app.startTimer('${task.id}')" class="w-9 h-9 rounded-full bg-primary/10 text-primary hover:bg-primary hover:text-white transition-all flex items-center justify-center shadow-sm" aria-label="Start Timer" title="Start Timer"><i class="fas fa-play text-xs pl-0.5"></i></button>
-                                
-                                <button onclick="app.manualComplete('${task.id}')" class="w-9 h-9 rounded-full text-gray-400 hover:text-secondary hover:bg-secondary/10 dark:hover:bg-gray-700 transition-all flex items-center justify-center" aria-label="Mark Done" title="Manual Complete"><i class="fas fa-check text-sm"></i></button>
-                            </div>
-                        `;
-                    }
-                } else {
-                     actionHtml = `<div class="flex flex-col items-end">
-                                    <div class="text-secondary text-xs font-bold flex items-center gap-1.5 bg-secondary/10 px-2 py-1 rounded-md">
-                                        <i class="fas fa-check-circle"></i> Complete
-                                    </div>
-                                    <span class="text-[10px] text-gray-400 mt-1 font-mono">${task.actualTime}m • Focus: ${task.focusScore || '-'}/5</span>
-                                   </div>`;
-                }
+            const btnAction = isRunning ? "app.openZenMode()" : `app.startTimer('${focusTask.id}')`;
+            
+            // Logic for "Why this task"
+            let reason = "Core syllabus progression";
+            if (focusTask.isRevision) reason = "Spaced repetition due today";
+            else if (isOverdue) reason = "Topic is overdue – clear backlog";
+            else if ((focusTask.duration || 0) > 50) reason = "High-weight deep work session";
 
-                let statusBadge = isPartial ? `<span class="ml-2 text-[9px] bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300 px-1.5 py-0.5 rounded font-bold uppercase tracking-wide">In Progress</span>` : '';
+            focusEl.innerHTML = `
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-6 border-l-4 ${borderClass} ${shadowClass} relative group transition-all duration-300">
+                    
+                    <div class="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button onclick="app.editTask('${focusTask.id}')" class="p-2 text-gray-400 hover:text-primary transition-colors bg-white dark:bg-gray-700 rounded-lg shadow-sm" title="Edit Task"><i class="fas fa-pencil-alt text-xs"></i></button>
+                    </div>
 
-                const containerClass = active 
-                    ? 'ring-2 ring-primary ring-offset-2 ring-offset-gray-50 dark:ring-offset-dark-bg border-primary' 
-                    : (isDone ? 'opacity-75 bg-gray-50/50 dark:bg-gray-800/50 border-transparent' : 'bg-white dark:bg-gray-800 border-gray-100 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600');
+                    <div class="flex justify-between items-start mb-2">
+                        <span class="text-[10px] font-bold uppercase tracking-widest ${statusColor}">${statusLabel}</span>
+                        <span class="text-xs font-mono text-gray-400">${focusTask.duration || 0}m</span>
+                    </div>
+                    
+                    <h2 class="text-2xl font-extrabold text-gray-900 dark:text-white leading-tight mb-0.5">${focusTask.subSubject}</h2>
+                    <p class="text-xs text-gray-400 font-medium mb-1">Chosen because: ${reason}</p>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 font-medium mb-6">${focusTask.subject} • Priority Task</p>
+                    
+                    <button onclick="${btnAction}" class="w-full py-3.5 rounded-lg font-bold text-xs uppercase tracking-widest shadow-md transition-all active:scale-[0.98] ${btnClass}">
+                        ${btnText}
+                    </button>
+                </div>`;
+        } else {
+            // Empty State
+            focusEl.innerHTML = `
+                <div class="flex flex-col items-center justify-center py-12 bg-white dark:bg-gray-800 rounded-xl border-2 border-dashed border-gray-200 dark:border-gray-700">
+                    <p class="text-gray-500 dark:text-gray-400 font-medium text-sm mb-2">Your schedule is clear.</p>
+                    <button onclick="app.openTaskModal()" class="bg-primary text-white hover:bg-primary-700 font-extrabold text-sm px-6 py-3 rounded-xl flex items-center gap-2 shadow-lg shadow-primary/20 transition-all">
+                        <i class="fas fa-plus-circle"></i> Add Anchor Task
+                    </button>
+                </div>`;
+        }
 
-                const html = `
-                    <div class="${containerClass} p-4 sm:p-5 rounded-xl shadow-soft flex flex-col sm:flex-row justify-between sm:items-center gap-4 group transition-all duration-200 border">
-                        <div class="flex-1 min-w-0">
-                            <div class="flex items-center gap-2.5 mb-2">
-                                <span class="text-[9px] font-bold uppercase tracking-widest text-gray-500 border border-gray-200 dark:border-gray-600 px-1.5 py-0.5 rounded bg-gray-50 dark:bg-gray-700/50 truncate max-w-[120px]">${task.subject}</span>
-                                ${statusBadge}
-                            </div>
-                            <h4 class="font-bold text-gray-800 dark:text-gray-100 text-base leading-snug truncate pr-2 ${isDone ? 'line-through text-gray-400 dark:text-gray-500' : ''}">${task.desc || task.subSubject}</h4>
-                            <div class="flex items-center gap-3 mt-1.5">
-                                <div class="text-xs text-gray-400 font-medium flex items-center gap-1.5"><i class="far fa-dot-circle text-[10px]"></i> ${task.subSubject}</div>
-                                <div class="w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-600"></div>
-                                <div class="text-xs text-gray-400 font-medium flex items-center gap-1.5"><i class="far fa-clock text-[10px]"></i> ${task.duration}m</div>
-                            </div>
-                        </div>
-                        <div class="flex items-center justify-between sm:justify-end gap-2 pt-2 sm:pt-0 border-t sm:border-t-0 border-gray-100 dark:border-gray-700">
-                            ${actionHtml}
-                            ${!isDone ? `<button onclick="app.deleteTask('${task.id}')" class="text-gray-300 hover:text-red-500 dark:text-gray-600 dark:hover:text-red-400 ml-2 w-8 h-8 flex items-center justify-center transition-colors" aria-label="Delete"><i class="fas fa-trash-alt text-xs"></i></button>` : ''}
+        // 3. EFFORT IMPACT (Bounded Logic)
+        const sevenDaysAgo = new Date(); sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+        const recentTasks = allTasks.filter(t => new Date(t.date) >= sevenDaysAgo);
+        const totalHours = Math.round(recentTasks.reduce((acc, t) => acc + (t.actualTime || 0), 0) / 60);
+        
+        const uniqueDone = new Set(recentTasks.filter(t => t.status === 'done').map(t => t.subSubject)).size;
+        const gainVal = Math.round((uniqueDone / (this.data.subjects.reduce((a, s) => a + s.sub.length, 0) || 1)) * 100);
+        
+        let label = "LOW";
+        if (gainVal >= 15) label = "HIGH"; else if (gainVal >= 5) label = "MODERATE";
+        
+        const isLowData = totalHours < 6;
+        const displayLeft = `Last 7 days: ${totalHours}h studied` + (isLowData ? '' : ` → Conversion: ${label}`);
+        const displayRight = isLowData ? "LIMITED DATA" : this.computeRiskMessage(recentTasks, coverage, gainVal, weakList) || "Stable pace";
+
+        document.getElementById('dashEffortImpact').innerHTML = `
+            <div class="bg-amber-50 dark:bg-amber-900/10 px-4 py-3 rounded-lg border border-amber-100 dark:border-amber-900/30 flex justify-between items-center gap-4">
+                 <span class="text-xs font-bold text-amber-800 dark:text-amber-500 truncate">${displayLeft}</span>
+                 <span class="text-[10px] font-bold uppercase tracking-wider text-amber-600/70 dark:text-amber-500/70 shrink-0">${displayRight}</span>
+            </div>
+        `;
+
+        // 4. STRATEGY CARD (Phase 3)
+        let strategyEl = document.getElementById('dashStrategyCard');
+        if (!strategyEl) {
+            strategyEl = document.createElement('div');
+            strategyEl.id = 'dashStrategyCard';
+            document.getElementById('dashEffortImpact').insertAdjacentElement('afterend', strategyEl);
+        }
+        
+        const signal = this.computePhase3Signal(allTasks, this.data.targetDate, this.data.subjects);
+        if (signal) {
+            strategyEl.innerHTML = `
+                <div role="region" class="mb-6 bg-white dark:bg-gray-800 rounded-xl p-5 border-l-4 border-amber-400 shadow-sm flex flex-col md:flex-row gap-5 items-start md:items-center justify-between">
+                    <div class="flex-1 min-w-0">
+                        <h4 class="text-[10px] font-bold uppercase tracking-widest text-amber-600 dark:text-amber-500 mb-1.5 flex items-center gap-2"><i class="fas fa-lightbulb"></i> Strategy</h4>
+                        <p class="text-sm font-bold text-gray-900 dark:text-gray-100 leading-snug">${signal.text}</p>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <button onclick="app.snoozeStrategy()" class="text-xs font-medium text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 underline decoration-dotted">Snooze 3d</button>
+                        <button onclick="app.executeStrategyAction('${signal.ctaAction.replace(/'/g, "\\'")}')" class="bg-primary hover:bg-primary-700 text-white px-5 py-3 rounded-lg font-bold text-xs uppercase tracking-wider shadow-md transition-all">${signal.ctaLabel}</button>
+                    </div>
+                </div>`;
+            strategyEl.classList.remove('hidden');
+        } else {
+            strategyEl.classList.add('hidden');
+        }
+
+        // 5. PROGRESS & QUALITY
+        const rated = recentTasks.filter(t => t.focusScore);
+        const deepCount = rated.filter(t => parseInt(t.focusScore) >= 4).length;
+        const ratio = rated.length ? Math.round((deepCount / rated.length) * 100) : 0;
+        
+        const completedToday = todayTasks.filter(t => t.status === 'done').length;
+        const totalToday = todayTasks.length;
+        const progressPct = totalToday > 0 ? Math.round((completedToday / totalToday) * 100) : 0;
+        
+        document.getElementById('dashProgressText').innerText = `DAILY: ${completedToday} of ${totalToday} FOCUS ITEMS`;
+        document.getElementById('dashProgressPct').innerText = `${progressPct}%`;
+        setTimeout(() => document.getElementById('dashProgressBar').style.width = `${progressPct}%`, 50);
+
+        const qualityEl = document.getElementById('dashQualityText');
+        if (rated.length >= 3) {
+            qualityEl.innerText = `Deep focus ratio: ${ratio}% ${ratio > 50 ? '(Good)' : '(Low)'}`;
+            qualityEl.classList.remove('hidden');
+        } else {
+            qualityEl.classList.add('hidden');
+        }
+
+        // 6. SPLIT LISTS: OPTIONAL vs COMPLETED
+        const optListEl = document.getElementById('dashOptionalList');
+        const otherTasks = todayTasks.filter(t => t.id !== (focusTask?.id));
+        
+        // Filter groups
+        const pendingTasks = otherTasks.filter(t => t.status !== 'done');
+        const completedTasks = otherTasks.filter(t => t.status === 'done');
+
+        let listHtml = '';
+
+        // A. Remaining / Up Next
+        if (pendingTasks.length > 0) {
+            listHtml += `<div class="mb-6">
+                <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3 px-1 flex items-center gap-2">
+                    <span class="w-1.5 h-1.5 rounded-full bg-blue-400"></span> Remaining (${pendingTasks.length})
+                </h3>
+                <div class="space-y-2">`;
+            
+            pendingTasks.forEach(t => {
+                listHtml += `
+                <div class="group flex justify-between items-center p-3 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-lg hover:border-gray-300 dark:hover:border-gray-600 transition-all shadow-sm">
+                    <div class="flex items-center gap-3 overflow-hidden flex-1 min-w-0">
+                        <span class="text-xs font-bold text-gray-700 dark:text-gray-200 truncate">${t.subSubject}</span>
+                        <span class="text-[10px] text-gray-400 bg-gray-50 dark:bg-gray-700 px-1.5 py-0.5 rounded">${t.duration}m</span>
+                    </div>
+                    
+                    <div class="flex items-center gap-1">
+                        <button onclick="app.startTimer('${t.id}')" class="w-7 h-7 flex items-center justify-center rounded text-gray-400 hover:text-green-500 hover:bg-green-50 dark:hover:bg-green-900/20 transition-colors" title="Start"><i class="fas fa-play text-[10px]"></i></button>
+                        <button onclick="app.editTask('${t.id}')" class="w-7 h-7 flex items-center justify-center rounded text-gray-400 hover:text-primary hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors" title="Edit"><i class="fas fa-pencil-alt text-[10px]"></i></button>
+                        <button onclick="app.manualComplete('${t.id}')" class="w-7 h-7 flex items-center justify-center rounded text-gray-400 hover:text-secondary hover:bg-secondary/10 dark:hover:bg-gray-700 transition-colors" title="Done"><i class="fas fa-check text-xs"></i></button>
+                        <button onclick="app.deleteTask('${t.id}')" class="w-7 h-7 flex items-center justify-center rounded text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors" title="Delete"><i class="fas fa-trash-alt text-[10px]"></i></button>
+                    </div>
+                </div>`;
+            });
+            listHtml += `</div></div>`;
+        }
+
+        // B. Completed
+        if (completedTasks.length > 0) {
+            listHtml += `<div>
+                <h3 class="text-xs font-bold text-emerald-600/70 dark:text-emerald-500/70 uppercase tracking-widest mb-3 px-1 flex items-center gap-2">
+                    <i class="fas fa-check-circle text-xs"></i> Completed Today (${completedTasks.length})
+                </h3>
+                <div class="space-y-2 opacity-75 hover:opacity-100 transition-opacity">`;
+            
+            completedTasks.forEach(t => {
+                listHtml += `
+                <div class="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-800/50 border border-transparent dark:border-gray-700/50 rounded-lg">
+                    <div class="flex items-center gap-3 overflow-hidden flex-1 min-w-0">
+                        <span class="text-xs font-bold text-gray-500 dark:text-gray-400 line-through truncate">${t.subSubject}</span>
+                        <div class="flex items-center gap-1 text-[9px] text-gray-400">
+                            <span class="font-mono">${t.actualTime}m</span>
+                            ${t.focusScore ? `<span class="bg-gray-100 dark:bg-gray-700 px-1 rounded">Focus: ${t.focusScore}</span>` : ''}
                         </div>
                     </div>
-                `;
-                list.insertAdjacentHTML('beforeend', html);
+                    <button onclick="app.deleteTask('${t.id}')" class="text-gray-300 hover:text-red-400 transition-colors px-2"><i class="fas fa-trash-alt text-[10px]"></i></button>
+                </div>`;
             });
-        },
+            listHtml += `</div></div>`;
+        }
+
+        if (pendingTasks.length === 0 && completedTasks.length === 0) {
+            listHtml = `<div class="text-[10px] text-gray-400 italic px-1 text-center py-4">No other tasks scheduled.</div>`;
+        }
+
+        optListEl.innerHTML = listHtml;
+
+        // 7. BACKLOG WHISPER
+        const backlogCount = allTasks.filter(t => t.status === 'backlog').length;
+        const blEl = document.getElementById('dashBacklogWhisper');
+        if (backlogCount > 0) {
+            blEl.classList.remove('hidden');
+            const itemText = backlogCount === 1 ? 'item' : 'items';
+            document.getElementById('backlogText').innerText = `You have ${backlogCount} postponed ${itemText} pending.`;
+        } else {
+            blEl.classList.add('hidden');
+        }
+    },
+
+        createTaskHTML(task, isOverdue) {
+    const isDone = task.status === 'done';
+    const isPartial = task.status === 'partial';
+    const active = this.data.activeTimer && this.data.activeTimer.id === task.id;
+    
+    let actionHtml = '';
+    
+    if (!isDone) {
+        if (active) {
+            actionHtml = `<div class="text-primary font-bold text-xs tracking-wider animate-pulse">RUNNING</div>`;
+        } else {
+            actionHtml = `
+                <div class="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                     <button onclick="app.editTask('${task.id}')" class="p-2 text-gray-400 hover:text-primary transition-colors"><i class="fas fa-pencil-alt"></i></button>
+                     <button onclick="app.startTimer('${task.id}')" class="w-8 h-8 rounded-lg bg-primary text-white flex items-center justify-center shadow-md hover:scale-110 transition-transform"><i class="fas fa-play text-[10px]"></i></button>
+                     <button onclick="app.manualComplete('${task.id}')" class="p-2 text-gray-400 hover:text-secondary transition-colors"><i class="fas fa-check"></i></button>
+                </div>
+            `;
+        }
+    } else {
+         actionHtml = `<div class="text-secondary text-xs font-bold bg-secondary/10 px-2 py-1 rounded"><i class="fas fa-check"></i> Done</div>`;
+    }
+
+    const borderClass = isOverdue 
+        ? 'border-l-4 border-l-red-500 bg-red-50/50 dark:bg-red-900/10' 
+        : (active ? 'border-primary ring-1 ring-primary bg-primary/5' : 'border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800');
+
+    const overdueLabel = isOverdue ? `<span class="text-[9px] font-bold bg-red-100 text-red-600 px-1.5 py-0.5 rounded ml-2">OVERDUE</span>` : '';
+
+    return `
+        <div class="p-4 rounded-xl shadow-sm border ${borderClass} flex justify-between items-center group transition-all hover:shadow-md">
+            <div class="min-w-0 flex-1">
+                <div class="flex items-center gap-2 mb-1">
+                    <span class="text-[9px] font-bold uppercase text-gray-400 tracking-wider">${task.subject}</span>
+                    ${overdueLabel}
+                    ${isPartial ? `<span class="text-[9px] font-bold bg-blue-100 text-blue-600 px-1.5 py-0.5 rounded ml-2">PAUSED</span>` : ''}
+                </div>
+                <h4 class="font-bold text-gray-800 dark:text-gray-100 text-sm truncate ${isDone ? 'line-through opacity-50' : ''}">${task.subSubject}</h4>
+                <div class="flex items-center gap-3 mt-1">
+                    <div class="text-xs text-gray-400 flex items-center gap-1"><i class="far fa-clock text-[10px]"></i> ${task.duration}m</div>
+                </div>
+            </div>
+            <div class="flex items-center gap-2 pl-2">
+                ${actionHtml}
+            </div>
+        </div>
+    `;
+},
+
+// HELPER: Small update to support the "Focus" button in Resume CTA
+       openZenMode() {
+    document.getElementById('zenModeOverlay').classList.remove('hidden');
+       },
 
         renderBacklog() {
-            const backlogTasks = this.data.tasks.filter(t => t.status === 'backlog');
-            const countEl = document.getElementById('backlogCount');
-            countEl.textContent = backlogTasks.length;
-            countEl.classList.toggle('hidden', backlogTasks.length === 0);
+        const backlogTasks = this.data.tasks.filter(t => t.status === 'backlog');
+        const count = backlogTasks.length;
+        
+        // 1. Sidebar Badge
+        const countEl = document.getElementById('backlogCount');
+        if(countEl) {
+            countEl.textContent = count;
+            countEl.classList.toggle('hidden', count === 0);
+        }
 
-            const sidebarList = document.getElementById('sidebarBacklogList');
-            sidebarList.innerHTML = '';
-            if(backlogTasks.length === 0) sidebarList.innerHTML = `<p class="text-gray-400 italic text-[10px] text-center py-2">No backlog.</p>`;
+        // 2. [FIX] Dashboard Header Badge (Phase 3)
+        const miniBadge = document.getElementById('dashMiniBacklogCount');
+        if (miniBadge) {
+            miniBadge.textContent = count > 0 ? count : '';
+            miniBadge.classList.toggle('hidden', count === 0);
+        }
 
-            const dashList = document.getElementById('dashboardBacklogList');
-            if(dashList) dashList.innerHTML = '';
-            if(dashList && backlogTasks.length === 0) dashList.innerHTML = `
-                <div class="flex flex-col items-center justify-center h-48 text-gray-400">
-                    <i class="fas fa-check-circle text-3xl mb-3 text-emerald-100 dark:text-emerald-900"></i>
-                    <span class="text-sm font-medium">All caught up!</span>
-                </div>`;
+        // 3. Render Lists
+        const sidebarList = document.getElementById('sidebarBacklogList');
+        sidebarList.innerHTML = '';
+        if(count === 0) sidebarList.innerHTML = `<p class="text-gray-400 italic text-[10px] text-center py-2">No backlog.</p>`;
 
-            backlogTasks.forEach(task => {
-                sidebarList.insertAdjacentHTML('beforeend', `
-                    <div class="group flex justify-between items-center py-2 px-2 hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded-lg transition-colors cursor-default">
-                        <div class="truncate w-24 text-gray-600 dark:text-gray-400 text-xs" title="${task.subSubject}">${task.subSubject}</div>
-                         <button onclick="app.assignToToday('${task.id}')" class="text-primary hover:text-primary-700 text-[10px] font-bold opacity-0 group-hover:opacity-100 transition-opacity">MOVE</button>
-                    </div>
-                `);
-
-                if(dashList) {
-                    dashList.insertAdjacentHTML('beforeend', `
-                        <div class="flex justify-between items-center p-3.5 bg-red-50 dark:bg-red-900/10 rounded-xl border border-red-100 dark:border-red-900/20 group hover:border-red-200 dark:hover:border-red-800 transition-colors">
-                            <div class="min-w-0 flex-1 pr-3">
-                                <div class="flex items-center gap-2 mb-1">
-                                    <div class="text-[9px] font-bold uppercase text-gray-400 tracking-wider">${task.subject}</div>
-                                    <div class="text-[9px] text-red-400 bg-red-100 dark:bg-red-900/40 px-1 rounded font-medium">Missed: ${task.date}</div>
-                                </div>
-                                <div class="text-sm font-bold text-gray-800 dark:text-gray-200 truncate">${task.subSubject}</div>
-                            </div>
-                            <button onclick="app.assignToToday('${task.id}')" class="text-xs bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 px-3 py-2 rounded-lg shadow-sm hover:border-primary hover:text-primary transition-all font-bold whitespace-nowrap">
-                                Do Today
-                            </button>
-                        </div>
-                    `);
-                }
-            });
-        },
-
-
-        renderCalendar() {
+        backlogTasks.forEach(task => {
+            sidebarList.insertAdjacentHTML('beforeend', `
+                <div class="group flex justify-between items-center py-2 px-2 hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded-lg transition-colors cursor-default">
+                    <div class="truncate w-24 text-gray-600 dark:text-gray-400 text-xs" title="${task.subSubject}">${task.subSubject}</div>
+                     <button onclick="app.assignToToday('${task.id}')" class="text-primary hover:text-primary-700 text-[10px] font-bold opacity-0 group-hover:opacity-100 transition-opacity">MOVE</button>
+                </div>
+            `);
+        });
+        
+        // Note: dashBacklogMini (Phase 3) is static/informational now, so no list rendering needed there.
+    },
+      
+    renderCalendar() {
             if(this.data.currentView !== 'calendar') return;
             const grid = document.getElementById('calendarGrid');
             grid.innerHTML = '';
@@ -1911,13 +2294,13 @@
             });
         }, 
        
-       setAnalyticsRange(days) {
-    this.data.analyticsRange = days;
+        setAnalyticsRange(days) {
+         this.data.analyticsRange = days;
     
-    document.querySelectorAll('.analytics-toggle').forEach(btn => {
+        document.querySelectorAll('.analytics-toggle').forEach(btn => {
         btn.classList.remove('bg-indigo-50', 'text-primary', 'dark:bg-gray-700', 'dark:text-white', 'shadow-sm');
         btn.classList.add('text-gray-500', 'hover:text-primary');
-    });
+       });
     
     const activeBtn = document.getElementById(`btnRange${days}`);
     if(activeBtn) {
@@ -2484,6 +2867,41 @@ listRows += `
                 this.resetForm();
             }
         },
+
+
+openBacklogModal() {
+        const list = document.getElementById('backlogModalList');
+        const backlogTasks = this.data.tasks.filter(t => t.status === 'backlog');
+        
+        document.getElementById('backlogModal').classList.remove('hidden');
+        list.innerHTML = '';
+
+        if (backlogTasks.length === 0) {
+            list.innerHTML = `
+                <div class="flex flex-col items-center justify-center py-12 text-gray-400">
+                    <i class="fas fa-check-circle text-4xl mb-3 text-emerald-100 dark:text-emerald-900"></i>
+                    <p class="font-medium text-sm">Backlog Zero!</p>
+                    <p class="text-xs opacity-70">You're all caught up.</p>
+                </div>`;
+            return;
+        }
+
+        backlogTasks.forEach(task => {
+            list.insertAdjacentHTML('beforeend', `
+                <div class="bg-white dark:bg-gray-800 p-3 rounded-xl border border-gray-100 dark:border-gray-700 flex justify-between items-center group hover:border-primary/30 transition-colors shadow-sm">
+                    <div class="min-w-0 pr-3">
+                        <div class="text-[10px] font-bold uppercase text-gray-400 mb-0.5 tracking-wider">${task.subject}</div>
+                        <div class="text-sm font-bold text-gray-800 dark:text-gray-200 truncate">${task.subSubject}</div>
+                        <div class="text-[10px] text-red-400 mt-0.5">Missed: ${task.date}</div>
+                    </div>
+                    <button onclick="app.assignToToday('${task.id}'); app.openBacklogModal();" class="shrink-0 bg-indigo-50 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-300 hover:bg-indigo-600 hover:text-white px-3 py-2 rounded-lg text-xs font-bold transition-all">
+                        Do Today
+                    </button>
+                </div>
+            `);
+        });
+    },
+
 
         renderDayManagerList(dateStr) {
             const list = document.getElementById('dayManagerList');
