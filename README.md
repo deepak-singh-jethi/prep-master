@@ -1,110 +1,494 @@
-# 📚 PrepMaster (v6.0.1)
+# PrepMaster (v6.0.1)
 
-**The Ultimate Local-First Study Planner for Competitive Exams.**
+**The Ultimate Local‑First Study Planner for Competitive Exams**
 
-![Version](https://img.shields.io/badge/version-6.0.1-blue)
-![Tech](https://img.shields.io/badge/built%20with-Vanilla%20JS%20%2B%20Tailwind-teal)
-![License](https://img.shields.io/badge/license-MIT-green)
+| Version | Tech           | License       |
+| ------- | -------------- | ------------- |
+| v6.0.1  | Vanilla JS SPA | MIT (assumed) |
 
-PrepMaster is a lightweight, single-file Single Page Application (SPA) designed to help students manage syllabus coverage, track study hours, and analyze performance for competitive exams (like UPSC, SSC, JEE, etc.). 
+PrepMaster is a **lightweight, single‑file Single Page Application (SPA)** designed to help students manage syllabus coverage, track study hours, and analyze performance for competitive exams such as **UPSC, SSC, JEE, NEET**, and similar exams.
 
-It operates entirely in the browser using `localStorage`, meaning **no internet connection, backend, or login is required.**
+It operates **entirely in the browser** using `localStorage`, which means:
+
+* ❌ No backend
+* ❌ No internet connection required
+* ❌ No login / authentication
+* ✅ Fully offline
+* ✅ User owns their data
+
+---
+
+## 1. What this project is (clear & honest)
+
+Prep‑Master is a **"dumb" frontend application** designed to simulate a study / task / focus workflow. It is intentionally backend‑less and framework‑less:
+
+* No React / Vue / Angular
+* No bundler (Vite, Webpack, etc.)
+* No server
+* No API calls yet
+
+Everything is driven by:
+
+* Static `index.html`
+* Plain JavaScript files
+* Browser storage (localStorage)
+
+This makes it ideal as a **UI + logic prototype** that will later be connected to a real backend.
+
+---
+
+## 2. High‑level architecture
+
+```
+Browser
+ ├── index.html        (single entry point)
+ ├── js/app.js         (bootstraps the app)
+ ├── js/system.js      (global state & orchestration)
+ ├── js/storage.js     (localStorage abstraction)
+ ├── js/tasks.js       (task / study logic)
+ ├── js/subjects.js    (subjects & categorization)
+ ├── js/timer.js       (focus / session timer)
+ ├── js/dialogs.js     (modals & UI dialogs)
+ ├── js/analytics.js   (local analytics tracking)
+ └── js/utils.js       (shared helper utilities)
+```
+
+There is **one HTML file** and multiple JS modules loaded via `<script>` tags.
+
+---
 
 ## ✨ Key Features
 
 ### 🗓️ Planning & Organization
-- **Dashboard:** At-a-glance view of "Today's Focus," backlog items, and daily progress bars.
-- **Sprint Calendar:** Visual calendar with heat-map style indicators for study density, mock tests, and revision days.
-- **Curriculum Manager:** specialized subject and topic management. organize your syllabus hierarchically (Subject -> Topics).
-- **Backlog Bucket:** Automatically catches missed tasks from previous days so nothing slips through the cracks.
+
+* **Dashboard**: At‑a‑glance view of *Today's Focus*, backlog items, and daily progress bars.
+* **Sprint Calendar**: Visual calendar with heat‑map style indicators for study density, mock tests, and revision days.
+* **Curriculum Manager**: Specialized subject and topic management. Organize your syllabus hierarchically (**Subject → Topics**).
+* **Backlog Bucket**: Automatically catches missed tasks from previous days so nothing slips through the cracks.
 
 ### ⏱️ Execution & Focus
-- **Global Timer:** Persistent timer bar that tracks study sessions in real-time.
-- **Zen Mode:** A distraction-free, full-screen overlay with a massive timer and control buttons to help you enter a flow state.
-- **Focus Scoring:** Rate your focus level (1-5) after every session to track quality, not just quantity.
+
+* **Global Timer**: Persistent timer bar that tracks study sessions in real‑time.
+* **Zen Mode**: Distraction‑free, full‑screen overlay with a massive timer and controls to help you enter a flow state.
+* **Focus Scoring**: Rate your focus level (1‑5) after every session to track *quality*, not just quantity.
 
 ### 📊 Analytics & Insights
-- **Performance Metrics:** Track total study hours, average focus quality, and completion rates.
-- **Subject Distribution:** Visual bar charts showing time allocation across different subjects.
-- **Drill-Down Analysis:** Click into any subject to see topic-wise statistics (Time spent, session count, last studied date).
-- **Smart Insights:** Automated detection of "Power Subjects" (high focus/time) and "Weak Areas" (low focus/completion).
-- **Review System:** Built-in Spaced Repetition logic (Again/Hard/Good/Easy) to schedule smart reviews.
+
+* **Performance Metrics**: Track total study hours, average focus quality, and completion rates.
+* **Subject Distribution**: Visual bar charts showing time allocation across different subjects.
+* **Drill‑Down Analysis**: Click any subject to see topic‑wise stats (time spent, session count, last studied date).
+* **Smart Insights**: Automated detection of **Power Subjects** (high focus/time) and **Weak Areas** (low focus/completion).
+* **Review System**: Built‑in spaced repetition logic (*Again / Hard / Good / Easy*) for smart reviews.
 
 ### 🛡️ Data & Customization
-- **Local-First:** All data is stored securely in your browser's `localStorage`.
-- **Import/Export:** distinct JSON export feature for backups and data portability.
-- **Dark Mode:** Fully responsive UI with a built-in light/dark theme toggle.
-- **Glassmorphism UI:** Modern, aesthetic interface using Tailwind CSS.
+
+* **Local‑First**: All data is stored securely in the browser using `localStorage`.
+* **Import / Export**: JSON export & import for backups and portability.
+* **Dark Mode**: Fully responsive UI with light / dark theme toggle.
+* **Glassmorphism UI**: Modern aesthetic interface built using Tailwind CSS.
 
 ---
 
 ## 🚀 Getting Started
 
-Since PrepMaster is a **zero-dependency** single file application, installation is instant.
+PrepMaster is a **zero‑dependency, single‑file application** — installation is instant.
 
 ### Installation
-1. Download the `index.html` file from this repository.
-2. Open the file in any modern web browser (Chrome, Edge, Firefox, Safari).
-3. Start planning!
+
+1. Download `index.html` from this repository.
+2. Open the file in any modern browser (Chrome, Edge, Firefox, Safari).
+3. Start planning.
 
 ### Usage Guide
 
-1. **Create Subjects:** Go to the **Subjects** tab and add your core subjects (e.g., History, Polity, Physics).
-2. **Add Topics:** Click on a subject to add specific chapters or topics.
-3. **Plan Your Day:** Go to the **Dashboard**, click "New Task," and select a subject/topic. Set a duration.
-4. **Start Studying:** Click the "Play" button on a task to start the timer.
-5. **Zen Mode:** For deep work, click the bottom timer bar to enter full-screen Zen Mode.
-6. **Log & Review:** When finished, stop the timer. Log your **Actual Time** and **Focus Score**.
+1. **Create Subjects**: Go to the *Subjects* tab and add core subjects (History, Polity, Physics, etc.).
+2. **Add Topics**: Click a subject to add chapters or topics.
+3. **Plan Your Day**: From the Dashboard, click **New Task**, choose subject/topic, and set duration.
+4. **Start Studying**: Click the ▶ Play button to start the timer.
+5. **Zen Mode**: Click the bottom timer bar for full‑screen focus mode.
+6. **Log & Review**: Stop the timer, log actual time and focus score.
 
 ---
 
 ## 🛠️ Tech Stack
 
-PrepMaster is built with simplicity and longevity in mind. It uses no build tools, no npm, and no frameworks.
+PrepMaster is built with **simplicity and longevity** in mind — no build tools, no npm, no frameworks.
 
-* **Core:** HTML5, Vanilla JavaScript (ES6+)
-* **Styling:** [Tailwind CSS](https://tailwindcss.com/) (via CDN)
-* **Icons:** [FontAwesome](https://fontawesome.com/) (via CDN)
-* **Fonts:** Inter & JetBrains Mono (via Google Fonts)
-* **Storage:** Browser LocalStorage API
-* **Architecture:** Monolithic SPA (Single `index.html` file)
-
----
-
-## 💾 Data Management
-
-**Where is my data?**
-Your data lives in your browser cache. If you clear your browser history/cache, you might lose your data.
-
-**How to backup?**
-1. Click the **Settings** (⚙️) icon in the top right.
-2. Click **Export Now**.
-3. Save the `.json` file to a safe location (Google Drive, Cloud, etc.).
-4. To restore, use the **Import File** button in the settings menu.
-
-> **Note:** The app includes an automatic "Safety Backup" feature that attempts to save a snapshot before you import new data.
+* **Core**: HTML5, Vanilla JavaScript (ES6+)
+* **Styling**: Tailwind CSS (via CDN)
+* **Icons**: FontAwesome (via CDN)
+* **Fonts**: Inter & JetBrains Mono (Google Fonts)
+* **Storage**: Browser LocalStorage API
+* **Architecture**: Monolithic SPA (single `index.html`)
 
 ---
 
-## 🤝 Contributing
+## 3. Folder & file breakdown (based on actual code)
 
-Contributions are welcome! Since this is a single-file project, please ensure:
+### `/index.html`
 
-1.  **Tailwind Classes:** Use standard Tailwind utility classes.
-2.  **No External Scripts:** Do not add local JS files; keep logic embedded in the `<script>` tag at the bottom of `index.html`.
-3.  **responsive:** Ensure UI changes work on mobile (`md:` and `lg:` breakpoints).
+**Role:**
 
-**To modify the code:**
-1.  Fork the repo.
-2.  Edit `index.html`.
-3.  Submit a Pull Request.
+* The single entry point of the application
+* Defines the DOM structure
+* Loads all JavaScript files
 
----
+**Important notes:**
 
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+* There is no routing; screen changes are DOM‑driven
+* IDs and class names in HTML are tightly coupled with JS logic
+* Any backend‑driven data later must map cleanly into existing DOM containers
 
 ---
 
-*Made for students, by students.*
+### `/js/app.js`
+
+**Purpose:** Application bootstrap
+
+**Responsibilities:**
+
+* Initializes the app on page load
+* Connects system modules together
+* Triggers initial render
+
+**Backend note:**
+
+* This is the ideal place to initialize:
+
+  * API client
+  * Auth state
+  * Environment config
+
+---
+
+### `/js/system.js`
+
+**Purpose:** Global application controller
+
+**Responsibilities:**
+
+* Maintains global app state
+* Coordinates between tasks, timer, storage, and UI
+* Acts as the closest thing to a "state manager"
+
+**Backend note:**
+
+* This file should later:
+
+  * Store the authenticated user
+  * Sync local state with server state
+  * Handle app‑wide error states
+
+---
+
+### `/js/storage.js`
+
+**Purpose:** Local persistence layer
+
+**Responsibilities:**
+
+* Wrapper over `localStorage`
+* Save / load tasks, sessions, progress
+* Prevent direct `localStorage` access elsewhere
+
+**Backend note (VERY IMPORTANT):**
+
+* This file will become the **bridge layer**:
+
+  * Local → Remote sync
+  * Offline‑first strategy
+* DO NOT let other files talk directly to backend APIs
+
+---
+
+### `/js/tasks.js`
+
+**Purpose:** Core study / task logic
+
+**Responsibilities:**
+
+* Create, update, delete tasks
+* Track task status
+* Link tasks to subjects
+
+**Backend note:**
+
+* Each task here maps 1:1 to a future backend entity
+* Keep task IDs stable and backend‑friendly
+
+---
+
+### `/js/subjects.js`
+
+**Purpose:** Subject & category management
+
+**Responsibilities:**
+
+* Define subject list
+* Map tasks to subjects
+* Drive subject‑based filtering and UI grouping
+
+**Backend note:**
+
+* Subjects should be backend‑controlled eventually
+* IDs must be stable (no array index‑based logic)
+
+---
+
+### `/js/timer.js`
+
+**Purpose:** Focus / session timer
+
+**Responsibilities:**
+
+* Start, pause, reset timers
+* Track elapsed time
+* Trigger session completion events
+
+**Backend note:**
+
+* Timer results should later be sent as session logs
+* Backend must accept partial sessions and crashes
+
+---
+
+### `/js/dialogs.js`
+
+**Purpose:** UI dialogs & modals
+
+**Responsibilities:**
+
+* Open / close dialogs
+* Confirm destructive actions
+* Display errors and information
+
+**UX note:**
+
+* This is where backend validation errors should surface cleanly
+
+---
+
+### `/js/analytics.js`
+
+**Purpose:** Local analytics tracking
+
+**Responsibilities:**
+
+* Track user actions
+* Store events locally
+* Log usage metrics
+
+**Backend note:**
+
+* Should later batch & send events to backend
+* Must never block UI interactions
+
+---
+
+### `/js/utils.js`
+
+**Purpose:** Shared helpers
+
+**Responsibilities:**
+
+* Formatting
+* ID generation
+* Date/time helpers
+
+**Backend note:**
+
+* Avoid logic duplication with backend
+* Treat utils as presentation helpers only
+
+---
+
+## 4. Current data model (inferred from code)
+
+### Task (current)
+
+```js
+{
+  id: string,
+  title: string,
+  subject: string,
+  completed: boolean,
+  createdAt: number
+}
+```
+
+### Session / Timer
+
+```js
+{
+  taskId: string,
+  startTime: number,
+  endTime: number,
+  duration: number
+}
+```
+
+---
+
+## 5. Product & UX assumptions baked into code
+
+* Single user per browser
+* No authentication
+* No multi‑device sync
+* Optimistic UI everywhere
+* Local state is source of truth
+
+Backend integration **must respect these assumptions initially** to avoid breaking UX.
+
+---
+
+## 6. How backend integration should be done (important)
+
+### Golden rules
+
+* ❌ Do NOT replace localStorage directly
+* ✅ Wrap backend calls inside `storage.js`
+* ✅ Keep UI logic untouched as much as possible
+
+### Suggested flow
+
+```
+UI → system.js → storage.js → API → backend
+```
+
+---
+
+## 7. Backend developer checklist (schema & API – CAREFUL)
+
+### General rules
+
+* Use **stable string IDs** (UUID preferred)
+* Return **camelCase JSON**
+* Never block UI on analytics calls
+* Support offline reconciliation
+
+---
+
+### Core entities
+
+#### User
+
+```json
+{
+  "id": "uuid",
+  "name": "string",
+  "email": "string",
+  "createdAt": "ISO8601"
+}
+```
+
+---
+
+#### Subject
+
+```json
+{
+  "id": "string",
+  "name": "string",
+  "order": 1
+}
+```
+
+---
+
+#### Task
+
+```json
+{
+  "id": "uuid",
+  "title": "string",
+  "subjectId": "string",
+  "completed": false,
+  "createdAt": "ISO8601",
+  "updatedAt": "ISO8601"
+}
+```
+
+---
+
+#### Study Session
+
+```json
+{
+  "id": "uuid",
+  "taskId": "uuid",
+  "startTime": "ISO8601",
+  "endTime": "ISO8601",
+  "durationSeconds": 1500
+}
+```
+
+---
+
+#### Analytics Event
+
+```json
+{
+  "id": "uuid",
+  "type": "TASK_CREATED | TIMER_STARTED | SESSION_COMPLETED",
+  "payload": {},
+  "createdAt": "ISO8601"
+}
+```
+
+---
+
+## 8. Required API endpoints (minimum)
+
+### Auth (future‑proof, optional initially)
+
+* `POST /auth/login`
+* `POST /auth/logout`
+
+---
+
+### Core data sync
+
+* `GET /subjects`
+* `GET /tasks`
+* `POST /tasks`
+* `PATCH /tasks/:id`
+* `DELETE /tasks/:id`
+
+---
+
+### Sessions
+
+* `POST /sessions`
+* `GET /sessions?taskId=`
+
+---
+
+### Analytics
+
+* `POST /events/batch`
+
+---
+
+## 9. Backend DO‑NOT‑BREAK checklist
+
+* [ ] Do NOT require frontend to change DOM structure
+* [ ] Do NOT change task shape without versioning
+* [ ] Do NOT return snake_case
+* [ ] Do NOT enforce auth on day one
+* [ ] Do NOT block writes due to analytics failure
+
+---
+
+## 10. Final note (important)
+
+This project is **frontend‑logic heavy and backend‑agnostic by design**.
+
+A good backend will:
+
+* Treat frontend as the UX authority
+* Adapt to existing task/session logic
+* Gradually replace localStorage with sync, not disruption
+
+---
+
+**This README is now aligned with the real codebase.**
