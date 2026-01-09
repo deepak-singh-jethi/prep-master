@@ -255,7 +255,7 @@ This app is meant to stay out of your way, work offline, respect your data, and 
 
 ## 📄 License
 
-MIT (recommended). Add a `LICENSE` file if distributing publicly.
+MIT
 
 ---
 
