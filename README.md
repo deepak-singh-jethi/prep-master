@@ -1,232 +1,201 @@
-# PrepMaster — v6.0.1
+# PrepMaster — v7.0.0
 
-> **The Ultimate Local‑First Study Planner for Competitive Exams**
+> **The Ultimate Local-First Study Planner for Competitive Exams**
 
-[![PrepMaster v6.0.1](https://img.shields.io/badge/version-6.0.1-blue?logo=github)](https://github.com)
-[![License: MIT](https://img.shields.io/badge/license-MIT-green)](#license)
-
----
-
-A compact, single‑file **vanilla JavaScript SPA** that runs entirely in your browser (`localStorage`‑backed). No build step, no backend required — designed to be *fast*, *offline*, and *easy to inspect*.
-
-This README was written after a full review of the repository so the text below is aligned with the exact code shipped in the `index.html` and `js/` modules.
+[![Version](https://img.shields.io/badge/version-7.0.0-blue)](#)
+[![Architecture](https://img.shields.io/badge/architecture-local--first-success)](#)
+[![Tech](https://img.shields.io/badge/tech-vanilla%20js%20spa-informational)](#)
 
 ---
 
-## Quick links
+PrepMaster is a **local-first, single-file Single Page Application (SPA)** built to help serious aspirants plan, execute, and analyze their preparation for competitive exams such as **UPSC, SSC, JEE, NEET**, and similar exams.
 
-* Live file: `index.html` (single entry point)
-* Important JS modules: `js/app.js`, `js/system.js`, `js/storage.js`, `js/tasks.js`, `js/timer.js`
-* Local storage key: `prepMasterData_v3`
-* Storage schema: `3.2`
-* Timer persist key: `prepMasterTimer`
+It is intentionally designed to be:
 
----
+* 📴 **Fully offline**
+* 🔐 **Private by default** (no login, no server)
+* ⚡ **Instant to start** (open → use)
+* 🧠 **Focused on execution quality, not vanity metrics**
 
-## Table of contents
-
-1. What this is (short)
-2. Quick start — run it like a human
-3. What I found (code inspection highlights)
-4. Feature map (user focused)
-5. Project structure (developer view)
-6. How data is stored & migration notes
-7. Recommended next steps (prioritised)
-8. Backend developer checklist & API schema (practical)
-9. Contributing, testing, license
+Everything runs **entirely in the browser** using `localStorage`.
 
 ---
 
-## 1) What this is (short)
+## ✨ What’s new in v7.0.0
 
-PrepMaster is a local‑first, offline study planner focused on short study sessions, syllabus tracking, and simple analytics. It’s ideal as a prototype or lightweight tool for personal use.
+v7 is a **stability + clarity release**. No philosophy change — just hardening what already works.
 
-Key philosophy: **the browser is the owner of the data** — this app keeps everything locally and avoids any server dependency.
+* Improved internal data consistency & schema validation
+* Clear separation of concerns between UI, state, and persistence
+* Safer localStorage handling with corruption fallback
+* More predictable timer persistence across reloads
+* README & documentation aligned with actual codebase
 
 ---
 
-## 2) Quick start — run it like a human
+## 🚀 Quick start (zero installation)
 
-1. Download `index.html` from the repo.
-2. Recommended: serve it with a simple static server (ES modules work most reliably this way):
+PrepMaster is a **zero-dependency app**.
+
+### Option A — Recommended (local server)
 
 ```bash
 # Python 3
 python3 -m http.server 8000
-# or Node (if you have npx)
+# or
 npx http-server -c-1 .
 ```
 
-3. Open [http://localhost:8000](http://localhost:8000) in your browser.
-4. Start by creating a Subject → add Topics → Add Task → ▶ Play.
+Open: [http://localhost:8000](http://localhost:8000)
 
-> Tip: The app *can* be opened directly via file:// in many browsers, but serving is more reliable across environments.
+### Option B — Direct open
+
+You *can* open `index.html` directly, but some browsers handle ES modules better when served.
 
 ---
 
-## 3) What I found (code inspection highlights — precise & useful)
+## 🧭 How to use (actual user flow)
 
-I inspected the repository files in `index.html` and `js/*.js`. Here are the important, actionable details.
+1. **Create Subjects** → add your core subjects (History, Polity, Physics, etc.)
+2. **Add Topics** → break subjects into manageable chapters
+3. **Plan Tasks** → assign a topic + duration for the day
+4. **Start Studying** → ▶ start the timer
+5. **Zen Mode** → click the bottom timer bar for full-screen focus
+6. **Log Quality** → stop the timer, log actual time + focus score (1–5)
+7. **Review & Improve** → use analytics, backlog, and smart reviews
 
-### Storage and schema
+---
 
-* The app saves its main payload under `localStorage` key: `prepMasterData_v3`.
-* The saved JSON contains a `schema` field expected to be `3.2`.
+## 🗓️ Planning & Organization
 
-Snippet from `js/storage.js`:
+* **Dashboard**: Today’s focus, backlog, and daily progress at a glance
+* **Sprint Calendar**: Heat-map style calendar showing study density & patterns
+* **Curriculum Manager**: Hierarchical syllabus structure (**Subject → Topics**)
+* **Backlog Bucket**: Missed tasks are automatically carried forward
 
-```js
-const STORAGE_KEY = 'prepMasterData_v3';
-// payload contains { schema: 3.2, tasks, subjects, targetDate, lastBackup }
+---
+
+## ⏱️ Execution & Focus
+
+* **Global Timer**: Persistent study timer (survives reloads)
+* **Zen Mode**: Distraction-free full-screen study mode
+* **Focus Scoring**: Rate each session (1–5) to track *quality*, not just hours
+
+---
+
+## 📊 Analytics & Insights
+
+* Total study hours & session counts
+* Average focus quality
+* Subject-wise time distribution (visual)
+* Topic-level drill-down (time, sessions, last studied)
+* Smart flags for **Power Subjects** and **Weak Areas**
+* Lightweight spaced-review logic (Again / Hard / Good / Easy)
+
+---
+
+## 🛡️ Data, Privacy & Ownership
+
+* **Local-first by design** — data never leaves your device
+* Stored in browser `localStorage`
+* **Import / Export JSON** for backups & portability
+* Safe-guarded against corrupted saves (automatic backup key)
+
+---
+
+## 🛠️ Tech stack (intentionally boring)
+
+PrepMaster avoids frameworks and build tools on purpose.
+
+* **Core**: HTML5 + Vanilla JavaScript (ES6 modules)
+* **Styling**: Tailwind CSS (CDN)
+* **Icons**: FontAwesome (CDN)
+* **Fonts**: Inter & JetBrains Mono
+* **Storage**: Browser LocalStorage API
+* **Architecture**: Monolithic SPA (`index.html` + `js/` modules)
+
+---
+
+## 🗂️ Project structure (real codebase)
+
 ```
-
-If the `schema` mismatches, `validateData()` will report a version mismatch — the app will not silently accept older/newer schemas.
-
-### Timer persistence
-
-* Active timer state is persisted separately under `prepMasterTimer` so an active session survives a page reload.
-
-### Module system
-
-* The code uses **ES modules** (e.g., `import { ... } from './utils.js'`) and `type="module"` scripts. For reliable behavior, serve the app over HTTP rather than opening as raw file in all browsers.
-
-### UI / Design tech
-
-* Tailwind CSS loaded via CDN (no build step), FontAwesome icons, Google fonts.
-* The UI uses glassmorphism and dark/light theme toggles embedded in `index.html`.
-
-### Built‑in behaviors worth knowing
-
-* The app automatically moves missed tasks into a “Backlog” bucket.
-* Focus scoring & a small review UI exist (Again / Hard / Good / Easy) for each task — a simple SRS-like mechanism.
-* The app includes small analytics stored locally (no network calls) and a batch export/import mechanism exists in the UI.
-
----
-
-## 4) Feature map (user facing)
-
-* Dashboard: Today’s focus, time left, quick stats.
-* Sprint calendar with heatmap indicators.
-* Subjects → Topics hierarchical curriculum manager.
-* Create/Start tasks with duration, run a persistent timer.
-* Zen Mode: full‑screen distraction‑free timer with scoring.
-* Export / Import (JSON) for backups.
-* Basic analytics: time per subject, sessions count, average focus.
-
----
-
-## 5) Project structure (developer view)
-
-```
-index.html                # Single SPA file — markup, styles, tailwind config
+index.html                 # Single entry point (UI + Tailwind config)
 js/
-  ├─ app.js               # Bootstraps `window.app`, wires UI to modules
-  ├─ system.js            # App-level utilities, backup checks, UI orchestration
-  ├─ storage.js           # localStorage wrapper, save/load/validate
-  ├─ tasks.js             # Task creation, card rendering, review buttons
-  ├─ subjects.js          # Subject/topic CRUD and UI lists
-  ├─ timer.js             # Timer state, elapsed calculation, persist/restore
-  ├─ dialogs.js           # Small queuing modal system (alert/confirm/prompt)
-  └─ utils.js             # generateUUID, formatDate and helpers
+ ├─ app.js                 # App bootstrap
+ ├─ system.js              # Global orchestration & UI coordination
+ ├─ storage.js             # LocalStorage abstraction + validation
+ ├─ tasks.js               # Task & review logic
+ ├─ subjects.js            # Subject / topic management
+ ├─ timer.js               # Persistent timer engine
+ ├─ dialogs.js             # Modal & confirmation system
+ └─ utils.js               # Shared helpers (IDs, dates, formatting)
 ```
-
-Notes:
-
-* Files are small and readable — a good candidate for incremental refactor.
-* All network‑related code is absent by design — any API integration should be introduced through `storage.js` or a new `sync.js` shim.
 
 ---
 
-## 6) How data is stored & migration notes (important!)
+## 💾 Local data model (v7)
 
-### Primary storage format (current)
-
-Main object stored at `prepMasterData_v3` looks like:
+**Storage key**: `prepMasterData_v3`
 
 ```json
 {
   "schema": 3.2,
-  "tasks": [ /* array of task objects */ ],
-  "subjects": [ /* array of subjects */ ],
-  "targetDate": "2026-02-01",
-  "lastBackup": "2026-01-09T12:00:00.000Z"
+  "subjects": [],
+  "tasks": [],
+  "targetDate": "YYYY-MM-DD",
+  "lastBackup": "ISO8601"
 }
 ```
 
-**Task shape (inferred)**
+**Task (conceptual)**
 
 ```json
 {
   "id": "uuid",
   "title": "string",
-  "subject": "subjectId or name",
-  "duration": 45,        // planned minutes
-  "actualTime": 30,      // minutes logged
+  "subject": "subjectId",
+  "duration": 45,
+  "actualTime": 30,
   "completed": false,
   "createdAt": "ISO8601"
 }
 ```
 
-### Corruption & backups
-
-* If `loadFromStorage()` finds invalid JSON, it creates a backup key suffixed with `_corrupted` and returns `null` — so the original is preserved. Good safety practice.
-
-### Migration guidance
-
-If you want to introduce a backend or change schema:
-
-1. Add a `migration` module that reads old schemas and maps to the new format.
-2. Update `storage.js` to call migrations during `loadFromStorage()`.
-3. Keep `schema` bumping and a `migrations/` folder with reversible steps.
+Active timer state is stored separately under `prepMasterTimer`.
 
 ---
 
-## 7) Recommended next steps (prioritised)
+## 🔮 Backend-ready (without breaking local-first)
 
-**P0 — Safe, small changes (do first)**
+PrepMaster **does not require a backend**, but it is designed so one can be added later *without rewriting the UI*.
 
-* Implement an API shim inside `js/storage.js` (a `syncToServer()` function) that can be toggled on/off.
-* Add a `migrations` function to handle schema changes without losing user data.
-* Add a small test page or instructions for automatic backups (download JSON export).
+### Integration rules (non-negotiable)
 
-**P1 — Backend readiness**
-
-* Create a `sync.js` that batches analytics and session uploads (`/events/batch`).
-* Add an optional local dev flag `USE_MOCK_API` to route requests to a mock server.
-
-**P2 — Nice to have**
-
-* Move CSS tokens out to a `styles/` file and keep `index.html` minimal.
-* Add E2E smoke test (open page → create subject → add task → start timer).
+* UI remains optimistic and offline-capable
+* Backend sync must be optional
+* LocalStorage remains the source of truth initially
+* Server adapts to existing data shape (not the other way around)
 
 ---
 
-## 8) Backend developer checklist & API schema (practical)
+## 📡 Backend developer checklist (v7 contract)
 
-This app is local‑first — **server integration must not break the offline UX**. Introduce server sync as an opt‑in, eventually replace local writes by syncing and reconciling, not by forcing clients to change shape.
+### General
 
-### Minimal API surface (recommended)
+* Use **camelCase JSON**
+* Use stable UUIDs
+* Accept idempotent writes
+* Never block UI on analytics
 
-All responses use **camelCase** and timestamps in ISO8601 UTC.
+### Core entities
 
-#### Auth (optional for later)
+**Subject**
 
-`POST /auth/login` → `{ user, token }`
-`POST /auth/refresh` → `{ token }`
+```json
+{ "id": "string", "name": "string", "order": 1 }
+```
 
-#### Subjects
-
-`GET /api/v1/subjects` → `{ data: [ { id, name, order } ] }`
-`POST /api/v1/subjects` → create subject
-
-#### Tasks
-
-`GET /api/v1/tasks?since=...` → `{ data: [task] }`
-`POST /api/v1/tasks` → `{ task }`
-`PATCH /api/v1/tasks/:id` → `{ task }`
-`DELETE /api/v1/tasks/:id`
-
-**Task JSON (align with local data)**
+**Task**
 
 ```json
 {
@@ -234,61 +203,60 @@ All responses use **camelCase** and timestamps in ISO8601 UTC.
   "title": "string",
   "subjectId": "string",
   "duration": 45,
-  "actualTime": 15,
+  "actualTime": 30,
   "completed": false,
   "createdAt": "ISO8601",
   "updatedAt": "ISO8601"
 }
 ```
 
-#### Sessions / Timer
-
-`POST /api/v1/sessions` — send completed session
+**Study Session**
 
 ```json
-{ "taskId":"uuid","startTime":"ISO8601","endTime":"ISO8601","durationSeconds":1500 }
+{
+  "id": "uuid",
+  "taskId": "uuid",
+  "startTime": "ISO8601",
+  "endTime": "ISO8601",
+  "durationSeconds": 1500,
+  "focusScore": 4
+}
 ```
 
-#### Analytics
+### Minimal endpoints (future)
 
-`POST /api/v1/events/batch` — accepts an array of local events (non‑blocking)
-
-**Important server rules**
-
-* Do **not** force the client to change DOM or task shape: provide a compatibility layer.
-* Accept upserts for tasks and return the authoritative resource.
-* Support idempotent requests (client may retry). Use request IDs or allow posting client IDs.
-
----
-
-## 9) Contributing, testing & license
-
-* Small repo, single file architecture — keep changes minimal and document migrations in `README`.
-* License: MIT recommended (please add `LICENSE` file).
-
-### Test suggestions
-
-* Manual smoke test: create subject → create task → start timer → stop → export JSON → import JSON.
-* Add unit tests for `storage.js` migration logic.
+* `GET /api/v1/subjects`
+* `GET /api/v1/tasks`
+* `POST /api/v1/tasks`
+* `PATCH /api/v1/tasks/:id`
+* `POST /api/v1/sessions`
+* `POST /api/v1/events/batch`
 
 ---
 
-## Final, human‑to‑human notes (why I’d use this app)
+## 🧪 Testing (manual but effective)
 
-PrepMaster is delightful because it **keeps friction low** — open the file, start studying. The UX choices (Zen mode, focus scoring, heatmap calendar, backlog capture) are pragmatic and match what high performers use: tracking focused time and reflecting on quality rather than raw grind. It’s also a great seed project to evolve into a syncable product while preserving offline-first behavior.
-
-If you want, I can now:
-
-* Produce a **machine‑readable `docs/api_contract.md`** that exactly matches the local task shapes (ready for backend devs).
-* Implement a **lightweight `sync.js` shim** inside the repo that demonstrates a no‑op server sync + safe retries.
-* Create **exported markdown release notes** and a polished `LICENSE` file.
-
-Which of these should I generate next? 👇
-
-* [ ] API contract (docs/api_contract.md)
-* [ ] `sync.js` shim + example server responses
-* [ ] LICENSE (MIT)
+* Create subject → topic → task
+* Start timer → reload page → verify persistence
+* Stop timer → log focus → check analytics
+* Export JSON → clear storage → import JSON
 
 ---
 
-*Prepared after a code review of the shipped repo. If you want this README written to a specific style (brand colors, more screenshots, or a shorter TL;DR), tell me and I’ll refine it.*
+## 📌 Philosophy (why this exists)
+
+PrepMaster is built on one belief:
+
+> *Consistency beats intensity — but only if you measure quality.*
+
+This app is meant to stay out of your way, work offline, respect your data, and help you execute every single day.
+
+---
+
+## 📄 License
+
+MIT (recommended). Add a `LICENSE` file if distributing publicly.
+
+---
+
+**PrepMaster v7.0.0** — stable, local-first, distraction-free.
