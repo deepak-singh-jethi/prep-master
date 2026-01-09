@@ -161,6 +161,113 @@
     .dark .overtime-warning {
         background-color: rgba(69, 26, 3, 0.2); /* Dark amber bg tint */
     }
+/* ===============================
+   UI/UX UPGRADE: HEATMAP & CONTRAST
+   =============================== */
+
+/* 1. Base Card: Sharper borders for better grid definition */
+.day-cell-base {
+    position: relative;
+    background: #1e293b !important; /* Slate-800 */
+    border: 1px solid #334155 !important; /* Slate-700 */
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+    transition: all 0.2s ease;
+    overflow: hidden;
+}
+.day-cell-base:hover {
+    border-color: #94a3b8 !important; /* Lighten border on hover */
+    transform: translateY(-2px);
+    z-index: 10;
+}
+
+/* 2. Past Days (Empty): Distinct "Void" look */
+.heat-past-empty {
+    background: #0f172a !important; /* Darker Slate-900 */
+    border: 1px dashed #475569 !important; /* Dashed Slate-600 */
+    opacity: 0.7;
+}
+/* Add a subtle diagonal stripe to indicate "passed time" */
+.heat-past-empty::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: repeating-linear-gradient(
+        45deg,
+        rgba(255, 255, 255, 0.03) 0px,
+        rgba(255, 255, 255, 0.03) 2px,
+        transparent 2px,
+        transparent 8px
+    );
+}
+
+/* 3. Heatmap Colors: High Contrast "Glass" Style */
+/* Missed (Red): Dark bg + Bright Border */
+.heat-missed {
+    background: rgba(69, 10, 10, 0.6) !important; /* Dark Red */
+    border: 1px solid #ef4444 !important; /* Bright Red */
+}
+
+/* Low (Emerald Tint): Subtle but visible */
+.heat-low {
+    background: rgba(6, 78, 59, 0.4) !important; /* Dark Green */
+    border: 1px solid #059669 !important;
+}
+
+/* Medium (Emerald Solid): Clear progress */
+.heat-med {
+    background: rgba(5, 150, 105, 0.5) !important;
+    border: 1px solid #34d399 !important;
+}
+
+/* High (Bright Emerald): Success state */
+.heat-high {
+    background: rgba(16, 185, 129, 0.6) !important;
+    border: 1px solid #6ee7b7 !important;
+}
+
+/* Perfect (Glow): The "Win" state */
+.heat-perfect {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.8), rgba(4, 120, 87, 0.9)) !important;
+    border: 1px solid #a7f3d0 !important;
+    box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);
+}
+
+
+
+/* Default States (Dark Backgrounds) */
+.text-dim { color: #94a3b8; font-size: 0.65rem; font-weight: 600; }
+.text-active { color: #f1f5f9; font-weight: 800; }
+.text-pct-missed { color: #fca5a5; } /* Pastel Red */
+.text-pct-progress { color: #6ee7b7; } /* Pastel Green */
+
+/* --- THE FIX: Force White Text on Green Backgrounds --- */
+/* When the parent card is 'heat-high' or 'heat-perfect', make the text white */
+
+.heat-high .text-slate-500, 
+.heat-perfect .text-slate-500 {
+    color: rgba(255, 255, 255, 0.95) !important; /* Day Number & Task Count */
+}
+
+.heat-high .text-pct-progress,
+.heat-perfect .text-pct-progress {
+    color: #ffffff !important; /* 100% Text */
+    text-shadow: 0 1px 2px rgba(0,0,0,0.2); /* Subtle drop shadow for readability */
+}
+
+.heat-high .border-t, 
+.heat-perfect .border-t {
+    border-color: rgba(255, 255, 255, 0.2) !important; /* Make the separator line white-ish */
+}
+
+/* Optional: Improve Red contrast too */
+.heat-missed .text-slate-500 {
+    color: rgba(255, 200, 200, 0.8) !important;
+}
+.heat-missed .text-pct-missed {
+    color: #ffffff !important;
+    font-weight: 800;
+}
 
 </style>
 </head>
