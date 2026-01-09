@@ -69,6 +69,20 @@
         }
     }
 </script>
+<script>
+    (function() {
+        const stored = localStorage.getItem('theme');
+        const sysDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        
+        if (stored === 'dark' || (!stored && sysDark)) {
+            document.documentElement.classList.add('dark');
+            document.documentElement.classList.remove('light');
+        } else {
+            document.documentElement.classList.remove('dark');
+            document.documentElement.classList.add('light');
+        }
+    })();
+</script>
 <style>
     /* FIX: Prevents layout jump when scrollbar appears/disappears */
     html { scrollbar-gutter: stable; }
