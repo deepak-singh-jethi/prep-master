@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PrepMaster - Finish Your Syllabus</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        brand: {
+                            dark: '#0f172a', // Slate 900
+                            card: '#1e293b', // Slate 800
+                            accent: '#3b82f6', // Blue 500
+                            glow: '#60a5fa', // Blue 400
+                        }
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom Styles for Glassmorphism & Gradients */
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .hero-glow {
+            background: radial-gradient(circle at center, rgba(59, 130, 246, 0.15) 0%, rgba(15, 23, 42, 0) 70%);
+        }
+        .text-gradient {
+            background: linear-gradient(to right, #60a5fa, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+    </style>
+</head>
+<body class="bg-brand-dark text-slate-100 font-sans antialiased overflow-x-hidden">
+
+    <nav class="fixed w-full z-50 glass-panel border-b border-white/5">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex-shrink-0 flex items-center gap-2 cursor-pointer hover:opacity-80 transition">
+                    <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                        <i class="fa-solid fa-layer-group text-white text-sm"></i>
+                    </div>
+                    <span class="font-bold text-xl tracking-tight">PrepMaster</span>
+                </div>
+                <div class="hidden md:flex space-x-8 text-sm font-medium text-slate-300">
+                    <a href="#features" class="hover:text-white transition">Features</a>
+                    <a href="#demo" class="hover:text-white transition">Demo</a>
+                    <a href="#pricing" class="hover:text-white transition">Pricing</a>
+                </div>
+                <div>
+                    <a href="#start" class="hidden md:inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 transition shadow-lg shadow-blue-900/50">
+                        Get Started
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <section class="relative pt-32 pb-20 lg:pt-40 lg:pb-28 overflow-hidden">
+        <div class="absolute inset-0 hero-glow z-0 pointer-events-none"></div>
+        
+        <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-2 gap-12 items-center">
+            
+            <div class="text-center lg:text-left">
+                <div class="inline-flex items-center px-3 py-1 rounded-full border border-blue-500/30 bg-blue-500/10 text-blue-300 text-xs font-semibold tracking-wide uppercase mb-6">
+                    <span class="w-2 h-2 rounded-full bg-blue-400 mr-2 animate-pulse"></span>
+                    v2.0 Now Live
+                </div>
+                
+                <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight leading-tight mb-6">
+                    Finish your syllabus with a <span class="text-gradient">study plan</span> that actually works.
+                </h1>
+                
+                <p class="text-lg text-slate-400 mb-8 max-w-2xl mx-auto lg:mx-0">
+                    PrepMaster — smart planner, focus sessions, and analytics made for competitive exams. Stop planning, start studying.
+                </p>
+                
+                <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mb-8">
+                    <a href="#" class="px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold text-lg shadow-lg shadow-blue-600/30 transition transform hover:-translate-y-1">
+                        Explore Free Planner
+                    </a>
+                    <button class="px-8 py-4 glass-panel hover:bg-white/10 text-white rounded-lg font-semibold text-lg border border-white/20 transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-play text-blue-400 text-sm"></i> See 60s Demo
+                    </button>
+                </div>
+
+                <p class="text-sm text-slate-500 flex items-center justify-center lg:justify-start gap-2">
+                    <i class="fa-solid fa-check-circle text-green-500"></i>
+                    Trusted by 18,000+ aspirants · Built for UPSC/State/SSC prep
+                </p>
+            </div>
+
+            <div class="relative group">
+                <div class="absolute -inset-1 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl blur opacity-30 group-hover:opacity-50 transition duration-1000"></div>
+                
+                <div class="relative rounded-2xl bg-brand-card border border-white/10 shadow-2xl overflow-hidden aspect-[16/10]">
+                    <img src="https://placehold.co/800x500/1e293b/FFF?text=Dashboard+UI+Preview" alt="PrepMaster Dashboard" class="w-full h-full object-cover opacity-90">
+                    
+                    <div class="absolute bottom-6 right-6 glass-panel px-4 py-3 rounded-lg flex items-center gap-3 shadow-xl animate-bounce">
+                        <div class="bg-green-500/20 p-2 rounded-full text-green-400">
+                            <i class="fa-solid fa-chart-line"></i>
+                        </div>
+                        <div>
+                            <div class="text-xs text-slate-400">Daily Goal</div>
+                            <div class="font-bold text-white">92% Complete</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="demo" class="py-20 bg-slate-900/50 border-y border-white/5">
+        <div class="max-w-5xl mx-auto px-4 text-center">
+            <h2 class="text-2xl font-bold mb-8">Try the Focus Mode <span class="text-slate-500 font-normal text-lg ml-2">(No signup required)</span></h2>
+            
+            <div class="glass-panel rounded-xl p-1 max-w-3xl mx-auto shadow-2xl ring-1 ring-white/10">
+                <div class="bg-slate-950 rounded-lg p-6 text-left">
+                    <div class="flex justify-between items-center mb-6 border-b border-white/10 pb-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-3 h-3 rounded-full bg-red-500"></div>
+                            <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+                            <div class="w-3 h-3 rounded-full bg-green-500"></div>
+                        </div>
+                        <div class="text-xs text-slate-500 font-mono">Today's Schedule: Modern History</div>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row gap-6">
+                        <div class="flex-1 space-y-3">
+                            <div class="flex items-center justify-between p-3 bg-slate-900 rounded border border-white/5 group hover:border-blue-500/50 transition cursor-pointer" onclick="toggleTask(this)">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-5 h-5 rounded border border-slate-600 flex items-center justify-center checkbox"><i class="fa-solid fa-check text-xs text-transparent transition"></i></div>
+                                    <span class="text-sm text-slate-300">Read: 1857 Revolt (Spectrum)</span>
+                                </div>
+                                <span class="text-xs text-slate-500">45m</span>
+                            </div>
+                            <div class="flex items-center justify-between p-3 bg-slate-900 rounded border border-white/5 group hover:border-blue-500/50 transition cursor-pointer" onclick="toggleTask(this)">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-5 h-5 rounded border border-slate-600 flex items-center justify-center checkbox"><i class="fa-solid fa-check text-xs text-transparent transition"></i></div>
+                                    <span class="text-sm text-slate-300">Map Practice: Western Ghats</span>
+                                </div>
+                                <span class="text-xs text-slate-500">30m</span>
+                            </div>
+                        </div>
+
+                        <div class="w-full sm:w-48 bg-slate-900 rounded border border-white/5 p-4 flex flex-col items-center justify-center">
+                            <div class="relative w-24 h-24 mb-3">
+                                <svg class="w-full h-full -rotate-90" viewBox="0 0 36 36">
+                                    <path class="text-slate-800" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="4" />
+                                    <path id="demo-progress" class="text-blue-500 transition-all duration-1000 ease-out" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="4" />
+                                </svg>
+                                <div class="absolute inset-0 flex items-center justify-center text-lg font-bold" id="demo-percentage">0%</div>
+                            </div>
+                            <p class="text-xs text-slate-400">Daily Completion</p>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4 text-center">
+                         <p class="text-xs text-slate-500 italic">Click tasks above to update analytics instantly</p>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+    </section>
+
+    <section id="features" class="py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16">
+            <h2 class="text-3xl font-bold mb-4">Why Top Aspirants Switch</h2>
+        </div>
+        
+        <div class="grid md:grid-cols-3 gap-8">
+            <div class="glass-panel p-8 rounded-2xl hover:bg-slate-800 transition group">
+                <div class="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center mb-6 text-blue-400 group-hover:scale-110 transition">
+                    <i class="fa-solid fa-calendar-check text-xl"></i>
+                </div>
+                <h3 class="text-xl font-bold mb-3">Smart Planner</h3>
+                <p class="text-slate-400 mb-6 leading-relaxed">Auto-plan your weeks based on your target exam date and remaining syllabus. Adaptive rescheduling if you miss a day.</p>
+                <a href="#" class="text-blue-400 font-medium text-sm flex items-center hover:gap-2 transition-all">
+                    Try Smart Planner <i class="fa-solid fa-arrow-right ml-2 text-xs"></i>
+                </a>
+            </div>
+
+            <div class="glass-panel p-8 rounded-2xl hover:bg-slate-800 transition group">
+                <div class="w-12 h-12 bg-purple-500/20 rounded-lg flex items-center justify-center mb-6 text-purple-400 group-hover:scale-110 transition">
+                    <i class="fa-solid fa-stopwatch text-xl"></i>
+                </div>
+                <h3 class="text-xl font-bold mb-3">Focus & Pomodoro</h3>
+                <p class="text-slate-400 mb-6 leading-relaxed">Integrated focus sessions with deep-work analytics. Block distractions and track your actual 'in-the-zone' hours.</p>
+                <a href="#" class="text-purple-400 font-medium text-sm flex items-center hover:gap-2 transition-all">
+                    Start Focus Session <i class="fa-solid fa-arrow-right ml-2 text-xs"></i>
+                </a>
+            </div>
+
+            <div class="glass-panel p-8 rounded-2xl hover:bg-slate-800 transition group">
+                <div class="w-12 h-12 bg-green-500/20 rounded-lg flex items-center justify-center mb-6 text-green-400 group-hover:scale-110 transition">
+                    <i class="fa-solid fa-chart-pie text-xl"></i>
+                </div>
+                <h3 class="text-xl font-bold mb-3">Performance Analytics</h3>
+                <p class="text-slate-400 mb-6 leading-relaxed">See weak topics, completion trends & PYQ alignment. Know exactly where you stand against the competition.</p>
+                <a href="#" class="text-green-400 font-medium text-sm flex items-center hover:gap-2 transition-all">
+                    View My Stats <i class="fa-solid fa-arrow-right ml-2 text-xs"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-20 bg-slate-800 border-y border-white/5">
+        <div class="max-w-7xl mx-auto px-4 grid lg:grid-cols-2 gap-12 items-center">
+            <div>
+                <h2 class="text-3xl font-bold mb-6">Built for Serious Aspirants</h2>
+                <ul class="space-y-4 mb-8">
+                    <li class="flex items-start gap-3">
+                        <i class="fa-solid fa-check text-blue-500 mt-1"></i>
+                        <span class="text-lg">UPSC, State PCS, SSC, RRB — syllabus matched</span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <i class="fa-solid fa-check text-blue-500 mt-1"></i>
+                        <span class="text-lg">Data-backed syllabus tracking</span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <i class="fa-solid fa-check text-blue-500 mt-1"></i>
+                        <span class="text-lg">PYQ-aligned maps & tasks</span>
+                    </li>
+                </ul>
+                <a href="#" class="text-slate-300 underline decoration-blue-500 underline-offset-4 hover:text-white">Read our data methodology</a>
+            </div>
+
+            <div class="glass-panel rounded-xl overflow-hidden">
+                <div class="px-6 py-4 bg-slate-900/50 border-b border-white/10">
+                    <h4 class="font-semibold text-sm uppercase tracking-wider text-slate-400">Previous Year Question Analysis</h4>
+                </div>
+                <table class="w-full text-left">
+                    <thead class="bg-slate-900/30 text-xs uppercase text-slate-500">
+                        <tr>
+                            <th class="px-6 py-3">Topic</th>
+                            <th class="px-6 py-3">Trend (2015-24)</th>
+                            <th class="px-6 py-3">Avg Qs/Year</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-white/5 text-sm">
+                        <tr>
+                            <td class="px-6 py-4">Modern History</td>
+                            <td class="px-6 py-4 text-green-400"><i class="fa-solid fa-arrow-trend-up"></i> High</td>
+                            <td class="px-6 py-4">8-12</td>
+                        </tr>
+                        <tr>
+                            <td class="px-6 py-4">Polity</td>
+                            <td class="px-6 py-4 text-green-400"><i class="fa-solid fa-arrow-trend-up"></i> High</td>
+                            <td class="px-6 py-4">12-15</td>
+                        </tr>
+                        <tr>
+                            <td class="px-6 py-4">Art & Culture</td>
+                            <td class="px-6 py-4 text-yellow-400"><i class="fa-solid fa-minus"></i> Stable</td>
+                            <td class="px-6 py-4">4-6</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <section id="pricing" class="py-24 max-w-7xl mx-auto px-4">
+        <div class="text-center mb-16">
+            <h2 class="text-3xl font-bold mb-4">Simple, Transparent Pricing</h2>
+            <p class="text-slate-400">Invest in your career for less than the cost of a coffee/month.</p>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            <div class="glass-panel p-8 rounded-2xl border border-white/10 opacity-80 hover:opacity-100 transition">
+                <h3 class="text-xl font-bold mb-2">Free Starter</h3>
+                <div class="text-3xl font-bold mb-6">$0</div>
+                <ul class="space-y-3 mb-8 text-sm text-slate-300">
+                    <li class="flex gap-2"><i class="fa-solid fa-check text-slate-500"></i> Core Planner</li>
+                    <li class="flex gap-2"><i class="fa-solid fa-check text-slate-500"></i> 5 Projects/Subjects</li>
+                    <li class="flex gap-2"><i class="fa-solid fa-check text-slate-500"></i> 7-day Analytics History</li>
+                </ul>
+                <a href="#" class="block w-full py-3 text-center rounded-lg border border-white/20 hover:bg-white/5 transition">Get Started</a>
+            </div>
+
+            <div class="relative bg-gradient-to-b from-blue-900/40 to-slate-900 p-8 rounded-2xl border border-blue-500/50 shadow-2xl transform md:-translate-y-4">
+                <div class="absolute top-0 right-0 bg-blue-600 text-xs font-bold px-3 py-1 rounded-bl-lg rounded-tr-lg">MOST POPULAR</div>
+                <h3 class="text-xl font-bold mb-2 text-blue-400">Pro Aspirant</h3>
+                <div class="text-3xl font-bold mb-1">₹349<span class="text-base font-normal text-slate-400">/mo</span></div>
+                <div class="text-xs text-slate-500 mb-6">or ₹2,999/year (2 months free)</div>
+                
+                <ul class="space-y-3 mb-8 text-sm">
+                    <li class="flex gap-2"><i class="fa-solid fa-check text-blue-400"></i> Unlimited Projects</li>
+                    <li class="flex gap-2"><i class="fa-solid fa-check text-blue-400"></i> Full Analytics History</li>
+                    <li class="flex gap-2"><i class="fa-solid fa-check text-blue-400"></i> Priority Templates (Exam Specific)</li>
+                    <li class="flex gap-2"><i class="fa-solid fa-check text-blue-400"></i> Downloadable Reports</li>
+                </ul>
+                <a href="#" class="block w-full py-3 text-center rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold transition shadow-lg shadow-blue-900/50">Upgrade to Pro</a>
+            </div>
+
+            <div class="glass-panel p-8 rounded-2xl border border-white/10 opacity-80 hover:opacity-100 transition">
+                <h3 class="text-xl font-bold mb-2">Coaching / Bulk</h3>
+                <div class="text-3xl font-bold mb-6">Custom</div>
+                <ul class="space-y-3 mb-8 text-sm text-slate-300">
+                    <li class="flex gap-2"><i class="fa-solid fa-check text-slate-500"></i> Coaching Center Licensing</li>
+                    <li class="flex gap-2"><i class="fa-solid fa-check text-slate-500"></i> Cohort Analytics</li>
+                    <li class="flex gap-2"><i class="fa-solid fa-check text-slate-500"></i> Bulk Seat Discounts</li>
+                </ul>
+                <a href="#" class="block w-full py-3 text-center rounded-lg border border-white/20 hover:bg-white/5 transition">Book a Demo</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-20 border-t border-white/5 bg-slate-900">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="grid md:grid-cols-2 gap-12 items-center">
+                <div class="space-y-8">
+                    <blockquote class="text-xl italic text-slate-300 border-l-4 border-blue-500 pl-4">
+                        "I used PrepMaster to finish my Mains syllabus 2 weeks before the exam. The analytics kept me honest about my weak areas."
+                    </blockquote>
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-full bg-slate-700 flex items-center justify-center text-xl">👨‍🎓</div>
+                        <div>
+                            <div class="font-bold">Arjun K.</div>
+                            <div class="text-sm text-slate-500">UPSC CSE 2023 Aspirant</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-slate-800 p-6 rounded-lg text-center">
+                        <div class="text-3xl font-bold text-blue-400 mb-1">72%</div>
+                        <div class="text-sm text-slate-400">Tasks Completed on Time</div>
+                    </div>
+                    <div class="bg-slate-800 p-6 rounded-lg text-center">
+                        <div class="text-3xl font-bold text-purple-400 mb-1">18k+</div>
+                        <div class="text-sm text-slate-400">Active Students</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-20 max-w-7xl mx-auto px-4 text-center">
+        <h2 class="text-3xl font-bold mb-16">Get Started in 3 Steps</h2>
+        <div class="flex flex-col md:flex-row justify-between items-center relative">
+            <div class="hidden md:block absolute top-1/2 left-0 w-full h-0.5 bg-slate-800 -z-10 transform -translate-y-1/2"></div>
+            
+            <div class="bg-brand-dark p-6 w-full md:w-1/3">
+                <div class="w-16 h-16 bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4 border-4 border-brand-dark text-blue-500 text-xl font-bold relative z-10">1</div>
+                <h3 class="font-bold text-lg mb-2">Pick Exam & Date</h3>
+                <p class="text-sm text-slate-400">Select your target (e.g., UPSC 2026) and exam date.</p>
+            </div>
+            
+            <div class="bg-brand-dark p-6 w-full md:w-1/3">
+                <div class="w-16 h-16 bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4 border-4 border-brand-dark text-blue-500 text-xl font-bold relative z-10">2</div>
+                <h3 class="font-bold text-lg mb-2">Auto-Plan Weeks</h3>
+                <p class="text-sm text-slate-400">We generate a schedule. You edit tasks to fit your style.</p>
+            </div>
+            
+            <div class="bg-brand-dark p-6 w-full md:w-1/3">
+                <div class="w-16 h-16 bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4 border-4 border-brand-dark text-blue-500 text-xl font-bold relative z-10">3</div>
+                <h3 class="font-bold text-lg mb-2">Track & Improve</h3>
+                <p class="text-sm text-slate-400">Use Focus Mode to execute. Check analytics to improve.</p>
+            </div>
+        </div>
+        <div class="mt-12">
+            <a href="#" class="inline-block px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-full font-semibold transition">Create My Plan (Free)</a>
+        </div>
+    </section>
+
+    <section class="py-20 bg-slate-900/50">
+        <div class="max-w-3xl mx-auto px-4">
+            <h2 class="text-2xl font-bold text-center mb-12">Frequently Asked Questions</h2>
+            <div class="space-y-4">
+                <details class="group bg-slate-800 rounded-lg p-4 cursor-pointer">
+                    <summary class="flex justify-between items-center font-medium list-none">
+                        <span>How is this different from Google Calendar?</span>
+                        <span class="transition group-open:rotate-180"><i class="fa-solid fa-chevron-down"></i></span>
+                    </summary>
+                    <p class="text-slate-400 mt-4 text-sm leading-relaxed">
+                        Google Calendar is for appointments. PrepMaster is for outcomes. We track syllabus completion percentages, offer subject-specific templates, and provide analytics on your study efficiency, which a standard calendar cannot do.
+                    </p>
+                </details>
+
+                <details class="group bg-slate-800 rounded-lg p-4 cursor-pointer">
+                    <summary class="flex justify-between items-center font-medium list-none">
+                        <span>What exams are supported?</span>
+                        <span class="transition group-open:rotate-180"><i class="fa-solid fa-chevron-down"></i></span>
+                    </summary>
+                    <p class="text-slate-400 mt-4 text-sm leading-relaxed">
+                        Currently optimized for UPSC CSE, State PCS (UP/Bihar/MP), SSC CGL, and RRB. However, the custom planner works for any syllabus-based exam.
+                    </p>
+                </details>
+
+                <details class="group bg-slate-800 rounded-lg p-4 cursor-pointer">
+                    <summary class="flex justify-between items-center font-medium list-none">
+                        <span>Is my data private?</span>
+                        <span class="transition group-open:rotate-180"><i class="fa-solid fa-chevron-down"></i></span>
+                    </summary>
+                    <p class="text-slate-400 mt-4 text-sm leading-relaxed">
+                        Yes. Your study patterns and data are private. We do not sell user data to coaching institutes.
+                    </p>
+                </details>
+            </div>
+        </div>
+    </section>
+
+    <footer class="bg-slate-950 py-12 border-t border-white/5 text-sm text-slate-400">
+        <div class="max-w-7xl mx-auto px-4 grid md:grid-cols-4 gap-8 mb-8">
+            <div class="col-span-1 md:col-span-1">
+                <div class="flex items-center gap-2 mb-4 text-white">
+                     <i class="fa-solid fa-layer-group text-blue-500"></i> <span class="font-bold">PrepMaster</span>
+                </div>
+                <p>Data-driven prep for the serious aspirant.</p>
+            </div>
+            <div>
+                <h4 class="text-white font-semibold mb-3">Product</h4>
+                <ul class="space-y-2">
+                    <li><a href="#" class="hover:text-blue-400">Features</a></li>
+                    <li><a href="#" class="hover:text-blue-400">Pricing</a></li>
+                    <li><a href="#" class="hover:text-blue-400">Methodology</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="text-white font-semibold mb-3">Support</h4>
+                <ul class="space-y-2">
+                    <li><a href="#" class="hover:text-blue-400">Help Center</a></li>
+                    <li><a href="#" class="hover:text-blue-400">Contact Us</a></li>
+                    <li><a href="#" class="hover:text-blue-400">System Status</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="text-white font-semibold mb-3">Legal</h4>
+                <ul class="space-y-2">
+                    <li><a href="#" class="hover:text-blue-400">Privacy Policy</a></li>
+                    <li><a href="#" class="hover:text-blue-400">Terms of Service</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center pt-8 border-t border-white/5">
+            <div>&copy; 2024 PrepMaster Inc. All rights reserved.</div>
+            <div class="flex space-x-6 mt-4 md:mt-0">
+                <a href="#" class="hover:text-white"><i class="fa-brands fa-twitter"></i></a>
+                <a href="#" class="hover:text-white"><i class="fa-brands fa-instagram"></i></a>
+                <a href="#" class="hover:text-white"><i class="fa-brands fa-linkedin"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        let tasksCompleted = 0;
+        const totalTasks = 2;
+
+        function toggleTask(element) {
+            const checkbox = element.querySelector('.checkbox');
+            const checkIcon = checkbox.querySelector('i');
+            const isChecked = element.classList.contains('bg-slate-800'); // Check simplified state logic
+
+            if (!isChecked) {
+                // Mark as done
+                element.classList.add('bg-slate-800', 'border-blue-500');
+                element.classList.remove('border-white/5');
+                checkbox.classList.add('bg-blue-600', 'border-blue-600');
+                checkbox.classList.remove('border-slate-600');
+                checkIcon.classList.remove('text-transparent');
+                checkIcon.classList.add('text-white');
+                tasksCompleted++;
+            } else {
+                // Unmark
+                element.classList.remove('bg-slate-800', 'border-blue-500');
+                element.classList.add('border-white/5');
+                checkbox.classList.remove('bg-blue-600', 'border-blue-600');
+                checkbox.classList.add('border-slate-600');
+                checkIcon.classList.add('text-transparent');
+                checkIcon.classList.remove('text-white');
+                tasksCompleted--;
+            }
+
+            updateChart();
+        }
+
+        function updateChart() {
+            const percentage = Math.round((tasksCompleted / totalTasks) * 100);
+            const circle = document.getElementById('demo-progress');
+            const text = document.getElementById('demo-percentage');
+            
+            // Update Text
+            text.innerText = percentage + "%";
+            
+            // Update SVG Stroke (0, 100 is empty; 100, 100 is full)
+            circle.setAttribute('stroke-dasharray', `${percentage}, 100`);
+            
+            // Color Shift
+            if(percentage === 100) {
+                circle.classList.remove('text-blue-500');
+                circle.classList.add('text-green-500');
+            } else {
+                circle.classList.add('text-blue-500');
+                circle.classList.remove('text-green-500');
+            }
+        }
+    </script>
+</body>
+</html>
