@@ -536,73 +536,129 @@ window.app = {
         }
     },
 
-    renderCalendar() {
-        if (this.data.currentView !== 'calendar') return;
-        const grid = document.getElementById('calendarGrid');
-        grid.innerHTML = '';
+ renderCalendar() {
+    if (this.data.currentView !== 'calendar') return;
 
-        const year = this.data.calendarMonth.getFullYear();
-        const month = this.data.calendarMonth.getMonth();
+    const grid = document.getElementById('calendarGrid');
+    grid.innerHTML = '';
 
-        document.getElementById('calendarMonthLabel').innerText = this.data.calendarMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-        const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const year = this.data.calendarMonth.getFullYear();
+    const month = this.data.calendarMonth.getMonth();
+    const todayStr = formatDate(new Date());
 
-        const firstDay = new Date(year, month, 1).getDay();
-        for (let i = 0; i < firstDay; i++) {
-            grid.insertAdjacentHTML('beforeend', `<div class="h-24 md:h-28"></div>`);
+    document.getElementById('calendarMonthLabel').innerText =
+        this.data.calendarMonth.toLocaleDateString('en-US', {
+            month: 'long',
+            year: 'numeric'
+        });
+
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const firstDay = new Date(year, month, 1).getDay();
+
+    // Empty slots before month start
+    for (let i = 0; i < firstDay; i++) {
+        grid.insertAdjacentHTML('beforeend', `<div class="opacity-0"></div>`);
+    }
+
+    for (let day = 1; day <= daysInMonth; day++) {
+        const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        const tasksForDay = this.data.tasks.filter(t => t.date === dateStr);
+
+        const isPast = dateStr < todayStr;
+        const isFuture = dateStr > todayStr;
+        const isToday = dateStr === todayStr;
+
+        let baseClass = 'day-cell-base';
+        let heatClass = '';
+        let pct = 0;
+        let totalTasks = tasksForDay.length;
+
+        // ---------- HEAT LOGIC ----------
+        if (totalTasks > 0) {
+            const score = tasksForDay.reduce(
+                (acc, t) =>
+                    acc + (t.status === 'done' ? 1 : (t.status === 'partial' ? 0.5 : 0)),
+                0
+            );
+
+            pct = Math.round((score / totalTasks) * 100);
+
+            if (!isFuture) {
+                if (pct === 0) heatClass = 'heat-missed';
+                else if (pct <= 40) heatClass = 'heat-low';
+                else if (pct <= 75) heatClass = 'heat-med';
+                else if (pct < 100) heatClass = 'heat-high';
+                else heatClass = 'heat-perfect';
+            }
+        } 
+        else if (isPast) {
+            // 🔴 CRITICAL FIX: past day with 0 tasks
+            heatClass = 'heat-past-empty';
         }
 
-        for (let day = 1; day <= daysInMonth; day++) {
-            const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-            const tasksForDay = this.data.tasks.filter(t => t.date === dateStr && t.status !== 'backlog');
+        // ---------- INTENT ----------
+        let intentLabel = '';
+        let intentClass = '';
 
-            let bgClass = "bg-white dark:bg-gray-800";
-            let textClass = "text-gray-700 dark:text-gray-300";
-            let label = "";
+        if ([7, 14, 21, 28].includes(day)) {
+            intentClass = 'accent-rev';
+            intentLabel = `<span class="text-[8px] font-black text-amber-500">REV</span>`;
+        } 
+        else if (day >= 29) {
+            intentClass = 'accent-mock';
+            intentLabel = `<span class="text-[8px] font-black text-purple-400">MOCK</span>`;
+        }
 
-            if ([7, 14, 21, 28].includes(day)) {
-                bgClass = "bg-amber-50 dark:bg-amber-900/10";
-                textClass = "text-amber-700 dark:text-amber-500";
-                label = "REV";
-            } else if (day >= 29) {
-                bgClass = "bg-purple-50 dark:bg-purple-900/10";
-                textClass = "text-purple-700 dark:text-purple-400";
-                label = "MOCK";
-            }
+        // ---------- DISPLAY ----------
+        const taskDisplay = totalTasks > 0 ? `${totalTasks}T` : '0T';
+        const pctDisplay = totalTasks > 0 ? `${pct}%` : '--%';
+        const pctColor =
+            totalTasks > 0
+                ? (pct === 0 ? 'text-red-400' : 'text-emerald-400')
+                : 'text-slate-600';
 
-            let dots = "";
-            if (tasksForDay.length > 0) {
-                const completed = tasksForDay.filter(t => t.status === 'done').length;
-                const ratio = completed / tasksForDay.length;
+        const html = `
+            <div onclick="app.openTaskModal('${dateStr}')"
+                 class="${baseClass} ${heatClass} ${intentClass}
+                        ${isToday ? 'ring-2 ring-primary z-10 scale-[1.02] shadow-glow' : ''}
+                        rounded-xl h-24 md:h-28 p-3 flex flex-col justify-between
+                        cursor-pointer group hover:border-white/20 transition-all">
 
-                let colorClass = "bg-gray-300 dark:bg-gray-600";
-                if (ratio === 1) colorClass = "bg-secondary";
-                else if (ratio > 0) colorClass = "bg-blue-400";
-                else if (new Date(dateStr) < new Date() && ratio < 1) colorClass = "bg-red-400";
+                <div class="flex justify-between items-start">
+                    <span class="text-[10px] font-bold text-slate-500">${day}</span>
+                    ${intentLabel}
+                </div>
 
-                dots = `<div class="flex gap-0.5 mt-2 flex-wrap">
-                                ${Array(Math.min(tasksForDay.length, 4)).fill(0).map(() => `<div class="w-1.5 h-1.5 rounded-full ${colorClass}"></div>`).join('')}
-                                ${tasksForDay.length > 4 ? '<span class="text-[8px] text-gray-400 leading-none">+</span>' : ''}
-                            </div>`;
-            }
-
-            const todayClass = (dateStr === formatDate(new Date())) ? 'ring-2 ring-primary z-10' : '';
-
-            const html = `
-                    <div onclick="app.openTaskModal('${dateStr}')" class="${bgClass} ${todayClass} border border-gray-100 dark:border-gray-700 rounded-xl h-24 md:h-28 p-2 md:p-3 relative cursor-pointer hover:shadow-md transition-all flex flex-col justify-between group overflow-hidden">
-                        <div class="flex justify-between items-start">
-                            <span class="font-bold text-sm ${textClass}">${day}</span>
-                            <span class="text-[9px] font-bold text-gray-300 dark:text-gray-600 block uppercase tracking-wider group-hover:text-primary transition-colors">${label}</span>
-                        </div>
-                        <div class="mt-auto">
-                            ${dots}
-                            <span class="text-[9px] text-gray-400 mt-1 block">${tasksForDay.length > 0 ? tasksForDay.length + ' tasks' : ''}</span>
-                        </div>
+                <div class="flex flex-col gap-1">
+                    <div class="flex gap-1 mb-1 items-center">
+                        ${
+                            totalTasks > 0
+                                ? tasksForDay.slice(0, 4).map(t =>
+                                    `<div class="w-1.5 h-1.5 rounded-full ${
+                                        t.status === 'done'
+                                           ? 'bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.6)]' // Glow for done
+: 'bg-gray-400' 
+                                    }"></div>`
+                                ).join('')
+                                : '<div class="w-1 h-1 rounded-full bg-slate-800"></div>'
+                        }
                     </div>
-                `;
-            grid.insertAdjacentHTML('beforeend', html);
-        }
-    },
+
+                    <div class="flex justify-between items-end border-t border-white/5 pt-1">
+                        <span class="text-[9px] font-bold text-slate-500 tracking-tight">
+                            ${taskDisplay}
+                        </span>
+                        <span class="text-[9px] font-mono font-bold ${pctColor}">
+                            ${pctDisplay}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        grid.insertAdjacentHTML('beforeend', html);
+    }
+},
 
     renderSubjects() {
         if (this.data.currentView !== 'subjects') return;
