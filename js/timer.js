@@ -11,9 +11,11 @@ export const timerOps = {
         if (!app.data.activeTimer) return 0;
 
         let currentSegment = 0;
+       
         if (app.data.activeTimer.startTime !== null) {
             currentSegment = Math.max(0, Date.now() - app.data.activeTimer.startTime);
         }
+        
         return (app.data.activeTimer.accumulated || 0) + currentSegment;
     },
 
@@ -98,22 +100,28 @@ export const timerOps = {
         const zenOverlay = document.getElementById('zenModeOverlay');
         if (zenOverlay) zenOverlay.classList.add('hidden');
 
-        // Calculate Final Time
-        const finalElapsedMS = timerOps.getElapsedMS();
-        const finalMinutes = Math.ceil(finalElapsedMS / 1000 / 60);
-        const taskId = app.data.activeTimer.id;
-
-        // Save progress if silent (switching tasks)
-        if (silent) {
-            const task = app.data.tasks.find(t => t.id === taskId);
-            if (task) {
-                task.actualTime = finalMinutes;
-                if (task.status !== 'done') task.status = 'partial';
-                app.saveData();
-            }
+        // 1. Freeze Time Immediately
+      
+        if (app.data.activeTimer.startTime !== null) {
+            const now = Date.now();
+            const delta = Math.max(0, now - app.data.activeTimer.startTime);
+            app.data.activeTimer.accumulated = (app.data.activeTimer.accumulated || 0) + delta;
+            app.data.activeTimer.startTime = null; // Frozen
         }
 
-        // Cleanup
+        // Calculate final stats from frozen state
+        const finalElapsedMS = app.data.activeTimer.accumulated;
+        const finalMinutes = Math.ceil(finalElapsedMS / 1000 / 60);
+        const taskId = app.data.activeTimer.id;
+ 
+        const task = app.data.tasks.find(t => t.id === taskId);
+        if (task) {
+            task.actualTime = finalMinutes;
+            if (silent && task.status !== 'done') task.status = 'partial';
+            app.saveData();
+        }
+
+        // 3. Cleanup Active Timer
         if (app.data.timerInterval) {
             clearInterval(app.data.timerInterval);
             app.data.timerInterval = null;
@@ -124,7 +132,7 @@ export const timerOps = {
         timerOps.updateGlobalTimerUI();
         app.render();
 
-        // If not silent, open the Completion Modal
+        // 4. Trigger Completion UI
         if (!silent) {
             app.manualComplete(taskId, finalMinutes);
         }
